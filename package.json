@@ -1,0 +1,12 @@
+{
+  "name": "songstructor",
+  "version": "1.0.0",
+  "description": "Create music",
+  "main": "app.js",
+  "scripts": {
+    "start": "node app.js"
+  },
+  "dependencies": {
+    "tone": "^15.1.0"
+  }
+}
