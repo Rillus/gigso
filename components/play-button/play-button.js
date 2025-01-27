@@ -1,9 +1,9 @@
-import BaseComponent from './base-component.js';
+import BaseComponent from '../base-component.js';
 
 class PlayButton extends BaseComponent {
     constructor() {
       const template = `
-          <button id="play-button" class="transport-button">&#9654;</button>
+          <button id="play-button" data-testid="play-button" class="transport-button">&#9654;</button>
       `;
       super(template, null, false);
       this.button = this.querySelector('#play-button');

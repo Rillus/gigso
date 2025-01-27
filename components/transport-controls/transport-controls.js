@@ -1,9 +1,9 @@
-import BaseComponent from './base-component.js';
+import BaseComponent from '../base-component.js';
 
-class TransportControls extends BaseComponent {
+export default class TransportControls extends BaseComponent {
     constructor() {
         const template = `
-            <div class="transport-controls">
+            <div class="transport-controls" data-testid="transport-controls">
                 <play-button></play-button>
                 <stop-button></stop-button>
                 <loop-button></loop-button>
@@ -15,18 +15,14 @@ class TransportControls extends BaseComponent {
                 align-items: center;
                 justify-content: center;
                 margin-bottom: 10px;
+            }
 
-                *:first-child {
-                  button {
-                    border-radius: 5px 0 0 5px;
-                  }
-                }
+            .transport-controls > *:first-child button {
+                border-radius: 5px 0 0 5px;
+            }
 
-                *:last-child {
-                  button {
-                    border-radius: 0 5px 5px 0;
-                  }
-                }
+            .transport-controls > *:last-child button {
+                border-radius: 0 5px 5px 0;
             }
         `;
         super(template, styles, false);

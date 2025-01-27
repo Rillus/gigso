@@ -1,4 +1,4 @@
-class GigsoKeyboard extends HTMLElement {
+export default class GigsoKeyboard extends HTMLElement {
     constructor() {
         super();
         this.attachShadow({ mode: 'open' });
@@ -81,8 +81,6 @@ class GigsoKeyboard extends HTMLElement {
     render() {
         const octaves = parseInt(this.getAttribute('octaves')) || 1;
         const keys = this.generateKeys(octaves);
-
-        console.log(this.shadowRoot);
 
         this.shadowRoot.innerHTML = `
             <style>
