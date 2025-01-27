@@ -4,12 +4,12 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Gigso</title>
-    <script src="https://cdn.jsdelivr.net/npm/tone@next/build/Tone.js"></script>
+    <script src="/node_modules/tone/build/Tone.js"></script>
+    <script type="module" src="components/base-component.js"></script>
+    <link rel="stylesheet" href="styles.css">
 </head>
 <body>
     <h1>Gigso</h1>
-    <menu-toggle></menu-toggle>
-    <add-chord-form></add-chord-form>
     <div id="app"></div>
     <script type="module" src="components/play-button.js"></script>
     <script type="module" src="components/stop-button.js"></script>
@@ -19,6 +19,10 @@
     <script type="module" src="components/piano-roll.js"></script>
     <script type="module" src="components/menu-toggle.js"></script>
     <script type="module" src="components/add-chord-form.js"></script>
+    <script type="module" src="components/chord-palette.js"></script>
+    <script type="module" src="components/chord-diagram.js"></script>
+    <script type="module" src="components/record-collection.js"></script>
+    <script type="module" src="components/transport-controls.js"></script>
     <script type="module" src="piano.js"></script>
     <script src="app.js"></script>
 </body>

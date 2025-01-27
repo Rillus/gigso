@@ -28,6 +28,7 @@ class PianoRoll extends HTMLElement {
                     height: 100%;
                     border-right: 1px solid #ddd;
                     display: flex;
+                    flex-wrap: wrap;
                     align-items: center;
                     justify-content: center;
                     background: #e0e0e0;
@@ -36,6 +37,7 @@ class PianoRoll extends HTMLElement {
                     box-sizing: border-box;
                     position: relative;
                     cursor: move;
+                    overflow: hidden
                 }
                 .resize-handle {
                     position: absolute;
@@ -48,12 +50,11 @@ class PianoRoll extends HTMLElement {
                 }
                 .remove-button {
                     position: absolute;
+                    font-family: sans-serif;
                     top: 2px;
-                    right: 2px;
+                    right: 12px;
                     width: 16px;
                     height: 16px;
-                    background: red;
-                    color: white;
                     font-size: 12px;
                     text-align: center;
                     line-height: 16px;
@@ -76,6 +77,10 @@ class PianoRoll extends HTMLElement {
                     background: #f0f0f0;
                     padding: 10px;
                     border: 1px solid #ccc;
+                }
+                .chordName {
+                    width: 100%;
+                    text-align: center;
                 }
             </style>
             <div class="piano-roll">
@@ -126,8 +131,12 @@ class PianoRoll extends HTMLElement {
             this.loopActive = event.detail;
         });
 
+        this.addEventListener('load-song', (song) => {
+            this.loadSong(song.detail);
+        })
+
         // Dispatch a "ready" event when the component is fully initialized
-        const readyEvent = new CustomEvent('piano-roll-ready');
+        const readyEvent = new CustomEvent('isReady');
         this.dispatchEvent(readyEvent);
     }
 
@@ -137,12 +146,26 @@ class PianoRoll extends HTMLElement {
         this.updateChordDisplay();
     }
 
+    loadSong(song) {
+      console.log('loadSong', song);
+      this.chords = song.chords;
+      this.renderChords();
+    }
+
     renderChords() {
         this.reel.innerHTML = '';
         this.chords.forEach((chord, chordIndex) => {
             const chordBox = document.createElement('div');
             chordBox.classList.add('chord-box');
-            chordBox.textContent = chord.name;
+            
+            const chordText = document.createElement('p');
+            chordText.setAttribute('class', 'chordName')
+            chordText.textContent = chord.name;
+            chordBox.appendChild(chordText);
+            const chordDiagram = document.createElement('chord-diagram');
+            chordDiagram.setAttribute('chord', chord.name)
+            chordBox.appendChild(chordDiagram);
+
             chordBox.setAttribute(
               'style', 
               `width: ${this.chordWidth * chord.duration}px; 

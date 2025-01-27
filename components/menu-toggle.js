@@ -1,39 +1,73 @@
-class MenuToggle extends HTMLElement {
+import BaseComponent from "./base-component.js";
+class MenuToggle extends BaseComponent {
     constructor() {
-        super();
-        this.attachShadow({ mode: 'open' });
-        this.shadowRoot.innerHTML = `
-            <style>
-                .menu {
-                    display: flex;
-                    flex-direction: column;
-                    margin: 10px;
-                }
-                button {
-                    margin: 5px 0;
-                    padding: 10px;
-                    font-size: 16px;
-                    cursor: pointer;
-                }
-            </style>
-            <div class="menu">
-                <button data-target="current-chord-display">Toggle Chord Display</button>
-                <button data-target="gigso-keyboard">Toggle Keyboard</button>
-            </div>
+        const template = `
+            <div class="menu"></div>
         `;
+
+        const styles = `
+          .menu {
+            display: flex;
+            flex-direction: row;
+            flex-wrap: no-wrap;
+            gap: 10px;
+          }
+          button {
+              margin: 5px 0;
+              padding: 10px;
+              font-size: 16px;
+              cursor: pointer;
+              width: auto;
+          }
+          .isOff {
+            opacity: 0.5;
+          }
+          .isOn {
+            opacity: 1;
+          }
+        `;
+
+        super(template, styles);
     }
 
     connectedCallback() {
-        this.shadowRoot.querySelectorAll('button').forEach(button => {
-            button.addEventListener('click', () => {
-                const target = button.getAttribute('data-target');
-                const element = document.querySelector(target);
-                if (element) {
-                    element.style.display = element.style.display === 'none' ? 'block' : 'none';
-                }
-            });
+      const buttonList = [
+        {
+          target: "current-chord-display",
+          name: "Current Chord Display"
+        },
+        {
+          target: "gigso-keyboard",
+          name: "Keyboard"
+        },
+        {
+          target: "add-chord-form",
+          name: "Add Chord"
+        },
+      ];
+
+      const menuElement = this.shadowRoot.querySelector('.menu');
+
+      buttonList.forEach((button) => {
+        const newButton = document.createElement('button');
+        newButton.setAttribute('data-target', button.target);
+        newButton.textContent = `Toggle ${button.name}`;
+        newButton.addEventListener('click', () => {
+          const element = document.querySelector(button.target);
+          if (element) {
+ 
+            if (element.style.display === 'none') {
+              element.style.display = 'block';
+              newButton.setAttribute('class', 'isOn');
+            } else {
+              element.style.display = 'none';
+              newButton.setAttribute('class', 'isOff');
+            }
+          }
         });
+        menuElement.appendChild(newButton);
+      })
     }
 }
 
-customElements.define('menu-toggle', MenuToggle); 
+customElements.define('menu-toggle', MenuToggle);

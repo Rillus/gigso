@@ -1,26 +1,8 @@
-class AddChordForm extends HTMLElement {
+import BaseComponent from './base-component.js';
+
+class AddChordForm extends BaseComponent {
     constructor() {
-        super();
-        this.attachShadow({ mode: 'open' });
-        this.shadowRoot.innerHTML = `
-            <style>
-                .form-container {
-                    display: flex;
-                    flex-direction: column;
-                    gap: 10px;
-                    padding: 10px;
-                    border: 1px solid #ccc;
-                    background: #f9f9f9;
-                    margin-bottom: 10px;
-                }
-                label {
-                    font-size: 14px;
-                }
-                input, button {
-                    padding: 5px;
-                    font-size: 14px;
-                }
-            </style>
+        const template = `
             <div class="form-container">
                 <label>
                     Chord Name:
@@ -41,8 +23,28 @@ class AddChordForm extends HTMLElement {
                 <button id="add-chord-button">Add Chord</button>
             </div>
         `;
-
-        this.shadowRoot.querySelector('#add-chord-button').addEventListener('click', () => this.addChord());
+        const styles = `
+          .form-container {
+              display: flex;
+              flex-direction: column;
+              gap: 10px;
+              padding: 10px;
+              border: 1px solid #ccc;
+              background: #f9f9f9;
+              margin-bottom: 10px;
+          }
+          label {
+              font-size: 14px;
+          }
+          input, button {
+              padding: 5px;
+              font-size: 14px;
+          }
+        `;
+        super(template, styles);
+        this.addEventListeners([
+            {selector: '#add-chord-button', event: 'click', handler: () => this.addChord()},
+        ]);
     }
 
     addChord() {
@@ -53,7 +55,7 @@ class AddChordForm extends HTMLElement {
 
         if (name && notes.length > 0 && duration > 0) {
             const chord = { name, notes, duration, delay };
-            this.dispatchEvent(new CustomEvent('add-chord', { detail: chord }));
+            this.dispatchComponentEvent(null, 'add-chord', chord);
             this.clearForm();
         } else {
             alert('Please fill in all fields correctly.');

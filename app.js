@@ -1,66 +1,128 @@
 // Define a simple chord pattern with names
 const chords = [
-    { name: 'C', notes: ['C4', 'E4', 'G4'], duration: 1, delay: 0 },
-    { name: 'Dm', notes: ['D4', 'F4', 'A4'], duration: 0.5, delay: 0 },
-    { name: 'Em', notes: ['E4', 'G4', 'B4'], duration: 0.5, delay: 0 },
-    { name: 'F', notes: ['F4', 'A4', 'C5'], duration: 1, delay: 0 }
-];
+    {
+      "name": "C",
+      "notes": [
+        "C4",
+        "E4",
+        "G4"
+      ],
+      "duration": 1,
+      "delay": 0,
+      "startPosition": 0
+    },
+  ];
 
 const synth = new Tone.PolySynth(Tone.Synth).toDestination();
 let loopActive = false;
 let songPosition = 0;
 let isPlaying = false;
 
-const song = new Tone.Loop(time => {
-    // playChord(chords[songPosition]);
-    if (loopActive) {
-        songPosition = (songPosition + 1) % chords.length;
-    } else {
-        if ((songPosition + 1) % chords.length === 0) {
-            stopSong();
-        } else {
-            songPosition = (songPosition + 1) % chords.length;
-        }
-    }
-}, '2n');
-
 // Render components
 const appContainer = document.getElementById('app');
 
-const playButton = document.createElement('play-button');
-const stopButton = document.createElement('stop-button');
-const loopButton = document.createElement('loop-button');
-const chordDisplay = document.createElement('current-chord-display');
-const keyboard = document.createElement('gigso-keyboard');
-const pianoRollEle = document.createElement('piano-roll');
+const elementsToAdd = [
+    {
+        tag: 'menu-toggle'
+    },
+    {
+        tag: 'record-collection',
+        eventListeners: [
+            {
+                name: 'load-song',
+                function: (event) => {
+                    console.log('load-song to record-collection', event);
+                    const song = event.detail;
+                    dispatchComponentEvent('piano-roll', 'load-song', song);
+                }
+            }
+        ]
+    },
+    {  
+        tag: 'transport-controls',
+    },
+    {
+        tag: 'stop-button',
+        eventListeners: [
+            {
+                name: 'interact',
+                function: () => {}
 
-appContainer.appendChild(playButton);
-appContainer.appendChild(stopButton);
-appContainer.appendChild(loopButton);
-appContainer.appendChild(chordDisplay);
-appContainer.appendChild(keyboard);
-appContainer.appendChild(pianoRollEle);
+            }
+        ]
+    },
+    {
+        tag: 'loop-button',
+        eventListeners: [
+            {
+                name: 'interact',
+                function: () => {}
 
-const pianoRoll = document.querySelector('piano-roll');
-const addChordForm = document.querySelector('add-chord-form');
+            }
+        ]
+    },
+    {
+        tag: 'current-chord-display',
+    },
+    {
+        tag: 'chord-palette',
+        eventListeners: [
+            {
+                name: 'add-chord',
+                function: (event) => {
+                    console.log('add-chord to chord-palette')
+                    const chord = event.detail;
+                    dispatchComponentEvent('piano-roll', 'add-chord', chord);
+                }
+            }
+        ]
+    },
+    // {
+    //     tag: 'chord-diagram',
+    // },
+    {
+        tag: 'gigso-keyboard',
+    },
+    {
+        tag: 'piano-roll',
+        eventListeners: [
+            {
+                name: 'isReady',
+                function: () => {
+                    const addChordEvent = (chord) => {
+                        dispatchComponentEvent('piano-roll', 'add-chord', chord);
+                    };
+                
+                    for (const chord of chords) {
+                        addChordEvent(chord);
+                    }
+                }
+            },
+            {
+                name: 'play-chord',
+                function: (event) => {
+                    playChord(event.detail);
+                }
+            }
+        ]
+    },
+    {
+        tag: 'add-chord-form',
+        eventListeners: [
+            {
+                name: 'add-chord',
+                function: (event) => {
+                    console.log('add-chord to chord form', event);
+                    const chord = event.detail;
+                    dispatchComponentEvent('piano-roll', 'add-chord', chord);
+                }
+            }
+        ]
+    },
+];
 
-pianoRoll.addEventListener('piano-roll-ready', () => {
-    console.log('Piano roll is ready');
-
-    // Dispatch a custom event to add chords
-    const addChordEvent = (chord) => {
-        const event = new CustomEvent('add-chord', { detail: chord });
-        pianoRoll.dispatchEvent(event);
-    };
-
-    for (const chord of chords) {
-        addChordEvent(chord);
-    }
-});
-
-addChordForm.addEventListener('add-chord', (event) => {
-    const chord = event.detail;
-    pianoRoll.dispatchEvent(new CustomEvent('add-chord', { detail: chord }));
+elementsToAdd.forEach(element => {
+    addElement(element);
 });
 
 // Listen for custom events from the web components
@@ -68,68 +130,86 @@ document.body.addEventListener('play-clicked', async () => {
     await Tone.start();
     playSong();
     console.log('Audio is ready');
-    dispatchEvent('piano-roll', new CustomEvent('play'));
+    dispatchComponentEvent('piano-roll', 'play');
 });
 
 document.body.addEventListener('stop-clicked', () => {
     stopSong();
-    dispatchEvent('piano-roll', new CustomEvent('stop'));
+    dispatchComponentEvent('piano-roll', 'stop');
 });
 
 document.body.addEventListener('loop-clicked', () => {
     loopActive = !loopActive;
     if (loopActive) {
-        dispatchEvent('loop-button', new CustomEvent('activate'));
+        dispatchComponentEvent('loop-button', 'activate');
     } else {
-        dispatchEvent('loop-button', new CustomEvent('deactivate'));
+        dispatchComponentEvent('loop-button', 'deactivate');
     }
     // Dispatch the loop state to the piano-roll
-    dispatchEvent('piano-roll', new CustomEvent('set-loop', { detail: loopActive }));
-});
-
-// Listen for the custom 'add-chord' event
-document.querySelector('piano-roll').addEventListener('play-chord', (event) => {
-    const chord = event.detail;
-    playChord(chord);
+    dispatchComponentEvent('piano-roll', 'set-loop', loopActive);
 });
 
 function playChord({chord, duration}) {
-    const time = Tone.now();
-    console.log('time', time);
-    
+    const time = Tone.now();    
     synth.triggerAttackRelease(chord.notes, duration, time);
-    dispatchEvent('current-chord-display', new CustomEvent('set-chord', { detail: chord.name }));
-    dispatchEvent('gigso-keyboard', new CustomEvent('highlight-notes', { detail: {notes: chord.notes, duration: duration} }));
-    console.log(`Playing: ${chord.name}`);
+    dispatchComponentEvent('current-chord-display', 'set-chord', chord.name);
+    dispatchComponentEvent('chord-diagram', 'set-chord', chord.name );
+    dispatchComponentEvent(
+        'gigso-keyboard', 
+        'highlight-notes', 
+        { 
+            notes: chord.notes, 
+            duration: duration
+        }
+    );
 }
 
 function playSong() {
     if (isPlaying) return;
     isPlaying = true;
-    dispatchEvent('piano-roll', new CustomEvent('play'));
-    dispatchEvent('play-button', new CustomEvent('activate'));
-    dispatchEvent('stop-button', new CustomEvent('deactivate'));
+    dispatchComponentEvent('piano-roll', 'play');
+    dispatchComponentEvent('play-button', 'activate');
+    dispatchComponentEvent('stop-button', 'deactivate');
 }
 
 function stopSong() {
-    dispatchEvent('piano-roll', new CustomEvent('stop'));
-    dispatchEvent('current-chord-display', new CustomEvent('set-chord', { detail: null }));
+    dispatchComponentEvent('piano-roll', 'stop');
+    dispatchComponentEvent('chord-diagram', 'set-chord', null);
+    dispatchComponentEvent('current-chord-display', 'set-chord', null);
     if (!isPlaying) return;
     isPlaying = false ;
-    dispatchEvent('play-button', new CustomEvent('deactivate'));
-    dispatchEvent('stop-button', new CustomEvent('activate'));
+    dispatchComponentEvent('play-button', 'deactivate');
+    dispatchComponentEvent('stop-button', 'activate');
 }
 
 function pauseSong() {
     if (!isPlaying) return;
     isPlaying = false;
-    dispatchEvent('piano-roll', new CustomEvent('pause'));
-    dispatchEvent('play-button', new CustomEvent('deactivate'));
-    dispatchEvent('stop-button', new CustomEvent('activate'));
+    dispatchComponentEvent('piano-roll', 'pause');
+    dispatchComponentEvent('play-button', 'deactivate');
+    dispatchComponentEvent('stop-button', 'activate');
 }
 
-function dispatchEvent(selector, event) {
-    document.querySelector(selector).dispatchEvent(event);
+function dispatchComponentEvent(selector, eventName, eventDetails) {
+    const eleRef = document.querySelector(selector);
+    if (eleRef) {
+        eleRef.dispatchEvent(new CustomEvent(eventName, { detail: eventDetails }));
+    } else {
+        console.warn('Element not found', selector, 'when triggering event', eventName);
+    }
+}
+
+function addElement(element, styles) {
+    const newElement = document.createElement(element.tag);
+    const eleRef = appContainer.appendChild(newElement);
+
+    if (element.eventListeners) {
+        element.eventListeners.forEach((eventListener) => {
+            eleRef.addEventListener(eventListener.name, eventListener.function);
+        })
+    }
+
+    console.debug('Adding new element ', element)
 }
 
 document.addEventListener('keydown', async (event) => {
@@ -149,10 +229,10 @@ document.addEventListener('keydown', async (event) => {
     }
 
     if (event.code === 'ArrowRight') {
-        dispatchEvent('piano-roll', new CustomEvent('next-chord'));
+        dispatchComponentEvent('piano-roll', new CustomEvent('next-chord'));
     }
 
     if (event.code === 'ArrowLeft') {
-        dispatchEvent('piano-roll', new CustomEvent('previous-chord'));
+        dispatchComponentEvent('piano-roll', new CustomEvent('previous-chord'));
     }
 });

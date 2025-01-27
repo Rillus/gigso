@@ -1,22 +1,18 @@
-class LoopButton extends HTMLElement {
+import BaseComponent from './base-component.js';
+
+class LoopButton extends BaseComponent {
     constructor() {
-        super();
-        this.attachShadow({ mode: 'open' });
-        this.shadowRoot.innerHTML = `
-            <style>
-                button {
-                    font-size: 24px;
-                    background: none;
-                    border: none;
-                    cursor: pointer;
-                }
-                button.active {
-                    color: blue; /* Change this to your desired active color */
-                }
-            </style>
-            <button>&#x21BB;</button> <!-- Unicode for clockwise open circle arrow -->
+        const template = `
+            <button id="loop-button" class="transport-button">&#x21BB;</button>
         `;
-        this.button = this.shadowRoot.querySelector('button');
+        const styles = `
+            #loop-button {
+                font-size: 18px;
+                line-height: 17px;
+            }
+        `;
+        super(template, styles, false);
+        this.button = this.querySelector('button');
     }
 
     connectedCallback() {

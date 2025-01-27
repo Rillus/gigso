@@ -1,22 +1,19 @@
-class StopButton extends HTMLElement {
+import BaseComponent from './base-component.js';
+
+class StopButton extends BaseComponent {
     constructor() {
-        super();
-        this.attachShadow({ mode: 'open' });
-        this.shadowRoot.innerHTML = `
-            <style>
-                button {
-                    font-size: 24px;
-                    background: none;
-                    border: none;
-                    cursor: pointer;
-                }
-                button.active {
-                    color: red; /* Change this to your desired active color */
-                }
-            </style>
-            <button>&#9632;</button> <!-- Unicode for square -->
+        const template = `
+            <button id="stop-button" class="transport-button">&#9632;</button>
         `;
-        this.button = this.shadowRoot.querySelector('button');
+        const styles = `
+            #stop-button {
+                font-size: 18px;
+                line-height: 17px;
+            }
+        `;
+
+        super(template, styles, false);
+        this.button = this.querySelector('button');
     }
 
     connectedCallback() {
@@ -31,6 +28,11 @@ class StopButton extends HTMLElement {
 
     activate() {
         this.button.classList.add('active');
+
+        setTimeout(() => {
+            console.log('deactivating stop button');
+            this.deactivate();
+        }, 300);
     }
 
     deactivate() {
