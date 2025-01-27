@@ -1,6 +1,6 @@
-import BaseComponent from './base-component.js';
+import BaseComponent from '../base-component.js';
 
-class AddChordForm extends BaseComponent {
+export default class AddChord extends BaseComponent {
     constructor() {
         const template = `
             <div class="form-container">
@@ -70,4 +70,4 @@ class AddChordForm extends BaseComponent {
     }
 }
 
-customElements.define('add-chord-form', AddChordForm); 
+customElements.define('add-chord', AddChord); 

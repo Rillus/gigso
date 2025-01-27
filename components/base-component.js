@@ -1,6 +1,8 @@
 export default class BaseComponent extends HTMLElement {
   constructor(template, styles, isolatedStyles = true) {
       super();
+      this.isolatedStyles = isolatedStyles;
+      
       if (isolatedStyles) {
         this.attachShadow({ mode: 'open' });
         this.shadowRoot.innerHTML = `

@@ -27,7 +27,7 @@ const elementsToAdd = [
     },
     {
         tag: 'record-collection',
-        eventListeners: [
+        emittedEvents: [
             {
                 name: 'load-song',
                 function: (event) => {
@@ -46,7 +46,7 @@ const elementsToAdd = [
     },
     {
         tag: 'chord-palette',
-        eventListeners: [
+        emittedEvents: [
             {
                 name: 'add-chord',
                 function: (event) => {
@@ -65,7 +65,7 @@ const elementsToAdd = [
     },
     {
         tag: 'piano-roll',
-        eventListeners: [
+        emittedEvents: [
             {
                 name: 'isReady',
                 function: () => {
@@ -87,8 +87,8 @@ const elementsToAdd = [
         ]
     },
     {
-        tag: 'add-chord-form',
-        eventListeners: [
+        tag: 'add-chord',
+        emittedEvents: [
             {
                 name: 'add-chord',
                 function: (event) => {
@@ -183,9 +183,9 @@ function addElement(element, styles) {
     const newElement = document.createElement(element.tag);
     const eleRef = appContainer.appendChild(newElement);
 
-    if (element.eventListeners) {
-        element.eventListeners.forEach((eventListener) => {
-            eleRef.addEventListener(eventListener.name, eventListener.function);
+    if (element.emittedEvents) {
+        element.emittedEvents.forEach((emittedEvent) => {
+            eleRef.addEventListener(emittedEvent.name, emittedEvent.function);
         })
     }
 
