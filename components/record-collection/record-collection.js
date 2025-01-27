@@ -1,5 +1,5 @@
-import BaseComponent from "./base-component.js";
-import songLibrary from "../song-library.js";
+import BaseComponent from "../base-component.js";
+import songLibrary from "../../song-library.js";
 
 /**
  * Record Collection
@@ -10,7 +10,7 @@ import songLibrary from "../song-library.js";
  * - load-song: {song}
  * 
  */
-class RecordCollection extends BaseComponent {
+export default class RecordCollection extends BaseComponent {
   constructor() {
    
     const template = `
@@ -61,7 +61,6 @@ class RecordCollection extends BaseComponent {
       const songButton = document.createElement('button');
       songButton.textContent = song.name;
       songButton.addEventListener('click', () => {
-        console.log('hiyyayaya!');
         this.loadSong(song);
       });
       collectionElement.appendChild(songButton);
@@ -69,7 +68,6 @@ class RecordCollection extends BaseComponent {
   }
 
   loadSong(song) {
-    console.log(song);
     this.dispatchEvent(new CustomEvent("load-song", { detail: song }));
   }
 }
