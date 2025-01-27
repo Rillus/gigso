@@ -1,4 +1,4 @@
-class ChordPalette extends HTMLElement {
+export default class ChordPalette extends HTMLElement {
   constructor() {
     super();
     this.attachShadow({ mode: "open" });

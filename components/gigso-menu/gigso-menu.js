@@ -1,5 +1,6 @@
-import BaseComponent from "./base-component.js";
-class MenuToggle extends BaseComponent {
+import BaseComponent from "../base-component.js";
+
+class GigsoMenu extends BaseComponent {
     constructor() {
         const template = `
             <div class="menu"></div>
@@ -52,16 +53,19 @@ class MenuToggle extends BaseComponent {
         const newButton = document.createElement('button');
         newButton.setAttribute('data-target', button.target);
         newButton.textContent = `Toggle ${button.name}`;
+        newButton.classList.add('isOn');
         newButton.addEventListener('click', () => {
           const element = document.querySelector(button.target);
           if (element) {
- 
+
             if (element.style.display === 'none') {
               element.style.display = 'block';
-              newButton.setAttribute('class', 'isOn');
+              newButton.classList.remove('isOff');
+              newButton.classList.add('isOn');
             } else {
               element.style.display = 'none';
-              newButton.setAttribute('class', 'isOff');
+              newButton.classList.remove('isOn');
+              newButton.classList.add('isOff');
             }
           }
         });
@@ -70,4 +74,4 @@ class MenuToggle extends BaseComponent {
     }
 }
 
-customElements.define('menu-toggle', MenuToggle);
+customElements.define('gigso-menu', GigsoMenu);

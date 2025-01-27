@@ -23,7 +23,7 @@ const appContainer = document.getElementById('app');
 
 const elementsToAdd = [
     {
-        tag: 'menu-toggle'
+        tag: 'gigso-menu'
     },
     {
         tag: 'record-collection',
@@ -42,7 +42,7 @@ const elementsToAdd = [
         tag: 'transport-controls',
     },
     {
-        tag: 'current-chord-display',
+        tag: 'current-chord',
     },
     {
         tag: 'chord-palette',
@@ -132,7 +132,7 @@ document.body.addEventListener('loop-clicked', () => {
 function playChord({chord, duration}) {
     const time = Tone.now();    
     synth.triggerAttackRelease(chord.notes, duration, time);
-    dispatchComponentEvent('current-chord-display', 'set-chord', chord.name);
+    dispatchComponentEvent('current-chord', 'set-chord', chord.name);
     dispatchComponentEvent('chord-diagram', 'set-chord', chord.name );
     dispatchComponentEvent(
         'gigso-keyboard', 
@@ -155,7 +155,7 @@ function playSong() {
 function stopSong() {
     dispatchComponentEvent('piano-roll', 'stop');
     dispatchComponentEvent('chord-diagram', 'set-chord', null);
-    dispatchComponentEvent('current-chord-display', 'set-chord', null);
+    dispatchComponentEvent('current-chord', 'set-chord', null);
     if (!isPlaying) return;
     isPlaying = false ;
     dispatchComponentEvent('play-button', 'deactivate');

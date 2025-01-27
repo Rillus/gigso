@@ -252,6 +252,10 @@ class PianoRoll extends HTMLElement {
     }
 
     play() {
+        // check chords
+        if (this.chords.length === 0) {
+            return;
+        }
         this.isPlaying = true;
         this.scrollReel();
     }

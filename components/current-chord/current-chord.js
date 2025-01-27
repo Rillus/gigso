@@ -1,4 +1,4 @@
-class CurrentChordDisplay extends HTMLElement {
+class CurrentChord extends HTMLElement {
     constructor() {
         super();
         this.attachShadow({ mode: 'open' });
@@ -28,4 +28,4 @@ class CurrentChordDisplay extends HTMLElement {
     }
 }
 
-customElements.define('current-chord-display', CurrentChordDisplay); 
+customElements.define('current-chord', CurrentChord); 
