@@ -1,23 +1,24 @@
-import BaseComponent from './base-component.js';
+import BaseComponent from '../base-component.js';
 
-class LoopButton extends BaseComponent {
+export default class StopButton extends BaseComponent {
     constructor() {
         const template = `
-            <button id="loop-button" class="transport-button">&#x21BB;</button>
+            <button id="stop-button" class="transport-button">&#9632;</button>
         `;
         const styles = `
-            #loop-button {
+            #stop-button {
                 font-size: 18px;
                 line-height: 17px;
             }
         `;
+
         super(template, styles, false);
         this.button = this.querySelector('button');
     }
 
     connectedCallback() {
         this.button.addEventListener('click', () => {
-            this.dispatchEvent(new CustomEvent('loop-clicked', { bubbles: true, composed: true }));
+            this.dispatchEvent(new CustomEvent('stop-clicked', { bubbles: true, composed: true }));
         });
 
         // Listen for custom events to update button state
@@ -27,6 +28,11 @@ class LoopButton extends BaseComponent {
 
     activate() {
         this.button.classList.add('active');
+
+        setTimeout(() => {
+            console.log('deactivating stop button');
+            this.deactivate();
+        }, 300);
     }
 
     deactivate() {
@@ -34,4 +40,4 @@ class LoopButton extends BaseComponent {
     }
 }
 
-customElements.define('loop-button', LoopButton); 
+customElements.define('stop-button', StopButton); 
