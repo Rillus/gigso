@@ -1,5 +1,5 @@
-import BaseComponent from "./base-component.js";
-import chordLibrary from "../chord-library.js";
+import BaseComponent from "../base-component.js";
+import chordLibrary from "../../chord-library.js";
 
 class ChordDiagram extends BaseComponent {
     constructor() {
@@ -75,7 +75,7 @@ class ChordDiagram extends BaseComponent {
     }
 
     static get observedAttributes() {
-        return ['chord'];
+        return ['chord', 'instrument'];
     }
 
     attributeChangedCallback(name, oldValue, newValue) {
@@ -84,7 +84,7 @@ class ChordDiagram extends BaseComponent {
         }
 
         if (name === 'instrument') {
-            this.instrumnet = newValue;
+            this.instrument = newValue;
         }
     }
 

@@ -84,5 +84,17 @@ export default class chordLibrary {
             ]
         }
     },
+    'G': {
+        'ukulele': {
+            'positions': [
+                0, 2, 3, 2
+            ],
+        },
+        'guitar': {
+            'positions': [
+                3, 2, 0, 0, 3, 3
+            ]
+        }
+    },
   };
 };
