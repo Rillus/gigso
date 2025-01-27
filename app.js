@@ -42,26 +42,6 @@ const elementsToAdd = [
         tag: 'transport-controls',
     },
     {
-        tag: 'stop-button',
-        eventListeners: [
-            {
-                name: 'interact',
-                function: () => {}
-
-            }
-        ]
-    },
-    {
-        tag: 'loop-button',
-        eventListeners: [
-            {
-                name: 'interact',
-                function: () => {}
-
-            }
-        ]
-    },
-    {
         tag: 'current-chord-display',
     },
     {
