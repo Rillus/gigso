@@ -1,21 +1,29 @@
 import BaseComponent from '../base-component.js';
 
-class LoopButton extends BaseComponent {
+export default class LoopButton extends HTMLElement {
     constructor() {
+        super();
+        this.initialised = false;
+    }
+    
+    connectedCallback() {
+        if (this.initialised) return;
+        this.initialised = true;
+
         const template = `
             <button id="loop-button" class="transport-button">&#x21BB;</button>
         `;
         const styles = `
-            #loop-button {
-                font-size: 18px;
-                line-height: 17px;
-            }
+            <style>
+                #loop-button {
+                    font-size: 18px;
+                    line-height: 17px;
+                }
+            </style>
         `;
-        super(template, styles, false);
+        this.innerHTML = styles + template;
         this.button = this.querySelector('button');
-    }
 
-    connectedCallback() {
         this.button.addEventListener('click', () => {
             this.dispatchEvent(new CustomEvent('loop-clicked', { bubbles: true, composed: true }));
         });

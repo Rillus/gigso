@@ -1,19 +1,24 @@
 import BaseComponent from '../base-component.js';
+import EventHandlers from '../../helpers/eventHandlers.js';
 
-class PlayButton extends BaseComponent {
+export default class PlayButton extends HTMLElement {
     constructor() {
-      const template = `
-          <button id="play-button" data-testid="play-button" class="transport-button">&#9654;</button>
-      `;
-      super(template, null, false);
-      this.button = this.querySelector('#play-button');
+      super();
+      this.initialised = false;
     }
-
+    
     connectedCallback() {
-      this.addEventListeners([
+      if (this.initialised) return;
+      this.initialised = true;
+
+      const template = `<button id="play-button" data-testid="play-button" class="transport-button">&#9654;</button>`;
+      this.innerHTML = template;
+      this.button = this.querySelector('#play-button');
+      
+      EventHandlers.addEventListeners([
           { selector: 'button', event: 'click', handler: () => this.handleClick() },
-          { selector: null, event: 'activate', handler: () => this.activate() },
-          { selector: null, event: 'deactivate', handler: () => this.deactivate() }
+          { selector: this, event: 'activate', handler: () => this.activate() },
+          { selector: this, event: 'deactivate', handler: () => this.deactivate() }
       ]);
     }
 

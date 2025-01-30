@@ -60,9 +60,7 @@ describe('GigsoKeyboard Component', () => {
         // Act
         const keyElement = keyboard.shadowRoot.querySelector('.key.C');
         fireEvent.mouseDown(keyElement);
-
-        console.log(keyboard.shadowRoot.innerHTML);
-
+        
         // Assert
         expect(playNoteSpy).toHaveBeenCalled();
     });

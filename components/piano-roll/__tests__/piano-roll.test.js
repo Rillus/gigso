@@ -1,6 +1,8 @@
 import '@testing-library/jest-dom';
 import { fireEvent } from '@testing-library/dom';
 import '../piano-roll.js'; // Import the component to ensure it's defined
+import State from '../../../state/state.js';
+const { loopActive, setLoopActive } = State;
 
 describe('PianoRoll Component', () => {
     let pianoRollElement;
@@ -68,11 +70,12 @@ describe('PianoRoll Component', () => {
         expect(pianoRollElement.currentPosition).toBe(0);
     });
 
-    test('should toggle loopActive state when set-loop event is dispatched', () => {
-        fireEvent(pianoRollElement, new CustomEvent('set-loop', { detail: true }));
-        expect(pianoRollElement.loopActive).toBe(true);
-
-        fireEvent(pianoRollElement, new CustomEvent('set-loop', { detail: false }));
-        expect(pianoRollElement.loopActive).toBe(false);
+    test('should play in a loop if loopActive is true', () => {
+        const chord = { name: 'C Major', notes: ['C4', 'E4', 'G4'], duration: 1, delay: 0 };
+        fireEvent(pianoRollElement, new CustomEvent('add-chord', { detail: chord }));
+        setLoopActive(true);
+        pianoRollElement.play();
+        expect(pianoRollElement.isPlaying).toBe(true);
+        expect(loopActive()).toBe(true);
     });
 }); 

@@ -1,7 +1,7 @@
 import BaseComponent from "../base-component.js";
 import chordLibrary from "../../chord-library.js";
 
-class ChordDiagram extends BaseComponent {
+export default class ChordDiagram extends BaseComponent {
     constructor() {
         const template = `
             <div class="chord-diagram">

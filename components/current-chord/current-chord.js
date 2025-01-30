@@ -1,4 +1,4 @@
-class CurrentChord extends HTMLElement {
+export default class CurrentChord extends HTMLElement {
     constructor() {
         super();
         this.attachShadow({ mode: 'open' });

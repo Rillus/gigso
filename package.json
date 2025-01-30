@@ -8,7 +8,7 @@
     "test": "jest --watch"
   },
   "dependencies": {
-    "tone": "^15.1.0"
+    "tone": "^15.1.3"
   },
   "devDependencies": {
     "@babel/plugin-transform-modules-commonjs": "^7.26.3",

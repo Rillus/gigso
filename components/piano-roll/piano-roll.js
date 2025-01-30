@@ -1,4 +1,8 @@
-class PianoRoll extends HTMLElement {
+import State from '../../state/state.js';
+
+const { loopActive } = State;
+
+export default class PianoRoll extends HTMLElement {
     constructor() {
         super();
         this.attachShadow({ mode: 'open' });
@@ -95,8 +99,7 @@ class PianoRoll extends HTMLElement {
         this.isPlaying = false;
         this.currentPosition = 0;
         this.endPosition = 400;
-        this.chordPlaying = null;
-        this.loopActive = false;
+        this.chordPlaying = null
     }
 
     connectedCallback() {
@@ -127,10 +130,6 @@ class PianoRoll extends HTMLElement {
             this.previousChord();
         });
 
-        this.addEventListener('set-loop', (event) => {
-            this.loopActive = event.detail;
-        });
-
         this.addEventListener('load-song', (song) => {
             this.loadSong(song.detail);
         })
@@ -147,7 +146,6 @@ class PianoRoll extends HTMLElement {
     }
 
     loadSong(song) {
-      console.log('loadSong', song);
       this.chords = song.chords;
       this.renderChords();
     }
@@ -205,11 +203,9 @@ class PianoRoll extends HTMLElement {
 
         const doDrag = (e) => {
             const newLeft = startLeft + (e.clientX - startX);
-            console.log('newLeft', newLeft);
 
             // convert to delay
             this.chords[chordIndex].delay = Math.max(0, newLeft / this.chordWidth) - chordIndex;
-            console.log('new delay', this.chords[chordIndex].delay);
             this.renderChords();
             this.updateChordDisplay();
         };
@@ -252,7 +248,6 @@ class PianoRoll extends HTMLElement {
     }
 
     play() {
-        // check chords
         if (this.chords.length === 0) {
             return;
         }
@@ -286,7 +281,7 @@ class PianoRoll extends HTMLElement {
         
         if (this.chordPlaying < this.chords.length) {
             if (this.currentPosition >= this.endPosition) {
-                if (this.loopActive) {
+                if (loopActive()) {
                     this.currentPosition = 0;
                     this.chordPlaying = 0;
                 } else {

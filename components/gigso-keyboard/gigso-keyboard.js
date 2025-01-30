@@ -21,6 +21,8 @@ export default class GigsoKeyboard extends HTMLElement {
         this.keysPerOctave = [
             'C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'
         ];
+        
+        this.currentOctave = 4;
     }
 
     static get observedAttributes() {
@@ -50,6 +52,14 @@ export default class GigsoKeyboard extends HTMLElement {
     }
 
     handleKeyDown(event) {
+        if (event.key === '=' || event.key === '+') {
+            this.currentOctave++;
+        }
+
+        if (event.key === '-' || event.key === '_') {
+            this.currentOctave--;
+        }
+
         const index = this.keyMap[event.key];
         if (index !== undefined) {
             this.playNoteAndHighlight(index);
@@ -64,15 +74,15 @@ export default class GigsoKeyboard extends HTMLElement {
     }
 
     playNoteAndHighlight(index) {
-        this.playNote(index);
-        const keyElement = this.shadowRoot.querySelectorAll('.key')[index];
+        this.playNote(index, true);
+        const keyElement = this.shadowRoot.querySelectorAll('.key')[index + ((this.currentOctave - 1) * 12)];
         if (keyElement) {
             keyElement.classList.add('active');
         }
     }
 
     removeHighlight(index) {
-        const keyElement = this.shadowRoot.querySelectorAll('.key')[index];
+        const keyElement = this.shadowRoot.querySelectorAll('.key')[index + ((this.currentOctave - 1) * 12)];
         if (keyElement) {
             keyElement.classList.remove('active');
         }
@@ -117,8 +127,8 @@ export default class GigsoKeyboard extends HTMLElement {
         }).join('');
     }
 
-    playNote(index) {
-        const octave = Math.floor(index / 12);
+    playNote(index, useOctave) {
+        const octave = useOctave ? this.currentOctave : Math.floor(index / 12);
         const noteIndex = index % 12;
         const noteNames = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'];
         const note = noteNames[noteIndex] + (octave);

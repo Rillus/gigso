@@ -1,6 +1,6 @@
 import BaseComponent from "../base-component.js";
 
-class GigsoMenu extends BaseComponent {
+export default class GigsoMenu extends BaseComponent {
     constructor() {
         const template = `
             <div class="menu"></div>

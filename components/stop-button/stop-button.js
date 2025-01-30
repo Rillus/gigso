@@ -1,22 +1,29 @@
 import BaseComponent from '../base-component.js';
 
-export default class StopButton extends BaseComponent {
+export default class StopButton extends HTMLElement {
     constructor() {
+        super();
+        this.initialised = false;
+    }
+    
+    connectedCallback() {
+        if (this.initialised) return;
+        this.initialised = true;
+
         const template = `
             <button id="stop-button" class="transport-button">&#9632;</button>
         `;
         const styles = `
-            #stop-button {
-                font-size: 18px;
-                line-height: 17px;
-            }
+            <style>
+                #stop-button {
+                    font-size: 18px;
+                    line-height: 17px;
+                }
+            </style>
         `;
-
-        super(template, styles, false);
+        this.innerHTML = styles + template;
         this.button = this.querySelector('button');
-    }
 
-    connectedCallback() {
         this.button.addEventListener('click', () => {
             this.dispatchEvent(new CustomEvent('stop-clicked', { bubbles: true, composed: true }));
         });
