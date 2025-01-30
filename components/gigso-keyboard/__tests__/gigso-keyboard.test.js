@@ -37,7 +37,7 @@ describe('GigsoKeyboard Component', () => {
 
         // Act
         fireEvent.keyDown(window, { key: 'a' }); // C note
-        const keyElement = keyboard.shadowRoot.querySelector('.key.C');
+        const keyElement = keyboard.shadowRoot.querySelector('[data-note="C4"]');
 
         // Assert
         expect(keyElement).toHaveClass('active');
@@ -63,5 +63,25 @@ describe('GigsoKeyboard Component', () => {
         
         // Assert
         expect(playNoteSpy).toHaveBeenCalled();
+    });
+
+    // test octave change
+    test('should change octave on keydown', () => {
+        // Arrange
+        const keyboard = new GigsoKeyboard();
+        document.body.appendChild(keyboard);
+
+        // Act
+        fireEvent.keyDown(window, { key: '+' });
+
+        // Assert
+        expect(keyboard.currentOctave).toBe(4);
+
+        // Act
+        fireEvent.keyDown(window, { key: '-' });
+        fireEvent.keyDown(window, { key: '-' });
+
+        // Assert
+        expect(keyboard.currentOctave).toBe(2);
     });
 });

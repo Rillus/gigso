@@ -22,7 +22,7 @@ export default class GigsoKeyboard extends HTMLElement {
             'C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'
         ];
         
-        this.currentOctave = 4;
+        this.currentOctave = 3;
     }
 
     static get observedAttributes() {
