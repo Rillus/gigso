@@ -1,5 +1,28 @@
+:root {
+  --colour-primary: #c6c6c6;
+  --chord-button-border-color: #a6a6a6;
+  --chord-button-active-color: #b6b6b6;
+  --chord-button-hover-color: #d6d6d6;
+
+  --colour-red: #E1453E;
+  --colour-orange: #F17947;
+  --colour-yellow: #FAB15C;
+  --colour-green: #60B05B;
+  --colour-blue: #5394C7;
+  --colour-indigo: #4b0082;
+  --colour-violet: #8F00FF;
+
+  --colour-C: var(--colour-red);
+  --colour-D: var(--colour-orange);
+  --colour-E: var(--colour-yellow);
+  --colour-F: var(--colour-green);
+  --colour-G: var(--colour-blue);
+  --colour-A: var(--colour-indigo);
+  --colour-B: var(--colour-violet);
+}
+
 .transport-button {
-  background-color: #c6c6c6; 
+  background-color: var(--colour-primary); 
   border: 1px solid #a6a6a6;
   border-width: 1px 1px 0 1px;
   padding: 5px 10px;

@@ -9,11 +9,12 @@ const toneScript = document.createElement('script');
 toneScript.src = '/node_modules/tone/build/Tone.js';
 document.head.appendChild(toneScript);
 
+import GigsoMenu from './components/gigso-menu/gigso-menu.js';
+import GigsoLogo from './components/gigso-logo/gigso-logo.js';
 import TransportControls from './components/transport-controls/transport-controls.js';
 import CurrentChord from './components/current-chord/current-chord.js';
 import GigsoKeyboard from './components/gigso-keyboard/gigso-keyboard.js';
 import PianoRoll from './components/piano-roll/piano-roll.js';
-import GigsoMenu from './components/gigso-menu/gigso-menu.js';
 import AddChord from './components/add-chord/add-chord.js';
 import ChordPalette from './components/chord-palette/chord-palette.js';
 import ChordDiagram from './components/chord-diagram/chord-diagram.js';
@@ -23,7 +24,10 @@ const appContainer = document.getElementById('app');
 
 const elementsToAdd = [
     {
-        tag: GigsoMenu
+        tag: GigsoLogo,
+    },
+    {
+        tag: GigsoMenu,
     },
     {
         tag: RecordCollection,
