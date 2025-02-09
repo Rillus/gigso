@@ -68,7 +68,7 @@ export default class ChordDiagram extends BaseComponent {
 
         super(template, styles)
         
-        this.instrument = 'ukulele';
+        this.instrument = 'mandolin';
         this.chords = chordLibrary.chords;
 
         this.shadowRoot.querySelector('.chord-diagram').innerHTML = this.createFretboard();
