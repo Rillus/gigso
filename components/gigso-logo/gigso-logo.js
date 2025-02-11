@@ -8,10 +8,6 @@ export default class GigsoLogo extends BaseComponent {
         `;
 
         const styles = `
-          .logo {
-            width: 100%;
-            height: 100%;
-          }
           #gigso {
             box-shadow: 5px 5px 10px 0 rgba(0, 0, 0, 0.9);
           }
@@ -47,7 +43,7 @@ export default class GigsoLogo extends BaseComponent {
 
     connectedCallback() {
       const logo = document.createElement('div');
-      logo.innerHTML = `<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+      logo.innerHTML = `
         <svg
           width="362"
           height="362"

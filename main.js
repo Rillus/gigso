@@ -29,6 +29,27 @@ const elementsToAdd = [
     {
         tag: GigsoMenu,
     },
+    // {
+    //     tag: CurrentChord,
+    // },
+        {
+            tag: ChordPalette,
+            emittedEvents: [
+                {
+                    name: 'add-chord',
+                    function: (event) => {
+                        const chord = event.detail;
+                        dispatchComponentEvent('piano-roll', 'add-chord', chord);
+                    }
+                }
+            ]
+        },
+    // {
+    //     tag: 'chord-diagram',
+    // },
+    {
+        tag: GigsoKeyboard,
+    },
     {
         tag: RecordCollection,
         emittedEvents: [
@@ -43,27 +64,6 @@ const elementsToAdd = [
     },
     {  
         tag: TransportControls,
-    },
-    {
-        tag: CurrentChord,
-    },
-    {
-        tag: ChordPalette,
-        emittedEvents: [
-            {
-                name: 'add-chord',
-                function: (event) => {
-                    const chord = event.detail;
-                    dispatchComponentEvent('piano-roll', 'add-chord', chord);
-                }
-            }
-        ]
-    },
-    // {
-    //     tag: 'chord-diagram',
-    // },
-    {
-        tag: GigsoKeyboard,
     },
     {
         tag: PianoRoll,

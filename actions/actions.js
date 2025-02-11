@@ -33,11 +33,11 @@ export default class Actions {
     dispatchComponentEvent('piano-roll', 'stop');
     dispatchComponentEvent('chord-diagram', 'set-chord', null);
     dispatchComponentEvent('current-chord', 'set-chord', null);
+    dispatchComponentEvent('gigso-logo', 'stop');
     if (!isPlaying()) return;
     setIsPlaying(false);
     dispatchComponentEvent('play-button', 'deactivate');
     dispatchComponentEvent('stop-button', 'activate');
-    dispatchComponentEvent('gigso-logo', 'stop');
   }
   
   static pauseSong() {
@@ -45,7 +45,6 @@ export default class Actions {
     setIsPlaying(false);
     dispatchComponentEvent('piano-roll', 'pause');
     dispatchComponentEvent('play-button', 'deactivate');
-    dispatchComponentEvent('stop-button', 'activate');
     dispatchComponentEvent('gigso-logo', 'pause');
   }
 }
