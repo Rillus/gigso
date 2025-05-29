@@ -33,8 +33,9 @@ export default class RecordCollection extends BaseComponent {
       .song-button {
         font-size: 14px;
         cursor: pointer;
-        width: 352px;
+        width: 100%;
         height: 40px;
+        background: transparent;
         transition: transform 0.3s, box-shadow 0.3s;
         transform-style: preserve-3d;
         transform: rotateX(0deg) rotateY(0deg) translate3d(-25px, 0, -100px);
@@ -49,7 +50,7 @@ export default class RecordCollection extends BaseComponent {
       }
 
       .cassette-face {
-        width: 352px;
+        width: 100%;
         height: 40px;
         backface-visibility: visible;
         border: 1px solid #ccc;
@@ -70,33 +71,33 @@ export default class RecordCollection extends BaseComponent {
 
       .cassette-face.side-left,
       .cassette-face.side-right {
-        width: 150px;
+        width: 220px;
         transform-origin: left top;
       }
 
       .cassette-face.side-left {
-        transform: rotateX(0deg) rotateY(-90deg) translateZ(150px);
+        transform: rotateX(0deg) rotateY(-90deg) translate3d(0, 0, 220px);
         background-color: #777777;
         transform-origin: right top;
       }
 
       .cassette-face.side-right {
-        transform: rotateX(0deg) rotateY(90deg) translate3d(150px, 0px, 202px);
+        transform: rotateX(0deg) rotateY(90deg) translate3d(220px, 0px, 122px);
         background-color: #777777;
         transform-origin: right top;
       }
 
       .cassette-face.top {
-        width: 352px;
-        height: 150px;
-        transform: rotateX(90deg) rotateY(0deg) translate3d(0px, -80px, 75px);
+        width: 342px;
+        height: 220px;
+        transform: rotateX(90deg) rotateY(0deg) translate3d(0px, -110px, 110px);
         background-color: #ffffff;
       }
         
       .cassette-face.bottom {
-        width: 352px;
-        height: 150px;
-        transform: rotateX(-90deg) rotateY(0deg) translate3d(0px, 76px, -35px);
+        width: 342px;
+        height: 220px;
+        transform: rotateX(-90deg) rotateY(0deg) translate3d(0px, 110px, -70px);
         background-color: #999;
       }
 
@@ -111,6 +112,7 @@ export default class RecordCollection extends BaseComponent {
       .label .song-title {
         font-size: 14px;
         font-weight: bold;
+        text-transform: uppercase;
       }
       
       .label .song-artist {

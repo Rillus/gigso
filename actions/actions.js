@@ -47,4 +47,9 @@ export default class Actions {
     dispatchComponentEvent('play-button', 'deactivate');
     dispatchComponentEvent('gigso-logo', 'pause');
   }
+  
+  static changeInstrument(instrument) {
+    dispatchComponentEvent('piano-roll', 'set-instrument', instrument);
+    // dispatchComponentEvent('chord-diagram', 'set-instrument', instrument);
+  }
 }

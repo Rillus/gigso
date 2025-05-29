@@ -1,12 +1,13 @@
 import BaseComponent from "../base-component.js";
 import chordLibrary from "../../chord-library.js";
+import State from '../../state/state.js';
+import EventHandlers from "../../helpers/eventHandlers.js";
+const { instrument: instrumentState } = State;
 
 export default class ChordDiagram extends BaseComponent {
     constructor() {
-        const template = `
-            <div class="chord-diagram">
-            </div>
-        `;
+        const template = `<div class="chord-diagram"></div>`;
+
         const styles = `
             .chord-diagram {
                 display: grid;
@@ -14,6 +15,9 @@ export default class ChordDiagram extends BaseComponent {
                 grid-template-rows: repeat(5, 25px);
                 gap: 0;
                 max-width: 80px;
+            }
+            .chord-diagram--guitar {
+                grid-template-columns: repeat(6, 15%);
             }
             .string {
                 width: 20px;
@@ -68,8 +72,11 @@ export default class ChordDiagram extends BaseComponent {
 
         super(template, styles)
         
-        this.instrument = 'mandolin';
+        this.instrument = instrumentState();
+        console.log('instrument', this.instrument);
+        this.chord = this.getAttribute('chord');
         this.chords = chordLibrary.chords;
+        this.initialised = false;
 
         this.shadowRoot.querySelector('.chord-diagram').innerHTML = this.createFretboard();
     }
@@ -79,26 +86,48 @@ export default class ChordDiagram extends BaseComponent {
     }
 
     attributeChangedCallback(name, oldValue, newValue) {
+        console.log('attributeChangedCallback', name, oldValue, newValue);
+        
+        if (oldValue === newValue) {
+            return;
+        }
+        
         if (name === 'chord') {
-            this.renderChord(newValue);
+            console.log('chord changed', newValue);
+            this.chord = newValue;
         }
 
         if (name === 'instrument') {
-            this.instrument = newValue;
+            console.log('instrument changed', newValue);
+            this.instrument = newValue.toLowerCase();
         }
+        this.setInstrument();
     }
 
     connectedCallback() {
-        this.addEventListener('set-chord', (event) => {
-            this.renderChord(event.detail);
-        });
+        if (this.initialised) {
+            return;
+        }
+
+        console.log('connectedCallback');
+        this.setInstrument();
+        // this.renderChord(event.detail);
+        // this.addEventListener('set-chord', (event) => {
+        // });
     }
 
     createFretboard() {
-        return Array(20).fill('<div class="fret"></div>').join('');
+        if (this.instrument === 'Mandolin' || this.instrument === 'Ukulele') {
+            return Array(20).fill('<div class="fret"></div>').join('');
+        }
+        return Array(30).fill('<div class="fret"></div>').join('');
     }
 
     renderChord(chord) {
+        if (!this.initialised) {
+            this.initialised = true;
+            return;
+        }
         const frets = this.shadowRoot.querySelectorAll('.fret');
         frets.forEach(fret => fret.classList.remove('active'));
 
@@ -117,12 +146,39 @@ export default class ChordDiagram extends BaseComponent {
             return;
         }
 
-        this.chords[chord][this.instrument].positions.forEach((fretNumber, stringIndex) => {
+        const positions = this.chords[chord][this.instrument].positions;
+        const numberOfStrings = positions.length;
+
+        positions.forEach((fretNumber, stringIndex) => {
             if (fretNumber > 0) {
-                const fretPosition = stringIndex + (fretNumber - 1) * 4;
-                frets[fretPosition].classList.add('active');
+                const fretPosition = stringIndex + (fretNumber - 1) * numberOfStrings;
+                
+                if (fretPosition >= 0 && fretPosition < frets.length) {
+                    frets[fretPosition].classList.add('active');
+                } else {
+                    console.warn(`Calculated fretPosition ${fretPosition} is out of bounds (0-${frets.length - 1}) for string ${stringIndex}, fret ${fretNumber}`);
+                }
             }
         });
+    }
+
+    setInstrument() {
+        console.log('setInstrument', this.instrument);
+        this.shadowRoot.querySelector('.chord-diagram').classList.forEach(className => {
+            console.log('className', className);
+            if (className !== 'chord-diagram') {
+                console.log('removing', className);
+                if (className !== `chord-diagram--${this.instrument}`) {
+                    this.shadowRoot.querySelector('.chord-diagram').classList.remove(className);
+                }
+            }
+        });
+        if (!this.shadowRoot.querySelector('.chord-diagram').classList.contains(`chord-diagram--${this.instrument}`)) {
+
+            this.shadowRoot.querySelector('.chord-diagram').classList.add(`chord-diagram--${this.instrument}`);
+        }
+       
+        this.renderChord(this.chord);
     }
 }
 

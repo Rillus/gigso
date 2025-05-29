@@ -1,3 +1,4 @@
+import EventHandlers from '../../helpers/eventHandlers.js';
 import State from '../../state/state.js';
 
 const { loopActive } = State;
@@ -99,7 +100,8 @@ export default class PianoRoll extends HTMLElement {
         this.isPlaying = false;
         this.currentPosition = 0;
         this.endPosition = 400;
-        this.chordPlaying = null
+        this.chordPlaying = null;
+        this.instrument = State.instrument();
     }
 
     connectedCallback() {
@@ -134,6 +136,12 @@ export default class PianoRoll extends HTMLElement {
             this.loadSong(song.detail);
         })
 
+        EventHandlers.addEventListeners([
+            {selector: this, event: 'set-instrument', handler: (event) => {
+                this.setInstrument(event.detail)
+            }}
+        ])
+
         // Dispatch a "ready" event when the component is fully initialized
         const readyEvent = new CustomEvent('isReady');
         this.dispatchEvent(readyEvent);
@@ -161,7 +169,8 @@ export default class PianoRoll extends HTMLElement {
             chordText.textContent = chord.name;
             chordBox.appendChild(chordText);
             const chordDiagram = document.createElement('chord-diagram');
-            chordDiagram.setAttribute('chord', chord.name)
+            chordDiagram.setAttribute('chord', chord.name);
+            chordDiagram.setAttribute('instrument', this.instrument);
             chordBox.appendChild(chordDiagram);
 
             chordBox.setAttribute(
@@ -303,6 +312,11 @@ export default class PianoRoll extends HTMLElement {
     playChord(chord, duration) {
         const event = new CustomEvent('play-chord', { detail: { chord, duration } });
         this.dispatchEvent(event);
+    }
+
+    setInstrument(instrument) {
+        this.instrument = instrument;
+        this.renderChords();
     }
 }
 
