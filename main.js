@@ -23,6 +23,7 @@ import ChordPalette from './components/chord-palette/chord-palette.js';
 import ChordDiagram from './components/chord-diagram/chord-diagram.js';
 import RecordCollection from './components/record-collection/record-collection.js';
 import InstrumentSelect from './instrument-select/instrument-select.js';
+import FrequencyAnalyser from './components/frequency-analyser/frequency-analyser.js';
 const appContainer = document.getElementById('app');
 
 const elementsToAdd = [
@@ -115,6 +116,17 @@ const elementsToAdd = [
             }
         ]
     },
+    {
+        tag: FrequencyAnalyser,
+        emittedEvents: [
+            {
+                name: 'frequency-analyzed',
+                function: (event) => {
+                    console.log('event', event)
+                }
+            }
+        ]
+    }
 ];
 
 document.addEventListener('DOMContentLoaded', async () => {
