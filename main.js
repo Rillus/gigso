@@ -24,6 +24,9 @@ import ChordDiagram from './components/chord-diagram/chord-diagram.js';
 import RecordCollection from './components/record-collection/record-collection.js';
 import InstrumentSelect from './instrument-select/instrument-select.js';
 import FrequencyAnalyser from './components/frequency-analyser/frequency-analyser.js';
+import VUMeter from './components/vu-meter/vu-meter.js';
+import FrequencyMonitor from './components/frequency-monitor/frequency-monitor.js';
+import EQDisplay from './components/eq-display/eq-display.js';
 const appContainer = document.getElementById('app');
 
 const elementsToAdd = [
@@ -126,6 +129,15 @@ const elementsToAdd = [
                 }
             }
         ]
+    },
+    {
+        tag: VUMeter,
+    },
+    {
+        tag: FrequencyMonitor,
+    },
+    {
+        tag: EQDisplay,
     }
 ];
 

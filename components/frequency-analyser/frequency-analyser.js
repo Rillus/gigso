@@ -133,7 +133,7 @@ export default class FrequencyAnalyser extends BaseComponent {
         // Bind methods
         this.startAnalysis = this.startAnalysis.bind(this);
         this.stopAnalysis = this.stopAnalysis.bind(this);
-        this.analyzeFrequency = this.analyzeFrequency.bind(this);
+        this.analyseFrequency = this.analyseFrequency.bind(this);
 
         // Add event listeners
         this.shadowRoot.querySelector('.start-button').addEventListener('click', () => {
@@ -220,7 +220,7 @@ export default class FrequencyAnalyser extends BaseComponent {
 
             this.isAnalyzing = true;
             this.shadowRoot.querySelector('.start-button').textContent = 'Stop Analysis';
-            this.analyzeFrequency();
+            this.analyseFrequency();
         } catch (error) {
             console.error('Error accessing microphone:', error);
             this.dispatchEvent(new CustomEvent('error', { 
@@ -246,7 +246,7 @@ export default class FrequencyAnalyser extends BaseComponent {
         this.setNeedleAngle(-50);
     }
 
-    analyzeFrequency() {
+    analyseFrequency() {
         if (!this.isAnalyzing) return;
 
         const bufferLength = this.analyser.frequencyBinCount;
@@ -280,7 +280,7 @@ export default class FrequencyAnalyser extends BaseComponent {
             this.setNeedleAngle(-50); // Rest position
         }
 
-        this.animationFrame = requestAnimationFrame(() => this.analyzeFrequency());
+        this.animationFrame = requestAnimationFrame(() => this.analyseFrequency());
     }
 
     setNeedleAngle(angle) {

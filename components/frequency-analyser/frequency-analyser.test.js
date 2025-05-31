@@ -111,12 +111,11 @@ describe('FrequencyAnalyser', () => {
         component.addEventListener('frequency-detected', eventSpy);
 
         // Manually trigger the frequency analysis
-        component.analyzeFrequency();
+        component.analyseFrequency();
         await Promise.resolve();
 
         expect(eventSpy).toHaveBeenCalled();
         const eventData = eventSpy.mock.calls[0][0].detail;
-        console.log('eventData', eventData.frequency);
         expect(eventData.frequency).toBeCloseTo(mockFrequency, -0.5);
         expect(eventData.note).toBe(mockNote.name);
     });
