@@ -92,25 +92,26 @@ export default class EQDisplay extends HTMLElement {
   }
 
   updateSpectrum(frequencyData) {
-    // The frequency data is already in dB format
-    const minDb = -200; // Minimum dB value
-    const maxDb = -60;  // Maximum dB value for good visualization
-    
-    // Create a document fragment for batch updates
-    const fragment = document.createDocumentFragment();
-    
-    for (let i = 0; i < this.bars.length; i++) {
-      // Get the dB value for this band
+    // Handle empty or invalid data
+    if (!frequencyData || frequencyData.length === 0) {
+      this.bars.forEach(bar => {
+        bar.style.height = '0%';
+      });
+      return;
+    }
+
+    // Convert dB to amplitude and normalize
+    const minDb = -200;
+    const maxDb = -60;
+    const scalingFactor = 1000000; // Increased for better visibility
+
+    for (let i = 0; i < this.numBars; i++) {
       const db = frequencyData[i];
-      
-      // Convert dB to amplitude (linear scale)
+      // Convert dB to amplitude
       const amplitude = Math.pow(10, db / 20);
-      
-      // Normalize to 0-100% with a much larger scaling factor
-      const normalized = Math.min(100, amplitude * 1000000);
-      
-      // Update bar height
-      this.bars[i].style.height = `${normalized}%`;
+      // Normalize to 0-100%
+      const normalizedValue = Math.min(100, amplitude * scalingFactor);
+      this.bars[i].style.height = `${normalizedValue}%`;
     }
   }
   

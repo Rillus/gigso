@@ -23,10 +23,10 @@ import ChordPalette from './components/chord-palette/chord-palette.js';
 import ChordDiagram from './components/chord-diagram/chord-diagram.js';
 import RecordCollection from './components/record-collection/record-collection.js';
 import InstrumentSelect from './instrument-select/instrument-select.js';
-import FrequencyAnalyser from './components/frequency-analyser/frequency-analyser.js';
 import VUMeter from './components/vu-meter/vu-meter.js';
 import FrequencyMonitor from './components/frequency-monitor/frequency-monitor.js';
 import EQDisplay from './components/eq-display/eq-display.js';
+import Tuner from './components/chromatic-tuner/chromatic-tuner.js';
 const appContainer = document.getElementById('app');
 
 const elementsToAdd = [
@@ -120,15 +120,7 @@ const elementsToAdd = [
         ]
     },
     {
-        tag: FrequencyAnalyser,
-        emittedEvents: [
-            {
-                name: 'frequency-analyzed',
-                function: (event) => {
-                    console.log('event', event)
-                }
-            }
-        ]
+        tag: Tuner,
     },
     {
         tag: VUMeter,

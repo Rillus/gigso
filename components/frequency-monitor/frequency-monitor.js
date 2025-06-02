@@ -96,7 +96,12 @@ export default class FrequencyMonitor extends HTMLElement {
             this.mediaStream = null;
         }
         if (this.audioContext) {
-            this.audioContext.close().catch(console.error);
+            try {
+                this.audioContext.close().catch(console.error);
+            } catch (error) {
+                // AudioContext might already be closed or in an invalid state
+                console.error('Error closing AudioContext:', error);
+            }
             this.audioContext = null;
         }
         if (this.animationFrame) {
@@ -169,7 +174,9 @@ export default class FrequencyMonitor extends HTMLElement {
                         frequency: dominantFrequency,
                         note: note.name,
                         cents: cents
-                    }
+                    },
+                    bubbles: true,
+                    composed: true
                 }));
             }
         } catch (error) {

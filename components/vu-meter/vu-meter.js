@@ -4,7 +4,7 @@ template.innerHTML = `
     .vu-meter {
       position: relative;
       width: 220px;
-      height: 180px;
+      height: 150px;
       background: #222;
       border-radius: 18px;
       box-shadow: 0 4px 16px #000a;
@@ -15,9 +15,21 @@ template.innerHTML = `
       position: absolute;
       left: 10px; top: 10px; right: 10px; bottom: 10px;
       background: radial-gradient(ellipse at 60% 80%, #ffe066 60%, #ffb300 100%);
-      border-radius: 0 0 120px 120px/0 0 100px 100px;
+      border-radius: 120px 120px 0 0/100px 100px 0 0;
       box-shadow: 0 2px 8px #0008 inset;
       z-index: 1;
+    }
+    .vu-face::before {
+      content: '';
+      position: absolute;
+      left: 50%;
+      transform: translateX(-50%);
+      bottom: 0; 
+      width: 80px; 
+      height: 40px;
+      background: #222;
+      border-radius: 100px 100px 0 0;
+      z-index: 6;
     }
     .current-frequency, .current-note {
       position: absolute;
@@ -30,6 +42,7 @@ template.innerHTML = `
       z-index: 5;
       pointer-events: none;
       user-select: none;
+      text-shadow: 0 0 5px #0008;
     }
     .current-frequency { top: 30px; }
     .current-note { top: 55px; }
@@ -64,12 +77,31 @@ template.innerHTML = `
     }
     .vu-needle {
       position: absolute;
-      left: 50%; bottom: 30px;
-      width: 4px; height: 90px;
-      background: linear-gradient(to top, #c00 60%, #fff 100%);
+      left: 50%; 
+      top: 40px;
+      width: 4px; 
+      height: 90px;
+      background: linear-gradient(to top, #c00 60%, #f22 100%);
       border-radius: 2px;
       transform-origin: 50% 90%;
-      box-shadow: 0 0 4px #c00a;
+      border: 1px solid #f66;
+      border-width: 0 0 0 1px;
+      box-shadow: 0 0 3px #222;
+      z-index: 4;
+      transition: transform 0.15s cubic-bezier(.4,2,.6,1);
+    }
+    .peak-indicator {
+      position: absolute;
+      left: calc(50% + 1px); 
+      top: 40px;
+      width: 2px; 
+      height: 90px;
+      background: linear-gradient(to top, #000 60%, #222 100%);
+      border-radius: 2px;
+      transform-origin: 50% 90%;
+      border: 1px solid #666;
+      border-width: 0 0 0 1px;
+      box-shadow: 0 0 3px #222;
       z-index: 4;
       transition: transform 0.15s cubic-bezier(.4,2,.6,1);
     }
@@ -92,6 +124,7 @@ template.innerHTML = `
       <span class="current-note">VU</span>
       <div class="vu-ticks"></div>
       <div class="vu-needle"></div>
+      <div class="peak-indicator"></div>
     </div>
     <div class="vu-screws vu-screw-tl"></div>
     <div class="vu-screws vu-screw-tr"></div>
@@ -109,6 +142,7 @@ export default class VUMeter extends HTMLElement {
     // Frame rate limiting
     this.lastUpdateTime = 0;
     this.updateInterval = 1000 / 30; // Target 30 FPS
+    this.peakAngle = -60;
     
     // Bind event handler
     this._boundVolumeHandler = this.handleVolume.bind(this);
@@ -143,6 +177,11 @@ export default class VUMeter extends HTMLElement {
     const db = 20 * Math.log10(Math.max(rms, 0.000001)); // Convert to dB, prevent log(0)
     const normalizedDb = Math.max(0, Math.min(1, (db - minDb) / (maxDb - minDb))); // Normalize to 0-1 and clamp
     const angle = (normalizedDb * 120) - 60; // Map to -60 to 60 degrees
+    const previousPeakAngle = this.peakAngle;
+    if (previousPeakAngle < angle + 1) {
+      this.shadowRoot.querySelector('.peak-indicator').style.transform = `translateX(-50%) rotate(${angle}deg)`;
+      this.peakAngle = angle;
+    }
     
     // Special case for zero volume
     if (rms === 0) {
@@ -158,14 +197,14 @@ export default class VUMeter extends HTMLElement {
     const radius = 70;
     const labelRadius = 90;
     const centreX = 100;
-    const centreY = 140;
+    const centreY = 120;
     const ticks = [
-      { value: -40, label: '-40' },
-      { value: -20, label: '-20' },
-      { value: 0, label: '0' },
-      { value: 5, label: '3' },
-      { value: 20, label: '6' },
-      { value: 40, label: '9' },
+      { value: -40, label: '-20' },
+      { value: -23, label: '-10' },
+      { value: -5, label: '-5' },
+      { value: 8, label: '-3' },
+      { value: 22, label: '0' },
+      { value: 40, label: '5' },
     ];
     const tickCount = 19;
     const minAngle = -60;
@@ -193,7 +232,7 @@ export default class VUMeter extends HTMLElement {
     ticks.forEach((tick) => {
       const angle = minAngle + ((tick.value + 40) / 80) * (maxAngle - minAngle);
       const rad = (angle - 90) * Math.PI / 180;
-      const x = centreX +20 + labelRadius * Math.cos(rad);
+      const x = centreX + 20 + labelRadius * Math.cos(rad);
       const y = centreY + labelRadius * Math.sin(rad);
       const label = document.createElement('div');
       label.className = 'vu-tick-label';

@@ -56,7 +56,15 @@ export default class InstrumentSelect extends HTMLElement {
 
     // Add event listener for changes
     select.addEventListener('change', (event) => {
-      changeInstrument(event.target.value);
+      const selectedInstrument = event.target.value;
+      changeInstrument(selectedInstrument);
+      
+      // Dispatch instrument-selected event for other components to listen to
+      this.dispatchEvent(new CustomEvent('instrument-selected', {
+        detail: selectedInstrument,
+        bubbles: true,
+        composed: true
+      }));
     });
   }
 

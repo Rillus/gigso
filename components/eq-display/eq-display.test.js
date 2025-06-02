@@ -23,8 +23,8 @@ describe('EQDisplay', () => {
   });
 
   it('updates bar heights based on frequency data', () => {
-    // Create mock frequency data (32 points)
-    const frequencyData = new Float32Array(2048).fill(0.5);
+    // Create mock frequency data with reasonable dB values
+    const frequencyData = new Float32Array(32).fill(-80); // -80 dB
     
     // Update the spectrum
     eqDisplay.updateSpectrum(frequencyData);
@@ -33,16 +33,45 @@ describe('EQDisplay', () => {
     const bars = eqDisplay.shadowRoot.querySelectorAll('.eq-bar');
     bars.forEach(bar => {
       expect(bar.style.height).not.toBe('0%');
+      expect(bar.style.height).not.toBe('100%');
     });
   });
 
   it('handles empty frequency data', () => {
-    const frequencyData = new Float32Array(2048).fill(0);
+    // Test with null, undefined, and empty array
+    eqDisplay.updateSpectrum(null);
+    
+    let bars = eqDisplay.shadowRoot.querySelectorAll('.eq-bar');
+    bars.forEach(bar => {
+      expect(bar.style.height).toBe('0%');
+    });
+
+    eqDisplay.updateSpectrum(undefined);
+    
+    bars = eqDisplay.shadowRoot.querySelectorAll('.eq-bar');
+    bars.forEach(bar => {
+      expect(bar.style.height).toBe('0%');
+    });
+
+    eqDisplay.updateSpectrum(new Float32Array(0));
+    
+    bars = eqDisplay.shadowRoot.querySelectorAll('.eq-bar');
+    bars.forEach(bar => {
+      expect(bar.style.height).toBe('0%');
+    });
+  });
+
+  it('handles very low dB values correctly', () => {
+    // Test with very low dB values (which should result in minimal bar heights)
+    const frequencyData = new Float32Array(32).fill(-200); // Very low dB
     eqDisplay.updateSpectrum(frequencyData);
     
     const bars = eqDisplay.shadowRoot.querySelectorAll('.eq-bar');
     bars.forEach(bar => {
-      expect(bar.style.height).toBe('0%');
+      // Very low dB should result in very small heights (close to 0%)
+      const height = parseFloat(bar.style.height);
+      expect(height).toBeGreaterThanOrEqual(0);
+      expect(height).toBeLessThan(5); // Should be very small
     });
   });
 }); 
