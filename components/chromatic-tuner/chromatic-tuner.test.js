@@ -64,7 +64,14 @@ describe('ChromaticTuner', () => {
   });
 
   it('listens for frequency-detected events', () => {
-    // Test that the tuner responds to frequency-detected events by checking display updates
+    // Set volume above threshold first
+    const volumeEvent = new CustomEvent('volume-detected', {
+      detail: { rms: 0.05 }, // Above default threshold of 0.01
+      bubbles: true,
+      composed: true
+    });
+    document.dispatchEvent(volumeEvent);
+
     const event = new CustomEvent('frequency-detected', {
       detail: {
         frequency: 440,
@@ -75,7 +82,6 @@ describe('ChromaticTuner', () => {
       composed: true
     });
     
-    // Get initial display values
     const frequencyDisplay = tuner.shadowRoot.querySelector('.current-frequency');
     const noteDisplay = tuner.shadowRoot.querySelector('.current-note');
     const initialFrequency = frequencyDisplay.textContent;
@@ -137,6 +143,14 @@ describe('ChromaticTuner', () => {
     // Test with guitar E2 string
     tuner.currentInstrument = 'guitar';
     
+    // Set volume above threshold first
+    const volumeEvent = new CustomEvent('volume-detected', {
+      detail: { rms: 0.05 }, // Above default threshold of 0.01
+      bubbles: true,
+      composed: true
+    });
+    document.dispatchEvent(volumeEvent);
+    
     const event = new CustomEvent('frequency-detected', {
       detail: {
         frequency: 82.41, // Low E
@@ -158,6 +172,14 @@ describe('ChromaticTuner', () => {
 
   it('handles sharp frequency correctly', () => {
     tuner.currentInstrument = 'guitar';
+    
+    // Set volume above threshold first
+    const volumeEvent = new CustomEvent('volume-detected', {
+      detail: { rms: 0.05 }, // Above default threshold of 0.01
+      bubbles: true,
+      composed: true
+    });
+    document.dispatchEvent(volumeEvent);
     
     const event = new CustomEvent('frequency-detected', {
       detail: {
@@ -181,6 +203,14 @@ describe('ChromaticTuner', () => {
   it('handles flat frequency correctly', () => {
     tuner.currentInstrument = 'guitar';
     
+    // Set volume above threshold first
+    const volumeEvent = new CustomEvent('volume-detected', {
+      detail: { rms: 0.05 }, // Above default threshold of 0.01
+      bubbles: true,
+      composed: true
+    });
+    document.dispatchEvent(volumeEvent);
+    
     // Use a frequency that will be flat relative to a guitar string
     // Let's use a frequency slightly flat relative to the A2 string (110Hz)
     const event = new CustomEvent('frequency-detected', {
@@ -203,6 +233,14 @@ describe('ChromaticTuner', () => {
   });
 
   it('resets display when no frequency is detected', () => {
+    // Set volume above threshold first
+    const volumeEvent = new CustomEvent('volume-detected', {
+      detail: { rms: 0.05 }, // Above default threshold of 0.01
+      bubbles: true,
+      composed: true
+    });
+    document.dispatchEvent(volumeEvent);
+
     const event = new CustomEvent('frequency-detected', {
       detail: {
         frequency: 0,
@@ -233,5 +271,68 @@ describe('ChromaticTuner', () => {
     expect(removeEventListenerSpy).toHaveBeenCalledWith('instrument-selected', tuner._boundInstrumentChange);
     
     removeEventListenerSpy.mockRestore();
+  });
+
+  it('only responds to frequency when volume is above threshold', () => {
+    tuner.currentInstrument = 'guitar';
+    
+    // Set volume below threshold
+    const lowVolumeEvent = new CustomEvent('volume-detected', {
+      detail: { rms: 0.005 }, // Below default threshold of 0.01
+      bubbles: true,
+      composed: true
+    });
+    
+    document.dispatchEvent(lowVolumeEvent);
+    
+    // Now send a frequency event
+    const frequencyEvent = new CustomEvent('frequency-detected', {
+      detail: {
+        frequency: 440,
+        note: 'A4',
+        cents: 0
+      },
+      bubbles: true,
+      composed: true
+    });
+    
+    document.dispatchEvent(frequencyEvent);
+    
+    // Should show "Too Quiet" instead of processing the frequency
+    const noteDisplay = tuner.shadowRoot.querySelector('.current-note');
+    expect(noteDisplay.textContent).toBe('Too Quiet');
+  });
+
+  it('responds to frequency when volume is above threshold', () => {
+    tuner.currentInstrument = 'guitar';
+    
+    // Set volume above threshold
+    const highVolumeEvent = new CustomEvent('volume-detected', {
+      detail: { rms: 0.05 }, // Above default threshold of 0.01
+      bubbles: true,
+      composed: true
+    });
+    
+    document.dispatchEvent(highVolumeEvent);
+    
+    // Now send a frequency event
+    const frequencyEvent = new CustomEvent('frequency-detected', {
+      detail: {
+        frequency: 440,
+        note: 'A4',
+        cents: 0
+      },
+      bubbles: true,
+      composed: true
+    });
+    
+    document.dispatchEvent(frequencyEvent);
+    
+    // Should process the frequency normally
+    const frequencyDisplay = tuner.shadowRoot.querySelector('.current-frequency');
+    const noteDisplay = tuner.shadowRoot.querySelector('.current-note');
+    
+    expect(frequencyDisplay.textContent).toBe('440 Hz');
+    expect(noteDisplay.textContent).not.toBe('Too Quiet');
   });
 }); 

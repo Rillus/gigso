@@ -151,8 +151,11 @@ export default class ChromaticTuner extends BaseComponent {
     super(template, styles);
 
     this.currentInstrument = 'guitar';
+    this.volumeThreshold = 0.01; // Minimum RMS volume to activate tuner (adjust as needed)
+    this.currentVolume = 0;
     this._boundFrequencyHandler = this.handleFrequencyDetected.bind(this);
     this._boundInstrumentChange = this.handleInstrumentSelected.bind(this);
+    this._boundVolumeHandler = this.handleVolumeDetected.bind(this);
 
     // Initialize the tuner
     this.renderTicks();
@@ -162,6 +165,9 @@ export default class ChromaticTuner extends BaseComponent {
   setupEventListeners() {
     // Listen for frequency-detected events from the frequency monitor
     document.addEventListener('frequency-detected', this._boundFrequencyHandler);
+    
+    // Listen for volume-detected events to track audio level
+    document.addEventListener('volume-detected', this._boundVolumeHandler);
     
     // Listen for instrument-selected events from the instrument select component
     document.addEventListener('instrument-selected', this._boundInstrumentChange);
@@ -181,22 +187,34 @@ export default class ChromaticTuner extends BaseComponent {
     instrumentDisplay.textContent = INSTRUMENT_RANGES[this.currentInstrument].name;
   }
 
+  handleVolumeDetected(event) {
+    this.currentVolume = event.detail.rms;
+  }
+
   handleFrequencyDetected(event) {
     const { frequency, note, cents } = event.detail;
     
+    // Only process frequency data if volume is above threshold
+    if (this.currentVolume < this.volumeThreshold) {
+      // Signal too weak - reset to rest position
+      this.setNeedleAngle(-50);
+      this.shadowRoot.querySelector('.current-frequency').textContent = '-- Hz';
+      this.shadowRoot.querySelector('.current-note').textContent = 'Too Quiet';
+      return;
+    }
+
     if (frequency > 0 && isFinite(frequency)) {
-      // Find the closest note for the selected instrument
-      const { note: closestNote, cents: instrumentCents } = this.findClosestNote(frequency);
-      
-      // Update display
+      // Update frequency display (round to nearest integer)
       this.shadowRoot.querySelector('.current-frequency').textContent = `${Math.round(frequency)} Hz`;
-      this.shadowRoot.querySelector('.current-note').textContent = closestNote;
-      
-      // Map cents to angle (-50 to +50 degrees)
-      let angle = Math.max(-50, Math.min(50, instrumentCents / 2));
+      this.shadowRoot.querySelector('.current-note').textContent = note;
+
+      // Calculate needle angle based on cents
+      // Map cents to angle: -50 cents = -50 degrees, +50 cents = +50 degrees
+      const angle = Math.max(-50, Math.min(50, cents));
       this.setNeedleAngle(angle);
     } else {
-      this.setNeedleAngle(-50); // Rest position
+      // Reset to rest position for invalid frequencies
+      this.setNeedleAngle(-50);
       this.shadowRoot.querySelector('.current-frequency').textContent = '-- Hz';
       this.shadowRoot.querySelector('.current-note').textContent = '--';
     }
@@ -281,6 +299,7 @@ export default class ChromaticTuner extends BaseComponent {
   disconnectedCallback() {
     // Clean up event listeners
     document.removeEventListener('frequency-detected', this._boundFrequencyHandler);
+    document.removeEventListener('volume-detected', this._boundVolumeHandler);
     document.removeEventListener('instrument-selected', this._boundInstrumentChange);
   }
 }

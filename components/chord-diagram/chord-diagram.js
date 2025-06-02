@@ -73,12 +73,18 @@ export default class ChordDiagram extends BaseComponent {
         super(template, styles)
         
         this.instrument = instrumentState();
-        console.log('instrument', this.instrument);
         this.chord = this.getAttribute('chord');
         this.chords = chordLibrary.chords;
         this.initialised = false;
 
         this.shadowRoot.querySelector('.chord-diagram').innerHTML = this.createFretboard();
+        this.initialised = true;
+
+        // Add event listener for set-chord event
+        this.addEventListener('set-chord', (event) => {
+            this.chord = event.detail;
+            this.renderChord(this.chord);
+        });
     }
 
     static get observedAttributes() {
@@ -86,19 +92,15 @@ export default class ChordDiagram extends BaseComponent {
     }
 
     attributeChangedCallback(name, oldValue, newValue) {
-        console.log('attributeChangedCallback', name, oldValue, newValue);
-        
         if (oldValue === newValue) {
             return;
         }
         
         if (name === 'chord') {
-            console.log('chord changed', newValue);
             this.chord = newValue;
         }
 
         if (name === 'instrument') {
-            console.log('instrument changed', newValue);
             this.instrument = newValue.toLowerCase();
         }
         this.setInstrument();
@@ -108,16 +110,11 @@ export default class ChordDiagram extends BaseComponent {
         if (this.initialised) {
             return;
         }
-
-        console.log('connectedCallback');
         this.setInstrument();
-        // this.renderChord(event.detail);
-        // this.addEventListener('set-chord', (event) => {
-        // });
     }
 
     createFretboard() {
-        if (this.instrument === 'Mandolin' || this.instrument === 'Ukulele') {
+        if (this.instrument.toLowerCase() === 'mandolin' || this.instrument.toLowerCase() === 'ukulele') {
             return Array(20).fill('<div class="fret"></div>').join('');
         }
         return Array(30).fill('<div class="fret"></div>').join('');
@@ -163,22 +160,22 @@ export default class ChordDiagram extends BaseComponent {
     }
 
     setInstrument() {
-        console.log('setInstrument', this.instrument);
         this.shadowRoot.querySelector('.chord-diagram').classList.forEach(className => {
-            console.log('className', className);
             if (className !== 'chord-diagram') {
-                console.log('removing', className);
                 if (className !== `chord-diagram--${this.instrument}`) {
                     this.shadowRoot.querySelector('.chord-diagram').classList.remove(className);
                 }
             }
         });
         if (!this.shadowRoot.querySelector('.chord-diagram').classList.contains(`chord-diagram--${this.instrument}`)) {
-
             this.shadowRoot.querySelector('.chord-diagram').classList.add(`chord-diagram--${this.instrument}`);
         }
+        
+        this.shadowRoot.querySelector('.chord-diagram').innerHTML = this.createFretboard();
        
-        this.renderChord(this.chord);
+        if (this.chord) {
+            this.renderChord(this.chord);
+        }
     }
 }
 
