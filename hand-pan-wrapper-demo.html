@@ -136,6 +136,7 @@
         <h2>✨ Features</h2>
         <ul>
             <li><strong>Audio Management:</strong> One-click audio context initialization with visual feedback</li>
+            <li><strong>Audio Effects:</strong> Real-time control of reverb, chorus, delay, and synth parameters</li>
             <li><strong>Key Selection:</strong> Choose from D, F, G keys in major or minor scales</li>
             <li><strong>Size Controls:</strong> Small, medium, and large HandPan sizes</li>
             <li><strong>Event Logging:</strong> Real-time logging of all HandPan events</li>
@@ -187,6 +188,16 @@
             <h4>getHandPan()</h4>
             <p>Returns the underlying HandPan component for advanced control</p>
         </div>
+        
+        <div class="api-method">
+            <h4>applyAudioEffects()</h4>
+            <p>Applies current audio effect settings to the HandPan synthesizer</p>
+        </div>
+        
+        <div class="api-method">
+            <h4>resetEffects()</h4>
+            <p>Resets all audio effects to their default values</p>
+        </div>
     </div>
 
     <!-- The HandPan Wrapper Component -->
@@ -224,6 +235,15 @@
             console.log('Demo: Enabling audio...');
             wrapper.enableAudio();
         }, 10000);
+        
+        // Example: Demonstrate audio effects API after 15 seconds
+        setTimeout(() => {
+            console.log('Demo: Demonstrating audio effects...');
+            // The sliders in the UI will automatically control the effects
+            // You can also programmatically control them:
+            // wrapper.audioEffects.reverb.wet = 0.5;
+            // wrapper.applyAudioEffects();
+        }, 15000);
     </script>
 </body>
 </html> 

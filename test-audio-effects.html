@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Audio Effects Test</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 20px;
+            background: linear-gradient(135deg, #0f0f23, #1a1a2e);
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            color: #fff;
+            min-height: 100vh;
+        }
+
+        .test-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .test-header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            background: linear-gradient(45deg, #4CAF50, #2196F3);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .test-info {
+            background: rgba(255,255,255,0.1);
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 30px;
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+
+        .test-info h2 {
+            margin-top: 0;
+            color: #4CAF50;
+        }
+
+        .test-info ul {
+            margin: 10px 0;
+            padding-left: 20px;
+        }
+
+        .test-info li {
+            margin-bottom: 8px;
+            color: #ddd;
+        }
+
+        .test-controls {
+            background: rgba(255,255,255,0.05);
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 30px;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .test-controls h2 {
+            margin-top: 0;
+            color: #FF9800;
+        }
+
+        .test-btn {
+            background: linear-gradient(135deg, #4CAF50, #45a049);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            margin: 5px;
+            transition: all 0.3s ease;
+        }
+
+        .test-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(76, 175, 80, 0.3);
+        }
+
+        .test-btn.secondary {
+            background: linear-gradient(135deg, #607d8b, #455a64);
+        }
+
+        .test-btn.secondary:hover {
+            box-shadow: 0 4px 15px rgba(96, 125, 139, 0.3);
+        }
+
+        .console-output {
+            background: rgba(0,0,0,0.3);
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 30px;
+            border: 1px solid rgba(255,255,255,0.1);
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+
+        .console-output h3 {
+            margin-top: 0;
+            color: #2196F3;
+        }
+
+        .console-entry {
+            margin-bottom: 5px;
+            color: #00ff00;
+        }
+
+        .console-entry.error {
+            color: #ff4444;
+        }
+
+        .console-entry.info {
+            color: #2196F3;
+        }
+    </style>
+</head>
+<body>
+    <div class="test-header">
+        <h1>🎛️ Audio Effects Test</h1>
+        <p>Testing the new audio effects controls in the HandPan Wrapper</p>
+    </div>
+
+    <div class="test-info">
+        <h2>🧪 Test Instructions</h2>
+        <ul>
+            <li><strong>1.</strong> Click "Enable Audio" to start the audio context</li>
+            <li><strong>2.</strong> Use the sliders in the HandPan Wrapper to adjust audio effects</li>
+            <li><strong>3.</strong> Click on the HandPan to play notes and hear the effects</li>
+            <li><strong>4.</strong> Try the test buttons below to programmatically control effects</li>
+            <li><strong>5.</strong> Check the console output for any errors or status messages</li>
+        </ul>
+    </div>
+
+    <div class="test-controls">
+        <h2>🔧 Test Controls</h2>
+        <button id="enableAudioBtn" class="test-btn">Enable Audio</button>
+        <button id="testReverbBtn" class="test-btn secondary">Test Reverb (High)</button>
+        <button id="testChorusBtn" class="test-btn secondary">Test Chorus (High)</button>
+        <button id="testDelayBtn" class="test-btn secondary">Test Delay (High)</button>
+        <button id="resetEffectsBtn" class="test-btn secondary">Reset Effects</button>
+        <button id="clearConsoleBtn" class="test-btn secondary">Clear Console</button>
+    </div>
+
+    <div class="console-output">
+        <h3>📝 Console Output</h3>
+        <div id="consoleOutput">
+            <div class="console-entry info">Audio Effects Test initialized...</div>
+        </div>
+    </div>
+
+    <!-- The HandPan Wrapper Component -->
+    <hand-pan-wrapper id="testHandPan"></hand-pan-wrapper>
+
+    <!-- Load Tone.js -->
+    <script src="https://unpkg.com/tone@14.7.77/build/Tone.js"></script>
+    
+    <!-- Load our components -->
+    <script type="module">
+        import HandPan from './components/hand-pan/hand-pan.js';
+        import HandPanWrapper from './components/hand-pan-wrapper/hand-pan-wrapper.js';
+        
+        const wrapper = document.getElementById('testHandPan');
+        const consoleOutput = document.getElementById('consoleOutput');
+        
+        // Console logging function
+        function logToConsole(message, type = 'info') {
+            const entry = document.createElement('div');
+            entry.className = `console-entry ${type}`;
+            entry.textContent = `[${new Date().toLocaleTimeString()}] ${message}`;
+            consoleOutput.appendChild(entry);
+            consoleOutput.scrollTop = consoleOutput.scrollHeight;
+        }
+        
+        // Test button event listeners
+        document.getElementById('enableAudioBtn').addEventListener('click', async () => {
+            try {
+                await wrapper.toggleAudio();
+                logToConsole('Audio enabled via test button', 'info');
+            } catch (error) {
+                logToConsole(`Error enabling audio: ${error.message}`, 'error');
+            }
+        });
+        
+        document.getElementById('testReverbBtn').addEventListener('click', () => {
+            try {
+                wrapper.audioEffects.reverb.decay = 1.5;
+                wrapper.audioEffects.reverb.wet = 0.8;
+                wrapper.applyAudioEffects();
+                logToConsole('Applied high reverb settings', 'info');
+            } catch (error) {
+                logToConsole(`Error applying reverb: ${error.message}`, 'error');
+            }
+        });
+        
+        document.getElementById('testChorusBtn').addEventListener('click', () => {
+            try {
+                wrapper.audioEffects.chorus.frequency = 4.0;
+                wrapper.audioEffects.chorus.depth = 0.9;
+                wrapper.audioEffects.chorus.wet = 0.6;
+                wrapper.applyAudioEffects();
+                logToConsole('Applied high chorus settings', 'info');
+            } catch (error) {
+                logToConsole(`Error applying chorus: ${error.message}`, 'error');
+            }
+        });
+        
+        document.getElementById('testDelayBtn').addEventListener('click', () => {
+            try {
+                wrapper.audioEffects.delay.delayTime = 0.3;
+                wrapper.audioEffects.delay.feedback = 0.6;
+                wrapper.audioEffects.delay.wet = 0.5;
+                wrapper.applyAudioEffects();
+                logToConsole('Applied high delay settings', 'info');
+            } catch (error) {
+                logToConsole(`Error applying delay: ${error.message}`, 'error');
+            }
+        });
+        
+        document.getElementById('resetEffectsBtn').addEventListener('click', () => {
+            try {
+                wrapper.resetEffects();
+                logToConsole('Effects reset to defaults', 'info');
+            } catch (error) {
+                logToConsole(`Error resetting effects: ${error.message}`, 'error');
+            }
+        });
+        
+        document.getElementById('clearConsoleBtn').addEventListener('click', () => {
+            consoleOutput.innerHTML = '<div class="console-entry info">Console cleared...</div>';
+        });
+        
+        // Listen for wrapper events
+        wrapper.addEventListener('audio-enabled', (event) => {
+            logToConsole('Audio context started successfully', 'info');
+        });
+        
+        wrapper.addEventListener('audio-disabled', (event) => {
+            logToConsole('Audio context disabled', 'info');
+        });
+        
+        wrapper.addEventListener('note-played', (event) => {
+            logToConsole(`Note played: ${event.detail.note}`, 'info');
+        });
+        
+        // Listen for any errors
+        window.addEventListener('error', (event) => {
+            logToConsole(`Global error: ${event.error.message}`, 'error');
+        });
+        
+        // Log when wrapper is ready
+        setTimeout(() => {
+            logToConsole('HandPan Wrapper ready for testing', 'info');
+        }, 1000);
+    </script>
+</body>
+</html>

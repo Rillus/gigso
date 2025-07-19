@@ -76,14 +76,14 @@ export default class HandPan extends HTMLElement {
                 sustain: 0.3,     // Lower sustain for faster fade
                 release: 0.6      // Faster release for quicker note fade
             }
-        }).toDestination();
+        });
 
         // Create enhanced reverb for steel drum resonance
         this.reverb = new Tone.Reverb({
             decay: 0.8,           // Shorter decay for faster note fade
             wet: 0.25,            // Less reverb for cleaner sound
             preDelay: 0.02        // Very short pre-delay for quick response
-        }).toDestination();
+        });
 
         // Add chorus for steel drum shimmer
         this.chorus = new Tone.Chorus({
@@ -91,19 +91,28 @@ export default class HandPan extends HTMLElement {
             delayTime: 2.5,
             depth: 0.7,
             wet: 0.2
-        }).toDestination();
+        });
 
         // Add subtle delay for steel drum echo
         this.delay = new Tone.PingPongDelay({
-            delayTime: "15n",
+            delayTime: 0.125,     // Convert from "15n" to seconds
             feedback: 0.2,
             wet: 0.15
-        }).toDestination();
+        });
 
-        // Create effects chain: synth → chorus → delay → reverb
+        // Create effects chain: synth → chorus → delay → reverb → destination
         this.synth.connect(this.chorus);
         this.chorus.connect(this.delay);
         this.delay.connect(this.reverb);
+        this.reverb.toDestination();
+
+        // Expose effects for external control
+        this.audioEffects = {
+            synth: this.synth,
+            reverb: this.reverb,
+            chorus: this.chorus,
+            delay: this.delay
+        };
     }
 
     render() {
