@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HandPan Component Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            margin: 0;
+            padding: 20px;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        h1 {
+            color: white;
+            text-align: center;
+            margin-bottom: 30px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .test-container {
+            background: rgba(255,255,255,0.1);
+            padding: 30px;
+            border-radius: 20px;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+            margin-bottom: 30px;
+        }
+
+        .controls {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        button {
+            background: rgba(255,255,255,0.2);
+            border: 2px solid rgba(255,255,255,0.3);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(5px);
+        }
+
+        button:hover {
+            background: rgba(255,255,255,0.3);
+            transform: translateY(-2px);
+        }
+
+        button.active {
+            background: rgba(255,255,255,0.4);
+            border-color: rgba(255,255,255,0.6);
+        }
+
+        .info {
+            color: white;
+            text-align: center;
+            margin-top: 20px;
+            font-size: 14px;
+            opacity: 0.8;
+        }
+
+        .event-log {
+            background: rgba(0,0,0,0.3);
+            color: #00ff00;
+            padding: 15px;
+            border-radius: 10px;
+            font-family: monospace;
+            font-size: 12px;
+            max-height: 200px;
+            overflow-y: auto;
+            margin-top: 20px;
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+
+        .event-log h3 {
+            margin-top: 0;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <h1>🎵 HandPan Component Test - Phase 2</h1>
+    
+    <div class="test-container">
+        <div class="controls">
+            <button onclick="changeKey('D', 'minor')" class="active">D Minor</button>
+            <button onclick="changeKey('F', 'major')">F Major</button>
+            <button onclick="changeKey('G', 'minor')">G Minor</button>
+            <button onclick="toggleMute()" id="muteBtn">Mute</button>
+            <button onclick="changeSize('small')">Small</button>
+            <button onclick="changeSize('medium')" class="active">Medium</button>
+            <button onclick="changeSize('large')">Large</button>
+        </div>
+        
+        <hand-pan id="handPan" key="D" scale="minor" size="medium"></hand-pan>
+        
+        <div class="info">
+            <p>🎵 <strong>Phase 2 Features:</strong></p>
+            <p>• Click or tap tone fields to play authentic hand pan sounds</p>
+            <p>• Multi-touch support - try multiple fingers on mobile</p>
+            <p>• Enhanced visual feedback with pulse animations</p>
+            <p>• Warm, metallic timbre with natural decay</p>
+        </div>
+    </div>
+
+    <div class="event-log">
+        <h3>Event Log</h3>
+        <div id="eventLog"></div>
+    </div>
+
+    <!-- Load Tone.js -->
+    <script src="https://unpkg.com/tone@14.7.77/build/Tone.js"></script>
+    
+    <!-- Load our component -->
+    <script type="module">
+        import HandPan from './components/hand-pan/hand-pan.js';
+        
+        // Wait for Tone.js to load
+        window.addEventListener('load', async () => {
+            // Start audio context
+            await Tone.start();
+            console.log('Audio context started');
+        });
+
+        // Set up event listeners at document level
+        document.addEventListener('note-played', (event) => {
+            console.log('Test: Received note-played event', event.detail);
+            logEvent(`Note played: ${event.detail.note} (${Math.round(event.detail.frequency)}Hz)`);
+        });
+
+        document.addEventListener('key-changed', (event) => {
+            console.log('Test: Received key-changed event', event.detail);
+            logEvent(`Key changed: ${event.detail.key} ${event.detail.scale}`);
+        });
+
+        // Global functions for testing
+        window.changeKey = function(key, scale) {
+            console.log('Test: changeKey called with', key, scale);
+            const handPan = document.getElementById('handPan');
+            
+            // Dispatch the set-key event to trigger the change
+            const setKeyEvent = new CustomEvent('set-key', {
+                detail: { key: key, scale: scale }
+            });
+            console.log('Test: Dispatching set-key event', setKeyEvent.detail);
+            handPan.dispatchEvent(setKeyEvent);
+            
+            // Update button states
+            document.querySelectorAll('.controls button').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            event.target.classList.add('active');
+            
+            logEvent(`Changed key to ${key} ${scale}`);
+        };
+
+        window.toggleMute = function() {
+            const handPan = document.getElementById('handPan');
+            const muteBtn = document.getElementById('muteBtn');
+            
+            if (handPan.isMuted) {
+                handPan.dispatchEvent(new CustomEvent('unmute'));
+                muteBtn.textContent = 'Mute';
+                logEvent('Unmuted hand pan');
+            } else {
+                handPan.dispatchEvent(new CustomEvent('mute'));
+                muteBtn.textContent = 'Unmute';
+                logEvent('Muted hand pan');
+            }
+        };
+
+        window.changeSize = function(size) {
+            const handPan = document.getElementById('handPan');
+            handPan.setAttribute('size', size);
+            
+            // Update button states
+            document.querySelectorAll('.controls button').forEach(btn => {
+                if (btn.textContent.toLowerCase().includes(size)) {
+                    btn.classList.add('active');
+                } else if (btn.textContent.includes('Small') || btn.textContent.includes('Medium') || btn.textContent.includes('Large')) {
+                    btn.classList.remove('active');
+                }
+            });
+            
+            logEvent(`Changed size to ${size}`);
+        };
+
+        window.logEvent = function(message) {
+            const eventLog = document.getElementById('eventLog');
+            const timestamp = new Date().toLocaleTimeString();
+            eventLog.innerHTML += `<div>[${timestamp}] ${message}</div>`;
+            eventLog.scrollTop = eventLog.scrollHeight;
+        };
+
+        // Note: Event listeners are now set up in the load event handler
+
+        // Initial log
+        logEvent('HandPan component loaded and ready!');
+        
+        // Test that the component is working
+        setTimeout(() => {
+            const handPan = document.getElementById('handPan');
+            console.log('Test: HandPan component:', handPan);
+            console.log('Test: HandPan notes:', handPan.notes);
+            console.log('Test: HandPan current key:', handPan.currentKey);
+            console.log('Test: HandPan current scale:', handPan.currentScale);
+        }, 1000);
+    </script>
+</body>
+</html> 

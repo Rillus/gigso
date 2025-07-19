@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HandPan Wrapper Demo</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 20px;
+            background: linear-gradient(135deg, #0f0f23, #1a1a2e);
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            color: #fff;
+            min-height: 100vh;
+        }
+
+        .demo-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .demo-header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            background: linear-gradient(45deg, #4CAF50, #2196F3);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .demo-header p {
+            font-size: 1.2em;
+            color: #ccc;
+            margin: 0;
+        }
+
+        .demo-info {
+            background: rgba(255,255,255,0.1);
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 30px;
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+
+        .demo-info h2 {
+            margin-top: 0;
+            color: #4CAF50;
+        }
+
+        .demo-info ul {
+            margin: 10px 0;
+            padding-left: 20px;
+        }
+
+        .demo-info li {
+            margin-bottom: 8px;
+            color: #ddd;
+        }
+
+        .usage-example {
+            background: rgba(0,0,0,0.3);
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 30px;
+            border: 1px solid rgba(255,255,255,0.1);
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            overflow-x: auto;
+        }
+
+        .usage-example h3 {
+            margin-top: 0;
+            color: #2196F3;
+        }
+
+        .code-block {
+            background: #1a1a1a;
+            padding: 15px;
+            border-radius: 5px;
+            border-left: 4px solid #4CAF50;
+        }
+
+        .api-section {
+            background: rgba(255,255,255,0.05);
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 30px;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .api-section h2 {
+            margin-top: 0;
+            color: #FF9800;
+        }
+
+        .api-method {
+            background: rgba(0,0,0,0.2);
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 15px;
+            border-left: 4px solid #FF9800;
+        }
+
+        .api-method h4 {
+            margin: 0 0 10px 0;
+            color: #FF9800;
+        }
+
+        .api-method p {
+            margin: 0;
+            color: #ddd;
+        }
+
+        @media (max-width: 768px) {
+            body {
+                padding: 10px;
+            }
+            
+            .demo-header h1 {
+                font-size: 2em;
+            }
+            
+            .usage-example {
+                font-size: 12px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="demo-header">
+        <h1>🎵 HandPan Wrapper Component</h1>
+        <p>A complete, drop-in HandPan instrument with controls and audio management</p>
+    </div>
+
+    <div class="demo-info">
+        <h2>✨ Features</h2>
+        <ul>
+            <li><strong>Audio Management:</strong> One-click audio context initialization with visual feedback</li>
+            <li><strong>Key Selection:</strong> Choose from D, F, G keys in major or minor scales</li>
+            <li><strong>Size Controls:</strong> Small, medium, and large HandPan sizes</li>
+            <li><strong>Event Logging:</strong> Real-time logging of all HandPan events</li>
+            <li><strong>Responsive Design:</strong> Works perfectly on desktop and mobile</li>
+            <li><strong>Easy Integration:</strong> Single component with all controls included</li>
+        </ul>
+    </div>
+
+    <div class="usage-example">
+        <h3>📝 Simple Usage</h3>
+        <div class="code-block">
+&lt;!-- Basic usage --&gt;
+&lt;hand-pan-wrapper&gt;&lt;/hand-pan-wrapper&gt;
+
+&lt;!-- With custom attributes --&gt;
+&lt;hand-pan-wrapper 
+    key="F" 
+    scale="major" 
+    size="large" 
+    audio-enabled="true"&gt;
+&lt;/hand-pan-wrapper&gt;
+        </div>
+    </div>
+
+    <div class="api-section">
+        <h2>🔧 JavaScript API</h2>
+        
+        <div class="api-method">
+            <h4>enableAudio()</h4>
+            <p>Enables the audio context and starts Tone.js</p>
+        </div>
+        
+        <div class="api-method">
+            <h4>disableAudio()</h4>
+            <p>Disables the audio context</p>
+        </div>
+        
+        <div class="api-method">
+            <h4>setKey(key, scale)</h4>
+            <p>Changes the HandPan key and scale (e.g., setKey('F', 'major'))</p>
+        </div>
+        
+        <div class="api-method">
+            <h4>setSize(size)</h4>
+            <p>Changes the HandPan size ('small', 'medium', 'large')</p>
+        </div>
+        
+        <div class="api-method">
+            <h4>getHandPan()</h4>
+            <p>Returns the underlying HandPan component for advanced control</p>
+        </div>
+    </div>
+
+    <!-- The HandPan Wrapper Component -->
+    <hand-pan-wrapper id="demoHandPan"></hand-pan-wrapper>
+
+    <!-- Load Tone.js -->
+    <script src="https://unpkg.com/tone@14.7.77/build/Tone.js"></script>
+    
+    <!-- Load our components -->
+    <script type="module">
+        import HandPan from './components/hand-pan/hand-pan.js';
+        import HandPanWrapper from './components/hand-pan-wrapper/hand-pan-wrapper.js';
+        
+        // Example of using the JavaScript API
+        const wrapper = document.getElementById('demoHandPan');
+        
+        // Listen for audio events
+        wrapper.addEventListener('audio-enabled', (event) => {
+            console.log('Audio enabled:', event.detail);
+        });
+        
+        wrapper.addEventListener('audio-disabled', (event) => {
+            console.log('Audio disabled:', event.detail);
+        });
+        
+        // Example: Programmatically change settings after 5 seconds
+        setTimeout(() => {
+            console.log('Demo: Changing to F major, large size...');
+            wrapper.setKey('F', 'major');
+            wrapper.setSize('large');
+        }, 5000);
+        
+        // Example: Enable audio after 10 seconds
+        setTimeout(() => {
+            console.log('Demo: Enabling audio...');
+            wrapper.enableAudio();
+        }, 10000);
+    </script>
+</body>
+</html> 
