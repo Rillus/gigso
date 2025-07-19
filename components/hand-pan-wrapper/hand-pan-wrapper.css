@@ -11,22 +11,132 @@
     color: #fff;
 }
 
-.control-section {
-    margin-bottom: 25px;
+/* HandPan Container - Now at the top */
+.hand-pan-container {
+    margin-bottom: 30px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 300px;
+    background: rgba(255,255,255,0.02);
+    border-radius: 15px;
+    border: 1px solid rgba(255,255,255,0.1);
     padding: 20px;
+}
+
+/* Collapsible Sections */
+.control-section {
+    margin-bottom: 15px;
     background: rgba(255,255,255,0.05);
     border-radius: 10px;
     border: 1px solid rgba(255,255,255,0.1);
+    overflow: hidden;
+    transition: all 0.3s ease;
 }
 
-.control-section h3 {
-    margin: 0 0 15px 0;
+.control-section.collapsible {
+    cursor: pointer;
+}
+
+.control-section.collapsible.collapsed .section-content {
+    max-height: 0;
+    opacity: 0;
+    padding: 0 20px;
+    overflow: hidden;
+}
+
+.control-section.collapsible:not(.collapsed) .section-content {
+    max-height: 1000px;
+    opacity: 1;
+    padding: 20px;
+    transition: all 0.3s ease;
+}
+
+.section-header {
+    padding: 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.section-header:hover {
+    background: rgba(255,255,255,0.05);
+}
+
+.section-header h3 {
+    margin: 0;
     font-size: 18px;
     font-weight: 600;
     color: #fff;
     display: flex;
     align-items: center;
     gap: 8px;
+}
+
+.collapse-icon {
+    font-size: 12px;
+    color: #ccc;
+    transition: transform 0.3s ease;
+}
+
+.control-section.collapsible:not(.collapsed) .collapse-icon {
+    transform: rotate(180deg);
+}
+
+/* Audio Preview Toggle */
+.audio-preview-toggle {
+    margin-bottom: 20px;
+    padding: 15px;
+    background: rgba(0,0,0,0.2);
+    border-radius: 8px;
+    border: 1px solid rgba(255,255,255,0.1);
+}
+
+.checkbox-label {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 500;
+    color: #ccc;
+}
+
+.checkbox-label input[type="checkbox"] {
+    display: none;
+}
+
+.checkmark {
+    width: 20px;
+    height: 20px;
+    border: 2px solid rgba(255,255,255,0.3);
+    border-radius: 4px;
+    background: rgba(255,255,255,0.1);
+    position: relative;
+    transition: all 0.3s ease;
+}
+
+.checkbox-label input[type="checkbox"]:checked + .checkmark {
+    background: linear-gradient(135deg, #4CAF50, #45a049);
+    border-color: #4CAF50;
+}
+
+.checkbox-label input[type="checkbox"]:checked + .checkmark::after {
+    content: '✓';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    color: white;
+    font-size: 12px;
+    font-weight: bold;
+}
+
+.checkbox-label:hover .checkmark {
+    border-color: #4CAF50;
+    box-shadow: 0 0 10px rgba(76, 175, 80, 0.3);
 }
 
 /* Audio Controls */
@@ -250,44 +360,34 @@
 }
 
 .size-btn:hover {
-    background: rgba(255,255,255,0.2);
-    border-color: rgba(255,255,255,0.4);
+    border-color: #4CAF50;
+    background: rgba(76, 175, 80, 0.1);
+    transform: translateY(-2px);
 }
 
 .size-btn.active {
-    background: linear-gradient(135deg, #2196F3, #1976D2);
-    border-color: #2196F3;
-    box-shadow: 0 4px 15px rgba(33, 150, 243, 0.3);
-}
-
-/* HandPan Container */
-.hand-pan-container {
-    display: flex;
-    justify-content: center;
-    margin: 30px 0;
-    padding: 20px;
-    background: rgba(0,0,0,0.2);
-    border-radius: 15px;
-    border: 1px solid rgba(255,255,255,0.1);
+    background: linear-gradient(135deg, #4CAF50, #45a049);
+    border-color: #4CAF50;
+    box-shadow: 0 4px 15px rgba(76, 175, 80, 0.3);
 }
 
 /* Event Log */
 .event-log {
-    background: rgba(0,0,0,0.3);
-    border: 1px solid rgba(255,255,255,0.1);
-    border-radius: 8px;
-    padding: 15px;
     max-height: 200px;
     overflow-y: auto;
+    background: rgba(0,0,0,0.2);
+    border-radius: 8px;
+    padding: 15px;
+    margin-bottom: 15px;
+    border: 1px solid rgba(255,255,255,0.1);
     font-family: 'Courier New', monospace;
     font-size: 12px;
-    margin-bottom: 15px;
 }
 
 .log-entry {
     margin-bottom: 5px;
-    color: #00ff00;
-    word-wrap: break-word;
+    color: #ccc;
+    padding: 2px 0;
 }
 
 .log-entry:last-child {
@@ -300,80 +400,84 @@
         padding: 15px;
         margin: 10px;
     }
-    
+
     .control-section {
-        padding: 15px;
-        margin-bottom: 20px;
+        margin-bottom: 10px;
     }
-    
+
     .effects-grid {
         grid-template-columns: 1fr;
         gap: 15px;
     }
-    
+
     .effect-group {
         padding: 12px;
     }
-    
+
     .slider-group {
         gap: 10px;
     }
-    
+
     .slider-group label {
         font-size: 12px;
     }
-    
+
     .key-controls {
         flex-direction: column;
         gap: 15px;
     }
-    
+
     .size-controls {
         justify-content: center;
     }
-    
+
     .audio-controls {
         flex-direction: column;
         align-items: flex-start;
         gap: 10px;
     }
-    
+
     .control-btn {
         width: 100%;
         min-width: auto;
+    }
+
+    .hand-pan-container {
+        min-height: 250px;
+        padding: 15px;
     }
 }
 
 @media (max-width: 480px) {
     .hand-pan-wrapper {
         padding: 10px;
+        margin: 5px;
     }
-    
-    .control-section h3 {
+
+    .section-header h3 {
         font-size: 16px;
     }
-    
+
     .effect-group h4 {
         font-size: 14px;
     }
-    
+
     .control-btn, .size-btn {
         padding: 8px 16px;
         font-size: 13px;
     }
-    
+
     .event-log {
         max-height: 150px;
         font-size: 11px;
     }
-    
+
     .slider-group label {
         font-size: 11px;
     }
-    
+
     .slider-group label span {
         font-size: 10px;
-        padding: 1px 4px;
         min-width: 35px;
     }
 } 

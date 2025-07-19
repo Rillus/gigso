@@ -11,6 +11,7 @@ export default class HandPanWrapper extends HTMLElement {
         this.currentSize = 'medium';
         this.audioEnabled = false;
         this.audioContextStarted = false;
+        this.audioPreviewEnabled = true; // New property for audio preview toggle
         
         // Audio effect properties
         this.audioEffects = {
@@ -41,6 +42,10 @@ export default class HandPanWrapper extends HTMLElement {
         // Get all available keys and scales
         this.availableKeys = getAllKeys();
         this.availableScales = getAllScaleTypes();
+        
+        // Audio preview synth for slider changes
+        this.previewSynth = null;
+        this.previewTimeout = null; // For debouncing audio preview
         
         this.render();
         this.addEventListeners();
@@ -92,133 +97,7 @@ export default class HandPanWrapper extends HTMLElement {
             </style>
             
             <div class="hand-pan-wrapper">
-                <!-- Audio Control Section -->
-                <div class="control-section audio-section">
-                    <h3>🎵 Audio Controls</h3>
-                    <div class="audio-controls">
-                        <button id="audioToggleBtn" class="control-btn ${this.audioEnabled ? 'enabled' : 'disabled'}">
-                            ${this.audioEnabled ? '🔊 Audio On' : '🔇 Audio Off'}
-                        </button>
-                        <span id="audioStatus" class="status-text">
-                            ${this.audioEnabled ? 'Audio ready' : 'Click to enable audio'}
-                        </span>
-                    </div>
-                </div>
-
-                <!-- Audio Effects Section -->
-                <div class="control-section effects-section">
-                    <h3>🎛️ Audio Effects</h3>
-                    <div class="effects-grid">
-                        <!-- Reverb Controls -->
-                        <div class="effect-group">
-                            <h4>🌊 Reverb</h4>
-                            <div class="slider-group">
-                                <label>Decay: <span id="reverbDecayValue">${this.audioEffects.reverb.decay}</span></label>
-                                <input type="range" id="reverbDecay" min="0.1" max="2.0" step="0.1" value="${this.audioEffects.reverb.decay}" class="slider">
-                                
-                                <label>Wet: <span id="reverbWetValue">${this.audioEffects.reverb.wet}</span></label>
-                                <input type="range" id="reverbWet" min="0" max="1" step="0.05" value="${this.audioEffects.reverb.wet}" class="slider">
-                                
-                                <label>Pre-delay: <span id="reverbPreDelayValue">${this.audioEffects.reverb.preDelay}</span></label>
-                                <input type="range" id="reverbPreDelay" min="0.01" max="0.1" step="0.01" value="${this.audioEffects.reverb.preDelay}" class="slider">
-                            </div>
-                        </div>
-
-                        <!-- Chorus Controls -->
-                        <div class="effect-group">
-                            <h4>🎭 Chorus</h4>
-                            <div class="slider-group">
-                                <label>Frequency: <span id="chorusFreqValue">${this.audioEffects.chorus.frequency}</span></label>
-                                <input type="range" id="chorusFreq" min="0.5" max="5" step="0.1" value="${this.audioEffects.chorus.frequency}" class="slider">
-                                
-                                <label>Depth: <span id="chorusDepthValue">${this.audioEffects.chorus.depth}</span></label>
-                                <input type="range" id="chorusDepth" min="0" max="1" step="0.05" value="${this.audioEffects.chorus.depth}" class="slider">
-                                
-                                <label>Wet: <span id="chorusWetValue">${this.audioEffects.chorus.wet}</span></label>
-                                <input type="range" id="chorusWet" min="0" max="1" step="0.05" value="${this.audioEffects.chorus.wet}" class="slider">
-                            </div>
-                        </div>
-
-                        <!-- Delay Controls -->
-                        <div class="effect-group">
-                            <h4>⏱️ Delay</h4>
-                            <div class="slider-group">
-                                <label>Time: <span id="delayTimeValue">${this.audioEffects.delay.delayTime}</span></label>
-                                <input type="range" id="delayTime" min="0.05" max="0.5" step="0.025" value="${this.audioEffects.delay.delayTime}" class="slider">
-                                
-                                <label>Feedback: <span id="delayFeedbackValue">${this.audioEffects.delay.feedback}</span></label>
-                                <input type="range" id="delayFeedback" min="0" max="0.8" step="0.05" value="${this.audioEffects.delay.feedback}" class="slider">
-                                
-                                <label>Wet: <span id="delayWetValue">${this.audioEffects.delay.wet}</span></label>
-                                <input type="range" id="delayWet" min="0" max="1" step="0.05" value="${this.audioEffects.delay.wet}" class="slider">
-                            </div>
-                        </div>
-
-                        <!-- Synth Controls -->
-                        <div class="effect-group">
-                            <h4>🎹 Synth</h4>
-                            <div class="slider-group">
-                                <label>Attack: <span id="synthAttackValue">${this.audioEffects.synth.attack}</span></label>
-                                <input type="range" id="synthAttack" min="0.001" max="0.1" step="0.001" value="${this.audioEffects.synth.attack}" class="slider">
-                                
-                                <label>Decay: <span id="synthDecayValue">${this.audioEffects.synth.decay}</span></label>
-                                <input type="range" id="synthDecay" min="0.01" max="0.5" step="0.01" value="${this.audioEffects.synth.decay}" class="slider">
-                                
-                                <label>Sustain: <span id="synthSustainValue">${this.audioEffects.synth.sustain}</span></label>
-                                <input type="range" id="synthSustain" min="0" max="1" step="0.05" value="${this.audioEffects.synth.sustain}" class="slider">
-                                
-                                <label>Release: <span id="synthReleaseValue">${this.audioEffects.synth.release}</span></label>
-                                <input type="range" id="synthRelease" min="0.1" max="2" step="0.05" value="${this.audioEffects.synth.release}" class="slider">
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <!-- Reset Effects Button -->
-                    <div class="effects-actions">
-                        <button id="resetEffectsBtn" class="control-btn secondary">Reset to Defaults</button>
-                    </div>
-                </div>
-
-                <!-- Key Selection Section -->
-                <div class="control-section key-section">
-                    <h3>🎼 Key Selection</h3>
-                    <div class="key-controls">
-                        <div class="key-row">
-                            <label>Key:</label>
-                            <select id="keySelect" class="control-select">
-                                ${this.availableKeys.map(key => 
-                                    `<option value="${key}" ${this.currentKey === key ? 'selected' : ''}>${key}</option>`
-                                ).join('')}
-                            </select>
-                        </div>
-                        <div class="key-row">
-                            <label>Scale:</label>
-                            <select id="scaleSelect" class="control-select">
-                                ${this.availableScales.map(scale => 
-                                    `<option value="${scale}" ${this.currentScale === scale ? 'selected' : ''}>${scale.charAt(0).toUpperCase() + scale.slice(1)}</option>`
-                                ).join('')}
-                            </select>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Size Selection Section -->
-                <div class="control-section size-section">
-                    <h3>📏 Size Selection</h3>
-                    <div class="size-controls">
-                        <button id="sizeSmall" class="size-btn ${this.currentSize === 'small' ? 'active' : ''}" data-size="small">
-                            Small
-                        </button>
-                        <button id="sizeMedium" class="size-btn ${this.currentSize === 'medium' ? 'active' : ''}" data-size="medium">
-                            Medium
-                        </button>
-                        <button id="sizeLarge" class="size-btn ${this.currentSize === 'large' ? 'active' : ''}" data-size="large">
-                            Large
-                        </button>
-                    </div>
-                </div>
-
-                <!-- HandPan Component -->
+                <!-- HandPan Component - Now at the top -->
                 <div class="hand-pan-container">
                     <hand-pan 
                         id="handPan" 
@@ -228,19 +107,197 @@ export default class HandPanWrapper extends HTMLElement {
                     </hand-pan>
                 </div>
 
-                <!-- Event Log -->
-                <div class="control-section log-section">
-                    <h3>📝 Event Log</h3>
-                    <div id="eventLog" class="event-log">
-                        <div class="log-entry">HandPan wrapper ready...</div>
+                <!-- Settings Sections - All collapsible -->
+                
+                <!-- Audio Control Section -->
+                <div class="control-section audio-section collapsible collapsed">
+                    <div class="section-header" data-section="audio">
+                        <h3>🎵 Audio Controls</h3>
+                        <span class="collapse-icon">▼</span>
                     </div>
-                    <button id="clearLogBtn" class="control-btn secondary">Clear Log</button>
+                    <div class="section-content">
+                        <div class="audio-controls">
+                            <button id="audioToggleBtn" class="control-btn ${this.audioEnabled ? 'enabled' : 'disabled'}">
+                                ${this.audioEnabled ? '🔊 Audio On' : '🔇 Audio Off'}
+                            </button>
+                            <span id="audioStatus" class="status-text">
+                                ${this.audioEnabled ? 'Audio ready' : 'Click to enable audio'}
+                            </span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Audio Effects Section -->
+                <div class="control-section effects-section collapsible collapsed">
+                    <div class="section-header" data-section="effects">
+                        <h3>🎛️ Audio Effects</h3>
+                        <span class="collapse-icon">▼</span>
+                    </div>
+                    <div class="section-content">
+                        <!-- Audio Preview Toggle -->
+                        <div class="audio-preview-toggle">
+                            <label class="checkbox-label">
+                                <input type="checkbox" id="audioPreviewToggle" ${this.audioPreviewEnabled ? 'checked' : ''}>
+                                <span class="checkmark"></span>
+                                🔊 Play C4 preview when changing sliders
+                            </label>
+                        </div>
+                        
+                        <div class="effects-grid">
+                            <!-- Reverb Controls -->
+                            <div class="effect-group">
+                                <h4>🌊 Reverb</h4>
+                                <div class="slider-group">
+                                    <label>Decay: <span id="reverbDecayValue">${this.audioEffects.reverb.decay}</span></label>
+                                    <input type="range" id="reverbDecay" min="0.1" max="2.0" step="0.1" value="${this.audioEffects.reverb.decay}" class="slider">
+                                    
+                                    <label>Wet: <span id="reverbWetValue">${this.audioEffects.reverb.wet}</span></label>
+                                    <input type="range" id="reverbWet" min="0" max="1" step="0.05" value="${this.audioEffects.reverb.wet}" class="slider">
+                                    
+                                    <label>Pre-delay: <span id="reverbPreDelayValue">${this.audioEffects.reverb.preDelay}</span></label>
+                                    <input type="range" id="reverbPreDelay" min="0.01" max="0.1" step="0.01" value="${this.audioEffects.reverb.preDelay}" class="slider">
+                                </div>
+                            </div>
+
+                            <!-- Chorus Controls -->
+                            <div class="effect-group">
+                                <h4>🎭 Chorus</h4>
+                                <div class="slider-group">
+                                    <label>Frequency: <span id="chorusFreqValue">${this.audioEffects.chorus.frequency}</span></label>
+                                    <input type="range" id="chorusFreq" min="0.5" max="5" step="0.1" value="${this.audioEffects.chorus.frequency}" class="slider">
+                                    
+                                    <label>Depth: <span id="chorusDepthValue">${this.audioEffects.chorus.depth}</span></label>
+                                    <input type="range" id="chorusDepth" min="0" max="1" step="0.05" value="${this.audioEffects.chorus.depth}" class="slider">
+                                    
+                                    <label>Wet: <span id="chorusWetValue">${this.audioEffects.chorus.wet}</span></label>
+                                    <input type="range" id="chorusWet" min="0" max="1" step="0.05" value="${this.audioEffects.chorus.wet}" class="slider">
+                                </div>
+                            </div>
+
+                            <!-- Delay Controls -->
+                            <div class="effect-group">
+                                <h4>⏱️ Delay</h4>
+                                <div class="slider-group">
+                                    <label>Time: <span id="delayTimeValue">${this.audioEffects.delay.delayTime}</span></label>
+                                    <input type="range" id="delayTime" min="0.05" max="0.5" step="0.025" value="${this.audioEffects.delay.delayTime}" class="slider">
+                                    
+                                    <label>Feedback: <span id="delayFeedbackValue">${this.audioEffects.delay.feedback}</span></label>
+                                    <input type="range" id="delayFeedback" min="0" max="0.8" step="0.05" value="${this.audioEffects.delay.feedback}" class="slider">
+                                    
+                                    <label>Wet: <span id="delayWetValue">${this.audioEffects.delay.wet}</span></label>
+                                    <input type="range" id="delayWet" min="0" max="1" step="0.05" value="${this.audioEffects.delay.wet}" class="slider">
+                                </div>
+                            </div>
+
+                            <!-- Synth Controls -->
+                            <div class="effect-group">
+                                <h4>🎹 Synth</h4>
+                                <div class="slider-group">
+                                    <label>Attack: <span id="synthAttackValue">${this.audioEffects.synth.attack}</span></label>
+                                    <input type="range" id="synthAttack" min="0.001" max="0.1" step="0.001" value="${this.audioEffects.synth.attack}" class="slider">
+                                    
+                                    <label>Decay: <span id="synthDecayValue">${this.audioEffects.synth.decay}</span></label>
+                                    <input type="range" id="synthDecay" min="0.01" max="0.5" step="0.01" value="${this.audioEffects.synth.decay}" class="slider">
+                                    
+                                    <label>Sustain: <span id="synthSustainValue">${this.audioEffects.synth.sustain}</span></label>
+                                    <input type="range" id="synthSustain" min="0" max="1" step="0.05" value="${this.audioEffects.synth.sustain}" class="slider">
+                                    
+                                    <label>Release: <span id="synthReleaseValue">${this.audioEffects.synth.release}</span></label>
+                                    <input type="range" id="synthRelease" min="0.1" max="2" step="0.05" value="${this.audioEffects.synth.release}" class="slider">
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Reset Effects Button -->
+                        <div class="effects-actions">
+                            <button id="resetEffectsBtn" class="control-btn secondary">Reset to Defaults</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Key Selection Section -->
+                <div class="control-section key-section collapsible collapsed">
+                    <div class="section-header" data-section="key">
+                        <h3>🎼 Key Selection</h3>
+                        <span class="collapse-icon">▼</span>
+                    </div>
+                    <div class="section-content">
+                        <div class="key-controls">
+                            <div class="key-row">
+                                <label>Key:</label>
+                                <select id="keySelect" class="control-select">
+                                    ${this.availableKeys.map(key => 
+                                        `<option value="${key}" ${this.currentKey === key ? 'selected' : ''}>${key}</option>`
+                                    ).join('')}
+                                </select>
+                            </div>
+                            <div class="key-row">
+                                <label>Scale:</label>
+                                <select id="scaleSelect" class="control-select">
+                                    ${this.availableScales.map(scale => 
+                                        `<option value="${scale}" ${this.currentScale === scale ? 'selected' : ''}>${scale.charAt(0).toUpperCase() + scale.slice(1)}</option>`
+                                    ).join('')}
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Size Selection Section -->
+                <div class="control-section size-section collapsible collapsed">
+                    <div class="section-header" data-section="size">
+                        <h3>📏 Size Selection</h3>
+                        <span class="collapse-icon">▼</span>
+                    </div>
+                    <div class="section-content">
+                        <div class="size-controls">
+                            <button id="sizeSmall" class="size-btn ${this.currentSize === 'small' ? 'active' : ''}" data-size="small">
+                                Small
+                            </button>
+                            <button id="sizeMedium" class="size-btn ${this.currentSize === 'medium' ? 'active' : ''}" data-size="medium">
+                                Medium
+                            </button>
+                            <button id="sizeLarge" class="size-btn ${this.currentSize === 'large' ? 'active' : ''}" data-size="large">
+                                Large
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Event Log -->
+                <div class="control-section log-section collapsible collapsed">
+                    <div class="section-header" data-section="log">
+                        <h3>📝 Event Log</h3>
+                        <span class="collapse-icon">▼</span>
+                    </div>
+                    <div class="section-content">
+                        <div id="eventLog" class="event-log">
+                            <div class="log-entry">HandPan wrapper ready...</div>
+                        </div>
+                        <button id="clearLogBtn" class="control-btn secondary">Clear Log</button>
+                    </div>
                 </div>
             </div>
         `;
     }
 
     addEventListeners() {
+        // Collapsible section headers
+        const sectionHeaders = this.shadowRoot.querySelectorAll('.section-header');
+        sectionHeaders.forEach(header => {
+            header.addEventListener('click', (e) => {
+                const section = e.currentTarget.closest('.collapsible');
+                section.classList.toggle('collapsed');
+            });
+        });
+
+        // Audio preview toggle
+        const audioPreviewToggle = this.shadowRoot.getElementById('audioPreviewToggle');
+        audioPreviewToggle.addEventListener('change', (e) => {
+            this.audioPreviewEnabled = e.target.checked;
+            this.logEvent(`Audio preview ${this.audioPreviewEnabled ? 'enabled' : 'disabled'}`);
+        });
+
         // Audio toggle
         const audioToggleBtn = this.shadowRoot.getElementById('audioToggleBtn');
         audioToggleBtn.addEventListener('click', () => this.toggleAudio());
@@ -328,8 +385,76 @@ export default class HandPanWrapper extends HTMLElement {
             // Apply effect to hand-pan
             this.applyAudioEffects();
             
+            // Play audio preview if enabled (with debouncing)
+            if (this.audioPreviewEnabled && this.audioEnabled) {
+                // Clear existing timeout
+                if (this.previewTimeout) {
+                    clearTimeout(this.previewTimeout);
+                }
+                // Set new timeout for debounced preview
+                this.previewTimeout = setTimeout(() => {
+                    this.playAudioPreview();
+                }, 100);
+            }
+            
             this.logEvent(`${effectType} ${property} changed to ${value.toFixed(3)}`);
         });
+    }
+
+    async playAudioPreview() {
+        try {
+            if (!this.previewSynth && this.audioEnabled) {
+                const { default: Tone } = await import('https://unpkg.com/tone@14.7.77/build/Tone.js');
+                
+                // Create a simple synth for preview
+                this.previewSynth = new Tone.Synth({
+                    oscillator: {
+                        type: 'sine'
+                    },
+                    envelope: {
+                        attack: 0.005,
+                        decay: 0.1,
+                        sustain: 0.3,
+                        release: 0.6
+                    }
+                });
+                
+                // Apply current audio effects to the preview synth
+                if (this.audioEffects) {
+                    // Create effects chain
+                    const reverb = new Tone.Reverb({
+                        decay: this.audioEffects.reverb.decay,
+                        preDelay: this.audioEffects.reverb.preDelay
+                    });
+                    reverb.wet.value = this.audioEffects.reverb.wet;
+                    
+                    const chorus = new Tone.Chorus({
+                        frequency: this.audioEffects.chorus.frequency,
+                        delayTime: this.audioEffects.chorus.delayTime,
+                        depth: this.audioEffects.chorus.depth
+                    });
+                    chorus.wet.value = this.audioEffects.chorus.wet;
+                    
+                    const delay = new Tone.FeedbackDelay({
+                        delayTime: this.audioEffects.delay.delayTime,
+                        feedback: this.audioEffects.delay.feedback
+                    });
+                    delay.wet.value = this.audioEffects.delay.wet;
+                    
+                    // Connect the chain
+                    this.previewSynth.chain(reverb, chorus, delay, Tone.Destination);
+                } else {
+                    this.previewSynth.toDestination();
+                }
+            }
+            
+            // Play C4 note if synth is ready
+            if (this.previewSynth) {
+                this.previewSynth.triggerAttackRelease('C4', '8n');
+            }
+        } catch (error) {
+            console.log('Audio preview error:', error);
+        }
     }
 
     applyAudioEffects() {
@@ -367,6 +492,12 @@ export default class HandPanWrapper extends HTMLElement {
             } catch (error) {
                 this.logEvent(`Error applying audio effects: ${error.message}`);
             }
+        }
+        
+        // Reset preview synth so it gets recreated with new effects
+        if (this.previewSynth) {
+            this.previewSynth.dispose();
+            this.previewSynth = null;
         }
     }
 
@@ -452,6 +583,18 @@ export default class HandPanWrapper extends HTMLElement {
             this.audioEnabled = false;
             this.updateAudioControls();
             this.logEvent('Audio disabled');
+            
+            // Clean up preview synth when audio is disabled
+            if (this.previewSynth) {
+                this.previewSynth.dispose();
+                this.previewSynth = null;
+            }
+            
+            // Clear any pending preview timeout
+            if (this.previewTimeout) {
+                clearTimeout(this.previewTimeout);
+                this.previewTimeout = null;
+            }
             
             // Dispatch audio-disabled event
             this.dispatchEvent(new CustomEvent('audio-disabled', {
