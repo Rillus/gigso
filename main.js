@@ -9,7 +9,7 @@ import State from './state/state.js';
 const { setInstrument } = State;
 
 const toneScript = document.createElement('script');
-toneScript.src = '/node_modules/tone/build/Tone.js';
+toneScript.src = 'https://unpkg.com/tone@14.7.77/build/Tone.js';
 document.head.appendChild(toneScript);
 
 import GigsoMenu from './components/gigso-menu/gigso-menu.js';
