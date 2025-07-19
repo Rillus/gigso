@@ -5,7 +5,8 @@
   "main": "app.js",
   "scripts": {
     "start": "node app.js",
-    "test": "jest --watch"
+    "test": "jest --watch",
+    "build": "echo 'Static site - no build required' && mkdir -p dist && cp -r *.html *.js *.css *.svg *.png components/ helpers/ state/ actions/ instrument-select/ dist/ 2>/dev/null || true"
   },
   "dependencies": {
     "tone": "^15.1.3"
