@@ -49,22 +49,41 @@ export function generateScaleNotes(key, scale) {
  * @returns {Array} Array of 8 notes formatted for hand pan layout
  */
 function convertToHandPanLayout(scaleNotes, rootKey) {
-    // Create a hand pan layout with optimal octave distribution
-    // Use octave 4 for root, 3rd, 5th, 7th (higher notes)
-    // Use octave 3 for 2nd, 4th, 6th, 9th (lower notes)
+    // Create a hand pan layout starting from root note in octave 4
+    // and ascending through the scale, wrapping to octave 5 when needed
     const layout = [];
     
-    // First 4 notes in octave 4
+    // Start with root note in octave 4
     layout.push(`${scaleNotes[0]}4`); // Root
-    layout.push(`${scaleNotes[2]}4`); // 3rd
-    layout.push(`${scaleNotes[4]}4`); // 5th
-    layout.push(`${scaleNotes[6]}4`); // 7th
     
-    // Next 4 notes in octave 3
-    layout.push(`${scaleNotes[1]}3`); // 2nd
-    layout.push(`${scaleNotes[3]}3`); // 4th
-    layout.push(`${scaleNotes[5]}3`); // 6th
-    layout.push(`${scaleNotes[7]}3`); // 9th
+    // Continue ascending through the scale
+    // Track the cumulative semitones to determine octave changes
+    let cumulativeSemitones = 0;
+    
+    for (let i = 1; i < scaleNotes.length; i++) {
+        const currentNote = scaleNotes[i];
+        const previousNote = scaleNotes[i - 1];
+        
+        // Calculate semitones between previous and current note
+        const currentIndex = CHROMATIC_SCALE.indexOf(currentNote);
+        const previousIndex = CHROMATIC_SCALE.indexOf(previousNote);
+        
+        let semitones;
+        if (currentIndex >= previousIndex) {
+            semitones = currentIndex - previousIndex;
+        } else {
+            // Wrapped around the chromatic scale
+            semitones = (12 - previousIndex) + currentIndex;
+        }
+        
+        cumulativeSemitones += semitones;
+        
+        // Determine octave based on cumulative semitones
+        // Start in octave 4, increment when we go beyond 12 semitones
+        const octave = 4 + Math.floor(cumulativeSemitones / 12);
+        
+        layout.push(`${currentNote}${octave}`);
+    }
     
     return layout;
 }

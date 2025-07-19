@@ -124,7 +124,17 @@ export default class HandPan extends HTMLElement {
             { top: '20%', left: '25%' }    // Top left
         ];
 
-        return this.notes.map((note, index) => {
+        // Sort notes by frequency to ensure clockwise ascending order
+        const sortedNotes = [...this.notes].sort((a, b) => {
+            const freqA = this.getNoteFrequency(a);
+            const freqB = this.getNoteFrequency(b);
+            return freqA - freqB;
+        });
+
+        // Store the sorted notes for use in event handlers
+        this.sortedNotes = sortedNotes;
+
+        return sortedNotes.map((note, index) => {
             const position = positions[index];
             return `
                 <div 
@@ -162,7 +172,7 @@ export default class HandPan extends HTMLElement {
     handleMouseInteraction(event, index) {
         if (this.isMuted) return;
 
-        const note = this.notes[index];
+        const note = this.sortedNotes[index];
         const noteId = `mouse-${index}`;
         
         console.log('HandPan: Mouse interaction - Playing note', note, 'at index', index);
@@ -206,7 +216,7 @@ export default class HandPan extends HTMLElement {
     handleTouchStart(event, index) {
         if (this.isMuted) return;
 
-        const note = this.notes[index];
+        const note = this.sortedNotes[index];
         const touch = event.touches[0];
         const touchId = touch.identifier;
         const noteId = `touch-${touchId}-${index}`;
