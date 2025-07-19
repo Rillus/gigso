@@ -8,6 +8,8 @@ const { playChord } = Actions;
 import State from './state/state.js';
 const { setInstrument } = State;
 
+import MidiController from './components/midi-controller/midi-controller.js';
+
 const toneScript = document.createElement('script');
 toneScript.src = '/node_modules/tone/build/Tone.js';
 document.head.appendChild(toneScript);
@@ -36,24 +38,44 @@ const elementsToAdd = [
     {
         tag: GigsoMenu,
     },
-    // {
-    //     tag: CurrentChord,
-    // },
-        {
-            tag: ChordPalette,
-            emittedEvents: [
-                {
-                    name: 'add-chord',
-                    function: (event) => {
-                        const chord = event.detail;
-                        dispatchComponentEvent('piano-roll', 'add-chord', chord);
-                    }
+    {
+        tag: MidiController,
+        emittedEvents: [
+            {
+                name: 'midi-connected',
+                function: (event) => {
+                    const { devices } = event.detail;
+                    // Set up MIDI input handling
+                    devices.inputs.forEach(input => {
+                        input.onmidimessage = (event) => {
+                            const [status, note, velocity] = event.data;
+                            const type = (status & 0xF0) === 0x90 ? 'noteon' : 'noteoff';
+                            
+                            if (type === 'noteon' && velocity > 0) {
+                                dispatchComponentEvent('gigso-keyboard', 'midi-note-on', { note, velocity });
+                                dispatchComponentEvent('piano-roll', 'midi-note-on', { note, velocity });
+                            } else {
+                                dispatchComponentEvent('gigso-keyboard', 'midi-note-off', { note });
+                                dispatchComponentEvent('piano-roll', 'midi-note-off', { note });
+                            }
+                        };
+                    });
                 }
-            ]
-        },
-    // {
-    //     tag: 'chord-diagram',
-    // },
+            }
+        ]
+    },
+    {
+        tag: ChordPalette,
+        emittedEvents: [
+            {
+                name: 'add-chord',
+                function: (event) => {
+                    const chord = event.detail;
+                    dispatchComponentEvent('piano-roll', 'add-chord', chord);
+                }
+            }
+        ]
+    },
     {
         tag: GigsoKeyboard,
     },
@@ -137,5 +159,6 @@ document.addEventListener('DOMContentLoaded', async () => {
   while (window.Tone === undefined) {
     await new Promise(resolve => setTimeout(resolve, 50));
   }
+  
   initializeApp(elementsToAdd);
 }); 
