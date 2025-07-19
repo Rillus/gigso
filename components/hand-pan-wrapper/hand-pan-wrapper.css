@@ -1,0 +1,241 @@
+/* HandPan Wrapper Component Styles */
+
+.hand-pan-wrapper {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 20px;
+    background: linear-gradient(135deg, #1a1a2e, #16213e);
+    border-radius: 15px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+    color: #fff;
+}
+
+.control-section {
+    margin-bottom: 25px;
+    padding: 20px;
+    background: rgba(255,255,255,0.05);
+    border-radius: 10px;
+    border: 1px solid rgba(255,255,255,0.1);
+}
+
+.control-section h3 {
+    margin: 0 0 15px 0;
+    font-size: 18px;
+    font-weight: 600;
+    color: #fff;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+/* Audio Controls */
+.audio-controls {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    flex-wrap: wrap;
+}
+
+.control-btn {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    min-width: 120px;
+}
+
+.control-btn.enabled {
+    background: linear-gradient(135deg, #4CAF50, #45a049);
+    color: white;
+    box-shadow: 0 4px 15px rgba(76, 175, 80, 0.3);
+}
+
+.control-btn.disabled {
+    background: linear-gradient(135deg, #f44336, #d32f2f);
+    color: white;
+    box-shadow: 0 4px 15px rgba(244, 67, 54, 0.3);
+}
+
+.control-btn.secondary {
+    background: linear-gradient(135deg, #607d8b, #455a64);
+    color: white;
+    box-shadow: 0 4px 15px rgba(96, 125, 139, 0.3);
+}
+
+.control-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(0,0,0,0.3);
+}
+
+.control-btn:active {
+    transform: translateY(0);
+}
+
+.status-text {
+    font-size: 14px;
+    color: #ccc;
+    font-style: italic;
+}
+
+/* Key Controls */
+.key-controls {
+    display: flex;
+    gap: 20px;
+    flex-wrap: wrap;
+}
+
+.key-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.key-row label {
+    font-weight: 600;
+    color: #fff;
+    min-width: 50px;
+}
+
+.control-select {
+    padding: 8px 12px;
+    border: 2px solid rgba(255,255,255,0.2);
+    border-radius: 6px;
+    background: rgba(255,255,255,0.1);
+    color: #fff;
+    font-size: 14px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.control-select:focus {
+    outline: none;
+    border-color: #4CAF50;
+    box-shadow: 0 0 10px rgba(76, 175, 80, 0.3);
+}
+
+.control-select option {
+    background: #2a2a2a;
+    color: #fff;
+}
+
+/* Size Controls */
+.size-controls {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.size-btn {
+    padding: 10px 20px;
+    border: 2px solid rgba(255,255,255,0.2);
+    border-radius: 8px;
+    background: rgba(255,255,255,0.1);
+    color: #fff;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    min-width: 80px;
+}
+
+.size-btn:hover {
+    background: rgba(255,255,255,0.2);
+    border-color: rgba(255,255,255,0.4);
+}
+
+.size-btn.active {
+    background: linear-gradient(135deg, #2196F3, #1976D2);
+    border-color: #2196F3;
+    box-shadow: 0 4px 15px rgba(33, 150, 243, 0.3);
+}
+
+/* HandPan Container */
+.hand-pan-container {
+    display: flex;
+    justify-content: center;
+    margin: 30px 0;
+    padding: 20px;
+    background: rgba(0,0,0,0.2);
+    border-radius: 15px;
+    border: 1px solid rgba(255,255,255,0.1);
+}
+
+/* Event Log */
+.event-log {
+    background: rgba(0,0,0,0.3);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 8px;
+    padding: 15px;
+    max-height: 200px;
+    overflow-y: auto;
+    font-family: 'Courier New', monospace;
+    font-size: 12px;
+    margin-bottom: 15px;
+}
+
+.log-entry {
+    margin-bottom: 5px;
+    color: #00ff00;
+    word-wrap: break-word;
+}
+
+.log-entry:last-child {
+    margin-bottom: 0;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .hand-pan-wrapper {
+        padding: 15px;
+        margin: 10px;
+    }
+    
+    .control-section {
+        padding: 15px;
+        margin-bottom: 20px;
+    }
+    
+    .key-controls {
+        flex-direction: column;
+        gap: 15px;
+    }
+    
+    .size-controls {
+        justify-content: center;
+    }
+    
+    .audio-controls {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
+    }
+    
+    .control-btn {
+        width: 100%;
+        min-width: auto;
+    }
+}
+
+@media (max-width: 480px) {
+    .hand-pan-wrapper {
+        padding: 10px;
+    }
+    
+    .control-section h3 {
+        font-size: 16px;
+    }
+    
+    .control-btn, .size-btn {
+        padding: 8px 16px;
+        font-size: 13px;
+    }
+    
+    .event-log {
+        max-height: 150px;
+        font-size: 11px;
+    }
+} 

@@ -1,0 +1,89 @@
+# Cursor Rules for Gigso Project
+
+## Project Overview
+Gigso is a web-based music creation application built with vanilla JavaScript, Web Components, and Tone.js. The project follows Test-Driven Development (TDD) principles and uses British English conventions.
+
+## Documentation Reference
+**ALWAYS** refer to `documents/PRD.md` for:
+- Feature specifications and requirements
+- Technical architecture details
+- Coding standards and conventions
+- Data structures and interfaces
+- UI/UX guidelines
+
+**ALWAYS** refer to `documents/COMPONENT-SPECIFICATIONS.md` for:
+- Component inputs, outputs, and expected behaviour
+- Event communication patterns
+- Integration requirements
+- Testing specifications
+
+**ALWAYS** refer to individual component files in `documents/components/` for:
+- Detailed component specifications
+- Specific implementation details
+- Component-specific testing requirements
+
+## Coding Standards (British English)
+- Use British English spelling and terminology
+- Follow TDD: Write tests before implementation
+- Use ES6 modules (import/export)
+- Follow kebab-case for files, PascalCase for classes, camelCase for functions
+- Extend BaseComponent for all Web Components
+- Use CustomEvent for component communication
+
+## Component Development
+- All components must extend BaseComponent
+- Include tests in `__tests__/` folders
+- Use isolated styles with Shadow DOM
+- Follow the event-driven architecture pattern
+- Reference PRD for component specifications
+
+## State Management
+- Use centralised state in `state/state.js`
+- Follow getter/setter pattern
+- Maintain immutability where possible
+- Reference PRD for state structure
+
+## Testing Requirements
+- Write tests before implementation (TDD)
+- Use Jest with jsdom environment
+- Test all component interactions
+- Maintain high test coverage
+- Follow naming convention: `component-name.test.js`
+
+## Audio Implementation
+- Use Tone.js for all audio functionality
+- Follow PRD performance requirements
+- Implement proper error handling for audio operations
+- Reference PRD for audio data structures
+
+## File Organisation
+- Follow the structure defined in PRD
+- Keep components in `components/` directory
+- Place tests alongside components
+- Use appropriate naming conventions
+
+## When Making Changes
+1. **First**: Check PRD for existing specifications
+2. **Update PRD** if specifications are incomplete or missing
+3. **Follow TDD**: Write tests first
+4. **Use British English** in all code and comments
+5. **Reference PRD** for data structures and interfaces
+6. **Maintain consistency** with existing codebase patterns
+
+## AI Assistant Guidelines
+- Always check `documents/PRD.md` before implementing features
+- Update the PRD if you discover missing or incomplete specifications
+- Follow British English conventions throughout
+- Implement TDD approach for all new features
+- Maintain the established architecture patterns
+- Reference the PRD for any architectural decisions
+
+## Key Files to Reference
+- `documents/PRD.md` - Complete project specification
+- `documents/COMPONENT-SPECIFICATIONS.md` - Component documentation overview
+- `documents/components/README.md` - Component documentation index
+- `documents/components/` - Individual component specifications
+- `components/base-component.js` - Base component architecture
+- `state/state.js` - State management patterns
+- `actions/actions.js` - Business logic examples
+- `main.js` - Application entry point and component registration 

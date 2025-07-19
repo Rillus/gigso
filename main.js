@@ -18,6 +18,7 @@ import AddChord from './components/add-chord/add-chord.js';
 import ChordPalette from './components/chord-palette/chord-palette.js';
 import ChordDiagram from './components/chord-diagram/chord-diagram.js';
 import RecordCollection from './components/record-collection/record-collection.js';
+import HandPan from './components/hand-pan/hand-pan.js';
 
 const appContainer = document.getElementById('app');
 
@@ -92,6 +93,23 @@ const elementsToAdd = [
                 function: (event) => {
                     const chord = event.detail;
                     dispatchComponentEvent('piano-roll', 'add-chord', chord);
+                }
+            }
+        ]
+    },
+    {
+        tag: HandPan,
+        emittedEvents: [
+            {
+                name: 'note-played',
+                function: (event) => {
+                    console.log('HandPan note played:', event.detail);
+                }
+            },
+            {
+                name: 'key-changed',
+                function: (event) => {
+                    console.log('HandPan key changed:', event.detail);
                 }
             }
         ]
