@@ -18,7 +18,7 @@ describe('ChordPalette Component', () => {
 
     test('should render all chord buttons', () => {
         const buttons = chordPaletteElement.shadowRoot.querySelectorAll('.chord-button');
-        expect(buttons.length).toBe(11); // Ensure all chords are rendered
+        expect(buttons.length).toBe(34); // Ensure all chromatic chords are rendered
     });
 
     test('should dispatch add-chord event with correct details when a chord button is clicked', () => {

@@ -10,6 +10,11 @@ export default class chordLibrary {
           'positions': [
               0, 0, 2, 2, 2, 0
           ]
+      },
+      'mandolin': {
+        'positions': [
+            2, 2, 4, 5
+        ]
       }
     },
     'Am': {
@@ -21,6 +26,11 @@ export default class chordLibrary {
         'guitar': {
             'positions': [
                 0, 0, 2, 2, 1, 0
+            ]
+        },
+        'mandolin': {
+            'positions': [
+                2, 2, 3, 5
             ]
         }
     },
@@ -34,6 +44,11 @@ export default class chordLibrary {
             'positions': [
                 0, 0, 2, 0, 1, 0
             ]
+        },
+        'mandolin': {
+            'positions': [
+                2, 2, 3, 3
+            ]
         }
     },
     'Dm': {
@@ -45,6 +60,28 @@ export default class chordLibrary {
         'guitar': {
             'positions': [
                 0, 0, 0, 2, 3, 1
+            ]
+        },
+        'mandolin': {
+            'positions': [
+                null, 0, 0, 1
+            ]
+        }
+    },
+    'D7': {
+        'ukulele': {
+            'positions': [
+                2, 0, 2, 0
+            ],
+        },
+        'guitar': {
+            'positions': [
+                0, 0, 0, 2, 1, 2
+            ]
+        },
+        'mandolin': {
+            'positions': [
+                null, 0, 3, 2
             ]
         }
     },
@@ -58,6 +95,11 @@ export default class chordLibrary {
             'positions': [
                 0, 3, 2, 0, 1, 0
             ]
+        },
+        'mandolin': {
+            'positions': [
+                0, 2, 3, 0
+            ]
         }
     },
     'Em': {
@@ -69,6 +111,11 @@ export default class chordLibrary {
         'guitar': {
             'positions': [
                 0, 2, 2, 0, 0, 0
+            ]
+        },
+        'mandolin': {
+            'positions': [
+                0, 2, 2, 0
             ]
         }
     },
@@ -82,6 +129,11 @@ export default class chordLibrary {
             'positions': [
                 0, 3, 3, 2, 1, 1
             ]
+        },
+        'mandolin': {
+            'positions': [
+                5, 3, 0, 1
+            ]
         }
     },
     'G': {
@@ -93,6 +145,11 @@ export default class chordLibrary {
         'guitar': {
             'positions': [
                 3, 2, 0, 0, 3, 3
+            ]
+        },
+        'mandolin': {
+            'positions': [
+                0, 0, 2, 3
             ]
         }
     },

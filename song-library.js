@@ -55,6 +55,46 @@ export default class songLibrary {
       ]
     },
     {
+      name: 'Mahasmashana',
+      artist: 'Father John Misty',
+      chords: [
+        {
+          "name": "G",
+          "notes": [
+            "G4",
+            "B4",
+            "D5"
+          ],
+          "duration": 1,
+          "delay": 0,
+          "startPosition": 0
+        },
+        {
+          "name": "D7",
+          "notes": [
+            "D4",
+            "F#4",
+            "A4",
+            "C5"
+          ],
+          "duration": 1,
+          "delay": 0,
+          "startPosition": 100
+        },
+        {
+          "name": "C",
+          "notes": [
+            "C4",
+            "E4",
+            "G4"
+          ],
+          "duration": 1,
+          "delay": 0,
+          "startPosition": 200
+        }
+      ]
+    },
+    {
       name: 'I Summon You',
       artist: 'Spoon',
       chords: [

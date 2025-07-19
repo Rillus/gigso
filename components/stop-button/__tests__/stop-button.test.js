@@ -15,7 +15,8 @@ describe('StopButton Component', () => {
     test('should render the stop button', () => {
         const button = getByRole(stopButtonElement, 'button');
         expect(button).toBeInTheDocument();
-        expect(button).toHaveTextContent('■');
+        expect(button.querySelector('svg')).toBeInTheDocument();
+        expect(button.querySelector('path')).toBeInTheDocument();
     });
 
     test('should dispatch "stop-clicked" event on click', () => {

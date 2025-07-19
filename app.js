@@ -31,6 +31,12 @@ document.body.addEventListener('play-clicked', async () => {
     dispatchComponentEvent('piano-roll', 'play');
 });
 
+
+document.body.addEventListener('pause-clicked', async () => {
+    pauseSong();
+    dispatchComponentEvent('piano-roll', 'pause');
+});
+
 document.body.addEventListener('stop-clicked', () => {
     stopSong();
     dispatchComponentEvent('piano-roll', 'stop');

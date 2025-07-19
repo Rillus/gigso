@@ -1,24 +1,75 @@
-.transport-button {
-  background-color: #c6c6c6; 
-  border: 1px solid #a6a6a6;
-  border-width: 1px 1px 0 1px;
-  padding: 5px 10px;
-  cursor: pointer;
-  box-shadow: 
-    2px 2px 2px rgba(0, 0, 0, 0.2), 
-    -2px -2px 2px rgba(255, 255, 255, 0.2); 
-  transition: all 0.2s ease;
-  
-  &:hover {
-    background-color: #d6d6d6;
-  }
-  
-  &.active {
-    background-color: #b6b6b6;
-    box-shadow: 
-      1px 1px 1px rgba(0, 0, 0, 0.2), 
-      -1px -1px 1px rgba(255, 255, 255, 0.2);
-    transform: translateY(1px);
-  }
+:root {
+  --colour-primary: #c6c6c6;
+  --chord-button-border-color: #a6a6a6;
+  --chord-button-active-color: #b6b6b6;
+  --chord-button-hover-color: #d6d6d6;
+
+  --colour-red: #E1453E;
+  --colour-orange: #F17947;
+  --colour-yellow: #FAB15C;
+  --colour-green: #60B05B;
+  --colour-blue: #5394C7;
+  --colour-indigo: #4b0082;
+  --colour-violet: #8F00FF;
+
+  --colour-C: var(--colour-red);
+  --colour-D: var(--colour-orange);
+  --colour-E: var(--colour-yellow);
+  --colour-F: var(--colour-green);
+  --colour-G: var(--colour-blue);
+  --colour-A: var(--colour-indigo);
+  --colour-B: var(--colour-violet);
 }
-  
+
+html {
+  overflow-x: hidden;
+}
+
+body {
+  background: url(./plastic.png) repeat;
+  margin: 0;
+}
+
+#app {
+  margin: 20px;
+  display: grid;
+  gap: 20px;
+  grid-template-columns: 362px 1fr;
+  /* grid-template-rows: 1fr 1fr; */
+  height: 100vh;
+}
+
+gigso-logo {
+  display: inline-block;
+  width: 362px;
+  height: 362px;
+  grid-column: 1;
+  grid-row: 1;
+  grid-row-end: 4;
+}
+
+gigso-menu {
+  display: inline-block;
+}
+
+chord-palette {
+  grid-column: 2;
+  grid-row: 2;
+}
+
+gigso-keyboard {
+  grid-column: 2;
+  grid-row: 3;
+}
+
+transport-controls {
+  grid-column: 1;
+  grid-row: 3;
+  align-content: flex-end;
+}
+
+
+piano-roll {
+  display: block;
+  width: 100%;
+}

@@ -26,23 +26,30 @@ export default class Actions {
     dispatchComponentEvent('piano-roll', 'play');
     dispatchComponentEvent('play-button', 'activate');
     dispatchComponentEvent('stop-button', 'deactivate');
+    dispatchComponentEvent('gigso-logo', 'start');
   }
 
   static stopSong() {
     dispatchComponentEvent('piano-roll', 'stop');
     dispatchComponentEvent('chord-diagram', 'set-chord', null);
     dispatchComponentEvent('current-chord', 'set-chord', null);
+    dispatchComponentEvent('gigso-logo', 'stop');
     if (!isPlaying()) return;
     setIsPlaying(false);
     dispatchComponentEvent('play-button', 'deactivate');
     dispatchComponentEvent('stop-button', 'activate');
   }
-
+  
   static pauseSong() {
     if (!isPlaying()) return;
     setIsPlaying(false);
     dispatchComponentEvent('piano-roll', 'pause');
     dispatchComponentEvent('play-button', 'deactivate');
-    dispatchComponentEvent('stop-button', 'activate');
+    dispatchComponentEvent('gigso-logo', 'pause');
+  }
+  
+  static changeInstrument(instrument) {
+    dispatchComponentEvent('piano-roll', 'set-instrument', instrument);
+    // dispatchComponentEvent('chord-diagram', 'set-instrument', instrument);
   }
 }

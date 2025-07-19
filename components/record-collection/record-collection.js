@@ -19,36 +19,110 @@ export default class RecordCollection extends BaseComponent {
 
     const styles = `
       .collection {
-          display: flex;
-          flex-wrap: wrap;
-          gap: 10px;
-          padding: 10px;
-          border: 1px solid #ccc;
-          background: #f9f9f9;
-          margin-bottom: 10px;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        padding: 10px;
+        border: 1px  #ccc;
+        background: #f9f9f9;
+        margin-bottom: 10px;
+        perspective: 1000px;
+        perspective-origin: right top;
       }
+
       .song-button {
-          padding: 10px;
-          font-size: 14px;
-          background: #e0e0e0;
-          border: 1px solid #999;
-          cursor: pointer;
-          border-radius: 4px;
-          transition: background 0.3s;
+        font-size: 14px;
+        cursor: pointer;
+        width: 100%;
+        height: 40px;
+        background: transparent;
+        transition: transform 0.3s, box-shadow 0.3s;
+        transform-style: preserve-3d;
+        transform: rotateX(0deg) rotateY(0deg) translate3d(-25px, 0, -100px);
+        position: relative;
+        border: 0;
       }
+
       .song-button:hover {
-          background: #d0d0d0;
+        transform: rotateX(0deg) rotateY(10deg);
+        box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
+        z-index: 1;
+      }
+
+      .cassette-face {
+        width: 100%;
+        height: 40px;
+        backface-visibility: visible;
+        border: 1px solid #ccc;
+        position: absolute;
+        top: 0;
+        left: 0;
+      }
+
+      .cassette-face.front {
+        transform: rotateX(0deg) rotateY(0deg);
+        background-color: #f0f0f0;
+      }
+
+      .cassette-face.back {
+        transform: rotateX(180deg) rotateY(0deg);
+        background-color: #777777;
+      }
+
+      .cassette-face.side-left,
+      .cassette-face.side-right {
+        width: 220px;
+        transform-origin: left top;
+      }
+
+      .cassette-face.side-left {
+        transform: rotateX(0deg) rotateY(-90deg) translate3d(0, 0, 220px);
+        background-color: #777777;
+        transform-origin: right top;
+      }
+
+      .cassette-face.side-right {
+        transform: rotateX(0deg) rotateY(90deg) translate3d(220px, 0px, 122px);
+        background-color: #777777;
+        transform-origin: right top;
+      }
+
+      .cassette-face.top {
+        width: 342px;
+        height: 220px;
+        transform: rotateX(90deg) rotateY(0deg) translate3d(0px, -110px, 110px);
+        background-color: #ffffff;
+      }
+        
+      .cassette-face.bottom {
+        width: 342px;
+        height: 220px;
+        transform: rotateX(-90deg) rotateY(0deg) translate3d(0px, 110px, -70px);
+        background-color: #999;
+      }
+
+      .label {
+        display: flex;
+        height: 100%;
+        justify-content: space-between;
+        align-items: center;
+        padding: 0 10px;
+      }
+      
+      .label .song-title {
+        font-size: 14px;
+        font-weight: bold;
+        text-transform: uppercase;
+      }
+      
+      .label .song-artist {
+        font-size: 12px;
       }
     `;
 
     super(template, styles);
 
     this.createSongButtons();
-
-
-    this.shadowRoot.querySelectorAll(".song-button").forEach((button) => {
-      button.addEventListener("click", (e) => this.loadSong(e));
-    });
   }
 
   createSongButtons() {
@@ -57,9 +131,22 @@ export default class RecordCollection extends BaseComponent {
 
     let html = '';
 
-    songs.forEach((song) => {
+    songs.forEach((song, index) => {
       const songButton = document.createElement('button');
-      songButton.textContent = song.name;
+      songButton.classList.add('song-button');
+      songButton.style.zIndex = songs.length - index;
+      songButton.innerHTML = `
+        <div class="cassette-face front">
+          <div class="label">
+            <span class="song-title">${song.name}</span>
+            <span class="song-artist">${song.artist}</span>
+          </div>
+        </div>
+        <div class="cassette-face side-left"></div>
+        <div class="cassette-face side-right"></div>
+        <div class="cassette-face top"></div>
+        <div class="cassette-face bottom"></div>
+      `;
       songButton.addEventListener('click', () => {
         this.loadSong(song);
       });
@@ -68,6 +155,7 @@ export default class RecordCollection extends BaseComponent {
   }
 
   loadSong(song) {
+    console.log('loading song?', song);
     this.dispatchEvent(new CustomEvent("load-song", { detail: song }));
   }
 }

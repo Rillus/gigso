@@ -67,7 +67,7 @@ const songs = [
 ### `createSongButtons()`
 Generates song buttons from the song library:
 - Accesses songs from `songLibrary.songs`
-- Creates button for each song
+- Creates button for each songle
 - Adds click event listeners
 - Appends buttons to collection container
 

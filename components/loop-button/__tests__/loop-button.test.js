@@ -14,7 +14,7 @@ describe('LoopButton Component', () => {
     test('should render the loop button', () => {
         const button = getByRole(loopButtonElement, 'button');
         expect(button).toBeInTheDocument();
-        expect(button).toHaveTextContent('↻');
+        expect(button.querySelector('svg')).toBeInTheDocument();
     });
 
     test('should dispatch "loop-clicked" event on click', () => {
