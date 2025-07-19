@@ -176,7 +176,7 @@ This document provides detailed specifications for each component in the Gigso a
 
 **Inputs**:
 - **Attributes**:
-  - `key` (string): Musical key of the hand pan (D, F, G)
+  - `key` (string): Musical key of the hand pan (C, C#, D, D#, E, F, F#, G, G#, A, A#, B)
   - `scale` (string): Scale type (minor, major)
   - `size` (string): Visual size (small, medium, large)
 - **Events**:
@@ -196,7 +196,8 @@ This document provides detailed specifications for each component in the Gigso a
 - Provides visual feedback with pulse animations and ripple effects
 - Supports multi-touch for simultaneous notes
 - Uses triangle oscillator with reverb for authentic hand pan timbre
-- Supports key changes (D minor, F major, G minor) with proper note layouts
+- Supports all 12 major and 12 minor scales with no repeated notes in any single key
+- Notes added sequentially from the root note following standard scale patterns
 - Responsive design for different screen sizes
 - Proper audio context management with error handling
 
@@ -221,7 +222,7 @@ This document provides detailed specifications for each component in the Gigso a
 
 **Inputs**:
 - **Attributes**:
-  - `key` (string): Initial musical key (D, F, G)
+  - `key` (string): Initial musical key (C, C#, D, D#, E, F, F#, G, G#, A, A#, B)
   - `scale` (string): Initial scale type (minor, major)
   - `size` (string): Initial size (small, medium, large)
   - `audio-enabled` (boolean): Whether audio should be enabled by default
@@ -249,7 +250,7 @@ This document provides detailed specifications for each component in the Gigso a
 
 **Features**:
 - **Audio Management**: Dynamic Tone.js loading and audio context initialization
-- **Key Selection**: Dropdown controls for key (D, F, G) and scale (major, minor)
+- **Key Selection**: Dropdown controls for all 12 chromatic keys and scale (major, minor)
 - **Size Controls**: Button-based selection for small, medium, large sizes
 - **Event Logging**: Real-time capture and display of all HandPan events
 - **Modern UI**: Dark theme with gradient backgrounds and smooth animations
@@ -281,9 +282,10 @@ wrapper.setSize('large');
 ```
 
 **Hand Pan Layout**:
-- 8-9 tone fields arranged in circular pattern
-- Common keys: D minor (most popular), F major, G minor
-- Natural hand pan note arrangements
+- 8 tone fields arranged in circular pattern
+- All 12 chromatic keys supported with major and minor scales
+- No repeated notes in any single key
+- Notes arranged sequentially from root note following standard scale patterns
 
 ---
 

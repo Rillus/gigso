@@ -7,7 +7,7 @@ Complete drop-in wrapper component that combines HandPan with audio management, 
 
 ### Attributes
 - `key` (string): Initial musical key of the hand pan
-  - **Values**: "D", "F", "G"
+  - **Values**: "C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"
   - **Default**: "D"
 - `scale` (string): Initial scale type
   - **Values**: "minor", "major"

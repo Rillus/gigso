@@ -1,3 +1,5 @@
+import { generateScaleNotes, getNoteFrequency } from '../../helpers/scaleUtils.js';
+
 export default class HandPan extends HTMLElement {
     constructor() {
         super();
@@ -6,7 +8,7 @@ export default class HandPan extends HTMLElement {
         // Initialise properties
         this.currentKey = 'D';
         this.currentScale = 'minor';
-        this.notes = ['D4', 'A3', 'A4', 'F3', 'F4', 'D3', 'D4', 'A3']; // D minor layout
+        this.notes = generateScaleNotes('D', 'minor'); // Use scale utilities
         this.isMuted = false;
         this.toneFields = [];
         this.activeTouches = new Map(); // Track multiple touches
@@ -315,18 +317,8 @@ export default class HandPan extends HTMLElement {
     }
 
     getNoteFrequency(note) {
-        // Basic frequency calculation (will be enhanced)
-        const noteNames = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'];
-        const noteName = note.slice(0, -1);
-        const octave = parseInt(note.slice(-1));
-        const noteIndex = noteNames.indexOf(noteName);
-        
-        // A4 = 440Hz, calculate relative frequency
-        const a4Index = 9; // A is at index 9
-        const a4Octave = 4;
-        const semitones = (octave - a4Octave) * 12 + (noteIndex - a4Index);
-        
-        return 440 * Math.pow(2, semitones / 12);
+        // Use the scale utilities for frequency calculation
+        return getNoteFrequency(note);
     }
 
     changeKey(key, scale) {
@@ -359,17 +351,8 @@ export default class HandPan extends HTMLElement {
     }
 
     getNotesForKey(key, scale) {
-        // Support multiple keys for Phase 1 testing
-        if (key === 'D' && scale === 'minor') {
-            return ['D4', 'A3', 'A4', 'F3', 'F4', 'D3', 'D4', 'A3'];
-        } else if (key === 'F' && scale === 'major') {
-            return ['F4', 'C4', 'C5', 'A3', 'A4', 'F3', 'F4', 'C4'];
-        } else if (key === 'G' && scale === 'minor') {
-            return ['G4', 'D4', 'D5', 'Bb3', 'Bb4', 'G3', 'G4', 'D4'];
-        }
-        
-        // Default to D minor
-        return ['D4', 'A3', 'A4', 'F3', 'F4', 'D3', 'D4', 'A3'];
+        // Use the scale utilities to generate notes for any key and scale
+        return generateScaleNotes(key, scale);
     }
 }
 

@@ -31,6 +31,7 @@
   - **Multi-touch Support**: Simultaneous note playing on touch devices
   - **Authentic Timbre**: Triangle oscillator with reverb for authentic hand pan sound
   - **Visual Feedback**: Pulse animations and ripple effects
+  - **Complete Scale Support**: All 12 major and 12 minor scales with no repeated notes in any single key
 - **Note Highlighting**: Visual feedback for currently playing notes
 - **MIDI-like Interaction**: Click to play individual notes
 

@@ -1,3 +1,5 @@
+import { getAllKeys, getAllScaleTypes } from '../../helpers/scaleUtils.js';
+
 export default class HandPanWrapper extends HTMLElement {
     constructor() {
         super();
@@ -9,6 +11,10 @@ export default class HandPanWrapper extends HTMLElement {
         this.currentSize = 'medium';
         this.audioEnabled = false;
         this.audioContextStarted = false;
+        
+        // Get all available keys and scales
+        this.availableKeys = getAllKeys();
+        this.availableScales = getAllScaleTypes();
         
         this.render();
         this.addEventListeners();
@@ -80,16 +86,17 @@ export default class HandPanWrapper extends HTMLElement {
                         <div class="key-row">
                             <label>Key:</label>
                             <select id="keySelect" class="control-select">
-                                <option value="D" ${this.currentKey === 'D' ? 'selected' : ''}>D</option>
-                                <option value="F" ${this.currentKey === 'F' ? 'selected' : ''}>F</option>
-                                <option value="G" ${this.currentKey === 'G' ? 'selected' : ''}>G</option>
+                                ${this.availableKeys.map(key => 
+                                    `<option value="${key}" ${this.currentKey === key ? 'selected' : ''}>${key}</option>`
+                                ).join('')}
                             </select>
                         </div>
                         <div class="key-row">
                             <label>Scale:</label>
                             <select id="scaleSelect" class="control-select">
-                                <option value="minor" ${this.currentScale === 'minor' ? 'selected' : ''}>Minor</option>
-                                <option value="major" ${this.currentScale === 'major' ? 'selected' : ''}>Major</option>
+                                ${this.availableScales.map(scale => 
+                                    `<option value="${scale}" ${this.currentScale === scale ? 'selected' : ''}>${scale.charAt(0).toUpperCase() + scale.slice(1)}</option>`
+                                ).join('')}
                             </select>
                         </div>
                     </div>

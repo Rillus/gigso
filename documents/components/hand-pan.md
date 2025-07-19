@@ -75,39 +75,61 @@ The HandPan component provides an interactive hand pan instrument interface desi
 - **Error handling**: Graceful handling of audio timing issues
 
 ### Key and Scale Support
-- **Supported keys**: D, F, G (most popular hand pan keys)
-- **Scale types**: Minor, major
-- **Note arrangement**: 8 notes arranged in logical hand pan order
+- **Supported keys**: All 12 chromatic keys (C, C#, D, D#, E, F, F#, G, G#, A, A#, B)
+- **Scale types**: Major and minor scales
+- **Note arrangement**: 8 notes arranged in logical hand pan order, no repeated notes in any single key
+- **Scale construction**: Notes added sequentially from the root note following standard scale patterns
 - **Key changes**: Smooth transition between different keys with proper note layouts
 
 ## Hand Pan Note Layout
 
-### D Minor (Most Common)
+### Scale Construction Rules
+- **8 notes per scale**: Each hand pan layout contains exactly 8 notes
+- **No repeated notes**: No note appears more than once in any single key
+- **Sequential construction**: Notes are added sequentially from the root note following standard scale patterns
+- **Logical arrangement**: Notes are arranged in a circular pattern for optimal hand pan playability
+
+### Example Layouts
+
+#### C Major Scale
 ```
-        D4
-    A3      A4
-  F3          F4
-    D3      D4
-        A3
+        C4
+    E4      G4
+  B4          D3
+    F3      A3
+        C#3
 ```
 
-### F Major
+#### D Minor Scale
+```
+        D4
+    F4      A4
+  C4          E3
+    G3      Bb3
+        D#3
+```
+
+#### F Major Scale
 ```
         F4
-    C4      C5
-  A3          A4
-    F3      F4
-        C4
+    A4      C4
+  E4          G3
+    Bb3      D3
+        F#3
 ```
 
-### G Minor
+#### G Minor Scale
 ```
         G4
-    D4      D5
-  Bb3         Bb4
-    G3      G4
-        D4
+    Bb4      D4
+  F4          A3
+    C3      Eb3
+        G#3
 ```
+
+### Scale Patterns
+- **Major Scale**: Root, Major 2nd, Major 3rd, Perfect 4th, Perfect 5th, Major 6th, Major 7th, Major 9th
+- **Minor Scale**: Root, Major 2nd, Minor 3rd, Perfect 4th, Perfect 5th, Minor 6th, Minor 7th, Major 9th
 
 ## Key Methods
 
