@@ -65,27 +65,45 @@ export default class HandPan extends HTMLElement {
     }
 
     createHandPanSynth() {
-        // Create authentic hand pan synthesiser with proper timbre
+        // Create authentic steel drum/hand pan synthesiser with rich harmonics and sustain
         this.synth = new Tone.Synth({
             oscillator: {
-                type: "triangle"  // Warm, metallic sound
+                type: "triangle"  // Base metallic sound
             },
             envelope: {
-                attack: 0.01,     // Quick attack
-                decay: 0.2,       // Medium decay
-                sustain: 0.3,     // Low sustain
-                release: 2.5      // Long release for natural decay
+                attack: 0.005,    // Very quick attack for immediate response
+                decay: 0.1,       // Quick decay to sustain level
+                sustain: 0.3,     // Lower sustain for faster fade
+                release: 0.6      // Faster release for quicker note fade
             }
         }).toDestination();
 
-        // Add subtle reverb for resonance
+        // Create enhanced reverb for steel drum resonance
         this.reverb = new Tone.Reverb({
-            decay: 1.5,
-            wet: 0.3
+            decay: 0.8,           // Shorter decay for faster note fade
+            wet: 0.25,            // Less reverb for cleaner sound
+            preDelay: 0.02        // Very short pre-delay for quick response
         }).toDestination();
 
-        // Connect synth to reverb
-        this.synth.connect(this.reverb);
+        // Add chorus for steel drum shimmer
+        this.chorus = new Tone.Chorus({
+            frequency: 2.5,
+            delayTime: 2.5,
+            depth: 0.7,
+            wet: 0.2
+        }).toDestination();
+
+        // Add subtle delay for steel drum echo
+        this.delay = new Tone.PingPongDelay({
+            delayTime: "15n",
+            feedback: 0.2,
+            wet: 0.15
+        }).toDestination();
+
+        // Create effects chain: synth → chorus → delay → reverb
+        this.synth.connect(this.chorus);
+        this.chorus.connect(this.delay);
+        this.delay.connect(this.reverb);
     }
 
     render() {
@@ -276,7 +294,7 @@ export default class HandPan extends HTMLElement {
             detail: {
                 note: note,
                 frequency: this.getNoteFrequency(note),
-                duration: 2,
+                duration: 1, // Shorter duration for faster note fade
                 index: index
             }
         });
@@ -315,11 +333,9 @@ export default class HandPan extends HTMLElement {
                 }
                 this.lastPlayTime = now;
                 
-                // Use separate attack and release to avoid timing conflicts
-                this.synth.triggerAttack(note);
-                setTimeout(() => {
-                    this.synth.triggerRelease();
-                }, 1000); // 1 second duration
+                // Use triggerAttackRelease for proper timing - 0.8 second duration
+                this.synth.triggerAttackRelease(note, "8n");
+                
             } catch (error) {
                 console.warn('HandPan: Error playing note:', error);
             }

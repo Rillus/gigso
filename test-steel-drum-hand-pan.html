@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Steel Drum HandPan Test - Enhanced Resonance</title>
+    <style>
+        body {
+            background: linear-gradient(135deg, #1e3c72, #2a5298);
+            color: white;
+            font-family: 'Arial', sans-serif;
+            margin: 0;
+            padding: 20px;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            text-align: center;
+        }
+
+        h1 {
+            color: #ffd700;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+            margin-bottom: 30px;
+        }
+
+        .info-panel {
+            background: rgba(255,255,255,0.1);
+            border-radius: 15px;
+            padding: 20px;
+            margin: 20px 0;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+
+        .controls {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin: 20px 0;
+        }
+
+        button {
+            background: linear-gradient(145deg, #4a90e2, #357abd);
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0,0,0,0.3);
+        }
+
+        button.active {
+            background: linear-gradient(145deg, #ffd700, #ffb347);
+            color: #333;
+        }
+
+        .audio-status {
+            background: rgba(0,255,0,0.2);
+            border: 2px solid #00ff00;
+            border-radius: 10px;
+            padding: 15px;
+            margin: 20px 0;
+            font-weight: bold;
+        }
+
+        .audio-status.disabled {
+            background: rgba(255,0,0,0.2);
+            border-color: #ff0000;
+        }
+
+        .features {
+            text-align: left;
+            background: rgba(0,0,0,0.3);
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+
+        .features h3 {
+            color: #ffd700;
+            margin-top: 0;
+        }
+
+        .features ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        .features li {
+            padding: 5px 0;
+            position: relative;
+            padding-left: 25px;
+        }
+
+        .features li:before {
+            content: "🎵";
+            position: absolute;
+            left: 0;
+        }
+
+        .event-log {
+            background: rgba(0,0,0,0.8);
+            color: #00ff00;
+            padding: 15px;
+            border-radius: 10px;
+            font-family: monospace;
+            font-size: 12px;
+            max-height: 200px;
+            overflow-y: auto;
+            margin-top: 20px;
+            border: 1px solid rgba(255,255,255,0.2);
+            text-align: left;
+        }
+
+        .event-log h3 {
+            margin-top: 0;
+            color: #ffd700;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🥁 Steel Drum HandPan - Enhanced Resonance</h1>
+        
+        <div class="info-panel">
+            <h2>Natural Steel Drum Sound with Sustain</h2>
+            <p>Experience authentic steel drum timbre with rich harmonics, natural resonance, and extended sustain.</p>
+        </div>
+
+        <div class="audio-status" id="audioStatus">
+            🔊 Audio: Click "Enable Audio" to start
+        </div>
+
+        <div class="controls">
+            <button onclick="enableAudio()" id="enableBtn">Enable Audio</button>
+            <button onclick="changeKey('D', 'minor')" class="active">D Minor</button>
+            <button onclick="changeKey('F', 'major')">F Major</button>
+            <button onclick="changeKey('G', 'minor')">G Minor</button>
+            <button onclick="changeKey('A', 'major')">A Major</button>
+            <button onclick="toggleMute()" id="muteBtn">Mute</button>
+        </div>
+
+        <div class="controls">
+            <button onclick="changeSize('small')">Small</button>
+            <button onclick="changeSize('medium')" class="active">Medium</button>
+            <button onclick="changeSize('large')">Large</button>
+        </div>
+        
+        <hand-pan id="handPan" key="D" scale="minor" size="medium"></hand-pan>
+        
+        <div class="features">
+            <h3>🎵 Enhanced Steel Drum Features:</h3>
+            <ul>
+                <li><strong>Dual Oscillators:</strong> Triangle + Sine for rich harmonics</li>
+                <li><strong>Natural Harmonics:</strong> Octave and perfect 5th overtones</li>
+                <li><strong>Extended Sustain:</strong> 4-second natural decay</li>
+                <li><strong>Steel Drum Resonance:</strong> Enhanced reverb with 2.5s decay</li>
+                <li><strong>Chorus Effect:</strong> Subtle shimmer for authentic character</li>
+                <li><strong>Ping-Pong Delay:</strong> Natural steel drum echo</li>
+                <li><strong>Immediate Response:</strong> 5ms attack for instant playability</li>
+                <li><strong>High Sustain Level:</strong> 70% sustain for long resonance</li>
+            </ul>
+        </div>
+
+        <div class="info-panel">
+            <p><strong>🎯 Try:</strong> Tap multiple tone fields simultaneously for rich harmonic combinations</p>
+            <p><strong>🎧 Listen for:</strong> Natural steel drum resonance, shimmering harmonics, and extended sustain</p>
+        </div>
+    </div>
+
+    <div class="event-log">
+        <h3>Event Log</h3>
+        <div id="eventLog"></div>
+    </div>
+
+    <!-- Load Tone.js -->
+    <script src="https://unpkg.com/tone@14.7.77/build/Tone.js"></script>
+    
+    <!-- Load our component -->
+    <script type="module">
+        import HandPan from './components/hand-pan/hand-pan.js';
+        
+        let audioEnabled = false;
+        let isMuted = false;
+        
+        function enableAudio() {
+            if (!audioEnabled) {
+                // Start audio context on user interaction
+                Tone.start().then(() => {
+                    audioEnabled = true;
+                    document.getElementById('audioStatus').textContent = '🔊 Audio: Enabled';
+                    document.getElementById('audioStatus').classList.remove('disabled');
+                    document.getElementById('enableBtn').textContent = 'Audio Enabled';
+                    document.getElementById('enableBtn').disabled = true;
+                    logEvent('Audio context started successfully');
+                }).catch(err => {
+                    logEvent('Error starting audio: ' + err.message);
+                });
+            }
+        }
+        
+        function changeKey(key, scale) {
+            const handPan = document.getElementById('handPan');
+            handPan.dispatchEvent(new CustomEvent('set-key', {
+                detail: { key, scale }
+            }));
+            
+            // Update button states
+            document.querySelectorAll('.controls button').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            event.target.classList.add('active');
+            
+            logEvent(`Key changed to ${key} ${scale}`);
+        }
+        
+        function toggleMute() {
+            const handPan = document.getElementById('handPan');
+            isMuted = !isMuted;
+            
+            if (isMuted) {
+                handPan.dispatchEvent(new CustomEvent('mute'));
+                document.getElementById('muteBtn').textContent = 'Unmute';
+                logEvent('HandPan muted');
+            } else {
+                handPan.dispatchEvent(new CustomEvent('unmute'));
+                document.getElementById('muteBtn').textContent = 'Mute';
+                logEvent('HandPan unmuted');
+            }
+        }
+        
+        function changeSize(size) {
+            const handPan = document.getElementById('handPan');
+            handPan.setAttribute('size', size);
+            
+            // Update button states
+            document.querySelectorAll('.controls button').forEach(btn => {
+                if (btn.textContent.toLowerCase().includes(size)) {
+                    btn.classList.add('active');
+                } else if (btn.textContent.toLowerCase().includes('small') || 
+                          btn.textContent.toLowerCase().includes('medium') || 
+                          btn.textContent.toLowerCase().includes('large')) {
+                    btn.classList.remove('active');
+                }
+            });
+            
+            logEvent(`Size changed to ${size}`);
+        }
+        
+        function logEvent(message) {
+            const eventLog = document.getElementById('eventLog');
+            const timestamp = new Date().toLocaleTimeString();
+            const logEntry = document.createElement('div');
+            logEntry.textContent = `[${timestamp}] ${message}`;
+            eventLog.appendChild(logEntry);
+            eventLog.scrollTop = eventLog.scrollHeight;
+        }
+        
+        // Listen for HandPan events
+        document.addEventListener('note-played', (event) => {
+            const { note, frequency, duration, index } = event.detail;
+            logEvent(`🎵 Note played: ${note} (${frequency.toFixed(1)}Hz) - Duration: ${duration}s`);
+        });
+        
+        document.addEventListener('key-changed', (event) => {
+            const { key, scale, notes } = event.detail;
+            logEvent(`🎼 Key changed: ${key} ${scale} - Notes: ${notes.join(', ')}`);
+        });
+        
+        // Make functions global
+        window.enableAudio = enableAudio;
+        window.changeKey = changeKey;
+        window.toggleMute = toggleMute;
+        window.changeSize = changeSize;
+        
+        logEvent('Steel Drum HandPan loaded - Enhanced with natural resonance and sustain');
+    </script>
+</body>
+</html> 
