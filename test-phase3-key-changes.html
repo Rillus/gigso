@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HandPan Phase 3 - Key & Scale System Demo</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: white;
+        }
+        
+        .demo-container {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            padding: 30px;
+            margin: 20px 0;
+            backdrop-filter: blur(10px);
+        }
+        
+        .controls {
+            display: flex;
+            gap: 15px;
+            margin: 20px 0;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+        
+        .control-group {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        
+        select, button {
+            padding: 10px 15px;
+            border: none;
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            cursor: pointer;
+            font-size: 14px;
+        }
+        
+        select:hover, button:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+        
+        .status {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 15px;
+            border-radius: 8px;
+            margin: 20px 0;
+            font-family: monospace;
+        }
+        
+        .event-log {
+            background: rgba(0, 0, 0, 0.5);
+            padding: 15px;
+            border-radius: 8px;
+            margin: 20px 0;
+            max-height: 200px;
+            overflow-y: auto;
+            font-family: monospace;
+            font-size: 12px;
+        }
+        
+        .hand-pan-container {
+            display: flex;
+            justify-content: center;
+            margin: 30px 0;
+        }
+        
+        h1, h2 {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        
+        .feature-list {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+        }
+        
+        .feature-list ul {
+            list-style: none;
+            padding: 0;
+        }
+        
+        .feature-list li {
+            padding: 8px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .feature-list li:before {
+            content: "✅ ";
+            margin-right: 10px;
+        }
+    </style>
+</head>
+<body>
+    <h1>🎵 HandPan Phase 3 Demo: Key & Scale System</h1>
+    
+    <div class="demo-container">
+        <h2>Phase 3 Features Implemented</h2>
+        <div class="feature-list">
+            <ul>
+                <li>Dynamic key changing (D, F, G, A, C and all 12 chromatic keys)</li>
+                <li>Scale type switching (minor, major, pentatonic)</li>
+                <li>Automatic note layout updates</li>
+                <li>Event system integration (set-key, key-changed events)</li>
+                <li>Visual key indicator in center</li>
+                <li>Error handling and graceful fallbacks</li>
+                <li>Robust input validation</li>
+            </ul>
+        </div>
+    </div>
+    
+    <div class="demo-container">
+        <h2>🎛️ Key & Scale Controls</h2>
+        <div class="controls">
+            <div class="control-group">
+                <label for="keySelect">Key:</label>
+                <select id="keySelect">
+                    <option value="D">D</option>
+                    <option value="F">F</option>
+                    <option value="G">G</option>
+                    <option value="A">A</option>
+                    <option value="C">C</option>
+                    <option value="E">E</option>
+                    <option value="Bb">Bb</option>
+                    <option value="C#">C#</option>
+                    <option value="D#">D#</option>
+                    <option value="F#">F#</option>
+                    <option value="G#">G#</option>
+                    <option value="A#">A#</option>
+                </select>
+            </div>
+            
+            <div class="control-group">
+                <label for="scaleSelect">Scale:</label>
+                <select id="scaleSelect">
+                    <option value="minor">Minor</option>
+                    <option value="major">Major</option>
+                    <option value="pentatonic">Pentatonic</option>
+                </select>
+            </div>
+            
+            <div class="control-group">
+                <label>&nbsp;</label>
+                <button id="changeKeyBtn">Change Key & Scale</button>
+            </div>
+            
+            <div class="control-group">
+                <label>&nbsp;</label>
+                <button id="testInvalidBtn">Test Invalid Input</button>
+            </div>
+        </div>
+        
+        <div class="status" id="currentStatus">
+            <strong>Current Status:</strong> D Minor
+        </div>
+    </div>
+    
+    <div class="demo-container">
+        <h2>🎵 HandPan Component</h2>
+        <div class="hand-pan-container">
+            <hand-pan id="handPan" key="D" scale="minor" size="large"></hand-pan>
+        </div>
+    </div>
+    
+    <div class="demo-container">
+        <h2>📊 Event Log</h2>
+        <div class="event-log" id="eventLog">
+            <div>Event log will appear here...</div>
+        </div>
+        <button id="clearLogBtn">Clear Log</button>
+    </div>
+
+    <!-- Load Tone.js -->
+    <script src="https://unpkg.com/tone@14.7.77/build/Tone.js"></script>
+    
+    <!-- Load scale utilities -->
+    <script type="module">
+        import { generateScaleNotes } from './helpers/scaleUtils.js';
+        
+        // Make scale utilities available globally for the component
+        window.generateScaleNotes = generateScaleNotes;
+    </script>
+    
+    <!-- Load the HandPan component -->
+    <script type="module" src="./components/hand-pan/hand-pan.js"></script>
+    
+    <script>
+        // Demo functionality
+        document.addEventListener('DOMContentLoaded', function() {
+            const handPan = document.getElementById('handPan');
+            const keySelect = document.getElementById('keySelect');
+            const scaleSelect = document.getElementById('scaleSelect');
+            const changeKeyBtn = document.getElementById('changeKeyBtn');
+            const testInvalidBtn = document.getElementById('testInvalidBtn');
+            const currentStatus = document.getElementById('currentStatus');
+            const eventLog = document.getElementById('eventLog');
+            const clearLogBtn = document.getElementById('clearLogBtn');
+            
+            // Log function
+            function logEvent(message) {
+                const timestamp = new Date().toLocaleTimeString();
+                const logEntry = document.createElement('div');
+                logEntry.innerHTML = `<span style="color: #aaa;">[${timestamp}]</span> ${message}`;
+                eventLog.appendChild(logEntry);
+                eventLog.scrollTop = eventLog.scrollHeight;
+            }
+            
+            // Update status display
+            function updateStatus(key, scale) {
+                currentStatus.innerHTML = `<strong>Current Status:</strong> ${key} ${scale.charAt(0).toUpperCase() + scale.slice(1)}`;
+            }
+            
+            // Listen for key-changed events
+            handPan.addEventListener('key-changed', function(event) {
+                const { key, scale, notes } = event.detail;
+                logEvent(`🎵 Key changed to: ${key} ${scale}`);
+                logEvent(`📝 New notes: [${notes.join(', ')}]`);
+                updateStatus(key, scale);
+            });
+            
+            // Listen for note-played events
+            handPan.addEventListener('note-played', function(event) {
+                const { note, frequency, duration } = event.detail;
+                logEvent(`🎶 Note played: ${note} (${frequency.toFixed(1)}Hz)`);
+            });
+            
+            // Change key button
+            changeKeyBtn.addEventListener('click', function() {
+                const key = keySelect.value;
+                const scale = scaleSelect.value;
+                
+                logEvent(`🔄 Changing key to: ${key} ${scale}`);
+                
+                // Dispatch set-key event
+                handPan.dispatchEvent(new CustomEvent('set-key', {
+                    detail: { key, scale }
+                }));
+            });
+            
+            // Test invalid input button
+            testInvalidBtn.addEventListener('click', function() {
+                logEvent(`⚠️ Testing invalid input: INVALID key and scale`);
+                
+                // Test invalid key
+                handPan.dispatchEvent(new CustomEvent('set-key', {
+                    detail: { key: 'INVALID', scale: 'minor' }
+                }));
+                
+                setTimeout(() => {
+                    // Test invalid scale
+                    handPan.dispatchEvent(new CustomEvent('set-key', {
+                        detail: { key: 'D', scale: 'INVALID' }
+                    }));
+                }, 1000);
+            });
+            
+            // Clear log button
+            clearLogBtn.addEventListener('click', function() {
+                eventLog.innerHTML = '<div>Event log cleared...</div>';
+            });
+            
+            // Initialize status
+            updateStatus('D', 'minor');
+            logEvent('🚀 HandPan Phase 3 demo initialized');
+            logEvent('✅ Key & scale system ready');
+            
+            // Auto-demo sequence
+            setTimeout(() => {
+                logEvent('🎬 Starting auto-demo sequence...');
+                
+                const demoSequence = [
+                    { key: 'F', scale: 'major', delay: 2000 },
+                    { key: 'G', scale: 'minor', delay: 2000 },
+                    { key: 'A', scale: 'major', delay: 2000 },
+                    { key: 'C', scale: 'pentatonic', delay: 2000 },
+                    { key: 'D', scale: 'minor', delay: 2000 }
+                ];
+                
+                let sequenceIndex = 0;
+                
+                function runDemoSequence() {
+                    if (sequenceIndex < demoSequence.length) {
+                        const { key, scale, delay } = demoSequence[sequenceIndex];
+                        
+                        setTimeout(() => {
+                            logEvent(`🎬 Auto-demo: Changing to ${key} ${scale}`);
+                            handPan.dispatchEvent(new CustomEvent('set-key', {
+                                detail: { key, scale }
+                            }));
+                            
+                            sequenceIndex++;
+                            runDemoSequence();
+                        }, delay);
+                    } else {
+                        logEvent('🎬 Auto-demo sequence completed');
+                    }
+                }
+                
+                runDemoSequence();
+            }, 3000);
+        });
+    </script>
+</body>
+</html>

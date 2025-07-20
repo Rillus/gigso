@@ -68,54 +68,72 @@ export default class HandPan extends HTMLElement {
     }
 
     createHandPanSynth() {
-        // Create authentic steel drum/hand pan synthesiser with rich harmonics and sustain
-        this.synth = new Tone.Synth({
-            oscillator: {
-                type: "triangle"  // Base metallic sound
-            },
-            envelope: {
-                attack: 0.062,    // Slightly longer attack for smoother response
-                decay: 0.26,      // Longer decay for richer tone
-                sustain: 0.7,     // Higher sustain for longer notes
-                release: 0.3      // Shorter release for quicker note fade
-            }
-        });
+        try {
+            // Create authentic steel drum/hand pan synthesiser with rich harmonics and sustain
+            this.synth = new Tone.Synth({
+                oscillator: {
+                    type: "triangle"  // Base metallic sound
+                },
+                envelope: {
+                    attack: 0.062,    // Slightly longer attack for smoother response
+                    decay: 0.26,      // Longer decay for richer tone
+                    sustain: 0.7,     // Higher sustain for longer notes
+                    release: 0.3      // Shorter release for quicker note fade
+                }
+            });
 
-        // Create enhanced reverb for steel drum resonance
-        this.reverb = new Tone.Reverb({
-            decay: 1.4,           // Longer decay for richer resonance
-            wet: 0.8,             // More reverb for atmospheric sound
-            preDelay: 0.04        // Slightly longer pre-delay for depth
-        });
+            // Create enhanced reverb for steel drum resonance
+            this.reverb = new Tone.Reverb({
+                decay: 1.4,           // Longer decay for richer resonance
+                wet: 0.8,             // More reverb for atmospheric sound
+                preDelay: 0.04        // Slightly longer pre-delay for depth
+            });
 
-        // Add chorus for steel drum shimmer
-        this.chorus = new Tone.Chorus({
-            frequency: 3.5,
-            delayTime: 2.5,
-            depth: 0.35,
-            wet: 0.7
-        });
+            // Add chorus for steel drum shimmer
+            this.chorus = new Tone.Chorus({
+                frequency: 3.5,
+                delayTime: 2.5,
+                depth: 0.35,
+                wet: 0.7
+            });
 
-        // Add subtle delay for steel drum echo
-        this.delay = new Tone.PingPongDelay({
-            delayTime: 0.175,     // Longer delay time for more echo
-            feedback: 0.2,
-            wet: 0.85
-        });
+            // Add subtle delay for steel drum echo
+            this.delay = new Tone.PingPongDelay({
+                delayTime: 0.175,     // Longer delay time for more echo
+                feedback: 0.2,
+                wet: 0.85
+            });
 
-        // Create effects chain: synth → chorus → delay → reverb → destination
-        this.synth.connect(this.chorus);
-        this.chorus.connect(this.delay);
-        this.delay.connect(this.reverb);
-        this.reverb.toDestination();
+            // Create effects chain: synth → chorus → delay → reverb → destination
+            this.synth.connect(this.chorus);
+            this.chorus.connect(this.delay);
+            this.delay.connect(this.reverb);
+            this.reverb.toDestination();
 
-        // Expose effects for external control
-        this.audioEffects = {
-            synth: this.synth,
-            reverb: this.reverb,
-            chorus: this.chorus,
-            delay: this.delay
-        };
+            // Expose effects for external control
+            this.audioEffects = {
+                synth: this.synth,
+                reverb: this.reverb,
+                chorus: this.chorus,
+                delay: this.delay
+            };
+        } catch (error) {
+            console.warn('HandPan: Error creating audio synthesiser:', error);
+            // Create fallback synthesiser without effects
+            this.synth = new Tone.Synth({
+                oscillator: { type: "triangle" },
+                envelope: {
+                    attack: 0.062,
+                    decay: 0.26,
+                    sustain: 0.7,
+                    release: 0.3
+                }
+            });
+            this.synth.toDestination();
+            
+            // Set fallback audio effects
+            this.audioEffects = { synth: this.synth };
+        }
     }
 
     render() {
@@ -141,6 +159,9 @@ export default class HandPan extends HTMLElement {
         // Store references to tone fields and re-add event listeners
         this.toneFields = this.shadowRoot.querySelectorAll('.tone-field');
         this.addEventListeners();
+        
+        // Update audio status indicator
+        this.updateAudioStatusIndicator();
     }
     
     getAudioStatusIndicator() {
@@ -443,11 +464,20 @@ export default class HandPan extends HTMLElement {
     changeKey(key, scale) {
         console.log('HandPan: Changing key to', key, scale);
         
-        this.currentKey = key;
-        this.currentScale = scale;
+        // Validate key and scale before updating
+        const validKey = this.validateKey(key) ? key : 'D';
+        const validScale = this.validateScale(scale) ? scale : 'minor';
+        
+        this.currentKey = validKey;
+        this.currentScale = validScale;
         
         // Update notes based on key and scale
-        this.notes = this.getNotesForKey(key, scale);
+        try {
+            this.notes = this.getNotesForKey(validKey, validScale);
+        } catch (error) {
+            console.warn('HandPan: Error generating notes, using default D minor:', error);
+            this.notes = this.getNotesForKey('D', 'minor');
+        }
         
         console.log('HandPan: New notes', this.notes);
         
@@ -457,8 +487,8 @@ export default class HandPan extends HTMLElement {
         // Dispatch key-changed event
         const keyEvent = new CustomEvent('key-changed', {
             detail: {
-                key: key,
-                scale: scale,
+                key: validKey,
+                scale: validScale,
                 notes: this.notes
             }
         });
@@ -467,6 +497,16 @@ export default class HandPan extends HTMLElement {
         
         // Dispatch event (it will bubble up to document automatically)
         this.dispatchEvent(keyEvent);
+    }
+
+    validateKey(key) {
+        const validKeys = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'];
+        return validKeys.includes(key);
+    }
+
+    validateScale(scale) {
+        const validScales = ['major', 'minor', 'pentatonic'];
+        return validScales.includes(scale);
     }
 
     getNotesForKey(key, scale) {
