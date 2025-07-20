@@ -67,8 +67,20 @@ export default class HandPan extends HTMLElement {
         this.initializeAudioContext();
     }
 
+    disconnectedCallback() {
+        // Clean up when component is removed from DOM
+        this.cleanup();
+    }
+
     createHandPanSynth() {
         try {
+            // Check if Tone.js is available
+            if (typeof Tone === 'undefined') {
+                console.warn('HandPan: Tone.js not available, creating fallback synthesiser');
+                this.createFallbackSynth();
+                return;
+            }
+
             // Create authentic steel drum/hand pan synthesiser with rich harmonics and sustain
             this.synth = new Tone.Synth({
                 oscillator: {
@@ -119,19 +131,48 @@ export default class HandPan extends HTMLElement {
             };
         } catch (error) {
             console.warn('HandPan: Error creating audio synthesiser:', error);
-            // Create fallback synthesiser without effects
-            this.synth = new Tone.Synth({
-                oscillator: { type: "triangle" },
-                envelope: {
-                    attack: 0.062,
-                    decay: 0.26,
-                    sustain: 0.7,
-                    release: 0.3
-                }
-            });
-            this.synth.toDestination();
-            
-            // Set fallback audio effects
+            this.createFallbackSynth();
+        }
+    }
+
+    createFallbackSynth() {
+        try {
+            if (typeof Tone !== 'undefined') {
+                // Create fallback synthesiser without effects
+                this.synth = new Tone.Synth({
+                    oscillator: { type: "triangle" },
+                    envelope: {
+                        attack: 0.062,
+                        decay: 0.26,
+                        sustain: 0.7,
+                        release: 0.3
+                    }
+                });
+                this.synth.toDestination();
+                
+                // Set fallback audio effects
+                this.audioEffects = { synth: this.synth };
+            } else {
+                // Create mock synthesiser for test environments
+                this.synth = {
+                    triggerAttackRelease: () => {},
+                    toDestination: () => {},
+                    connect: () => {},
+                    oscillator: { type: 'triangle' },
+                    envelope: { attack: 0.062, decay: 0.26, sustain: 0.7, release: 0.3 }
+                };
+                this.audioEffects = { synth: this.synth };
+            }
+        } catch (error) {
+            console.warn('HandPan: Error creating fallback synthesiser:', error);
+            // Create minimal mock synthesiser
+            this.synth = {
+                triggerAttackRelease: () => {},
+                toDestination: () => {},
+                connect: () => {},
+                oscillator: { type: 'triangle' },
+                envelope: { attack: 0.062, decay: 0.26, sustain: 0.7, release: 0.3 }
+            };
             this.audioEffects = { synth: this.synth };
         }
     }
@@ -207,6 +248,10 @@ export default class HandPan extends HTMLElement {
                     class="tone-field" 
                     data-note="${note}"
                     data-index="${index}"
+                    role="button"
+                    tabindex="0"
+                    aria-label="Play ${note} note"
+                    aria-pressed="false"
                     style="top: ${position.top}; left: ${position.left}; transform: translate(-50%, -50%); transform-origin: center center;"
                 >
                     ${note}
@@ -232,6 +277,21 @@ export default class HandPan extends HTMLElement {
                 event.preventDefault();
                 this.handleTouchEnd(event, index);
             });
+            
+            // Keyboard events for accessibility
+            field.addEventListener('keydown', (event) => {
+                if (event.key === 'Enter' || event.key === ' ') {
+                    event.preventDefault();
+                    this.handleKeyboardInteraction(event, index);
+                }
+            });
+            
+            field.addEventListener('keyup', (event) => {
+                if (event.key === 'Enter' || event.key === ' ') {
+                    event.preventDefault();
+                    this.handleKeyboardRelease(event, index);
+                }
+            });
         });
         
         // Add click handler for audio status indicator
@@ -253,18 +313,25 @@ export default class HandPan extends HTMLElement {
         
         console.log('HandPan: Mouse interaction - Playing note', note, 'at index', index);
         
-        // Play the note
-        await this.playNote(note, '2n');
+        // Performance optimization: Use requestAnimationFrame for visual updates
+        requestAnimationFrame(() => {
+            // Add visual feedback
+            const field = event.target;
+            if (field) {
+                field.classList.add('active');
+                
+                // Create ripple effect
+                this.createRipple(event, field);
+            }
+        });
+        
+        // Play the note (non-blocking)
+        this.playNote(note, '2n').catch(error => {
+            console.warn('HandPan: Error playing note:', error);
+        });
         
         // Track active note
         this.activeNotes.add(noteId);
-        
-        // Add visual feedback
-        const field = event.target;
-        field.classList.add('active');
-        
-        // Create ripple effect
-        this.createRipple(event, field);
         
         // Dispatch note-played event
         this.dispatchNoteEvent(note, index);
@@ -274,7 +341,10 @@ export default class HandPan extends HTMLElement {
             if (this.activeNotes.has(noteId)) {
                 this.activeNotes.delete(noteId);
             }
-            field.classList.remove('active');
+            const field = event.target;
+            if (field) {
+                field.classList.remove('active');
+            }
         }, 300);
     }
 
@@ -286,7 +356,68 @@ export default class HandPan extends HTMLElement {
         
         // Remove visual feedback immediately
         const field = event.target;
-        field.classList.remove('active');
+        if (field) {
+            field.classList.remove('active');
+        }
+    }
+
+    handleKeyboardInteraction(event, index) {
+        if (this.isMuted) return;
+
+        const note = this.sortedNotes[index];
+        const noteId = `keyboard-${index}`;
+        
+        console.log('HandPan: Keyboard interaction - Playing note', note, 'at index', index);
+        
+        // Performance optimization: Use requestAnimationFrame for visual updates
+        requestAnimationFrame(() => {
+            // Add visual feedback
+            const field = event.target;
+            if (field) {
+                field.classList.add('active');
+                field.setAttribute('aria-pressed', 'true');
+                
+                // Create ripple effect
+                this.createRipple(event, field);
+            }
+        });
+        
+        // Play the note (non-blocking)
+        this.playNote(note, '2n').catch(error => {
+            console.warn('HandPan: Error playing note:', error);
+        });
+        
+        // Track active note
+        this.activeNotes.add(noteId);
+        
+        // Dispatch note-played event
+        this.dispatchNoteEvent(note, index);
+        
+        // Remove visual feedback after animation completes
+        setTimeout(() => {
+            if (this.activeNotes.has(noteId)) {
+                this.activeNotes.delete(noteId);
+            }
+            const field = event.target;
+            if (field) {
+                field.classList.remove('active');
+                field.setAttribute('aria-pressed', 'false');
+            }
+        }, 300);
+    }
+
+    handleKeyboardRelease(event, index) {
+        const noteId = `keyboard-${index}`;
+        
+        // Remove from active notes
+        this.activeNotes.delete(noteId);
+        
+        // Remove visual feedback immediately
+        const field = event.target;
+        if (field) {
+            field.classList.remove('active');
+            field.setAttribute('aria-pressed', 'false');
+        }
     }
 
     async handleTouchStart(event, index) {
@@ -302,18 +433,25 @@ export default class HandPan extends HTMLElement {
         // Track this touch
         this.activeTouches.set(touchId, { index, noteId });
         
-        // Play the note
-        await this.playNote(note, '2n');
+        // Performance optimization: Use requestAnimationFrame for visual updates
+        requestAnimationFrame(() => {
+            // Add visual feedback
+            const field = event.target;
+            if (field) {
+                field.classList.add('active');
+                
+                // Create ripple effect
+                this.createRipple(event, field);
+            }
+        });
+        
+        // Play the note (non-blocking)
+        this.playNote(note, '2n').catch(error => {
+            console.warn('HandPan: Error playing note:', error);
+        });
         
         // Track active note
         this.activeNotes.add(noteId);
-        
-        // Add visual feedback
-        const field = event.target;
-        field.classList.add('active');
-        
-        // Create ripple effect
-        this.createRipple(event, field);
         
         // Dispatch note-played event
         this.dispatchNoteEvent(note, index);
@@ -323,7 +461,10 @@ export default class HandPan extends HTMLElement {
             if (this.activeNotes.has(noteId)) {
                 this.activeNotes.delete(noteId);
             }
-            field.classList.remove('active');
+            const field = event.target;
+            if (field) {
+                field.classList.remove('active');
+            }
         }, 300);
     }
 
@@ -343,7 +484,9 @@ export default class HandPan extends HTMLElement {
             
             // Remove visual feedback immediately
             const field = event.target;
-            field.classList.remove('active');
+            if (field) {
+                field.classList.remove('active');
+            }
         }
     }
 
@@ -362,6 +505,8 @@ export default class HandPan extends HTMLElement {
     }
 
     createRipple(event, element) {
+        if (!element) return;
+        
         const ripple = document.createElement('span');
         ripple.className = 'ripple';
         
@@ -376,8 +521,11 @@ export default class HandPan extends HTMLElement {
         
         element.appendChild(ripple);
         
+        // Memory management: Clean up ripple after animation
         setTimeout(() => {
-            ripple.remove();
+            if (ripple && ripple.parentNode) {
+                ripple.remove();
+            }
         }, 600);
     }
 
@@ -385,6 +533,12 @@ export default class HandPan extends HTMLElement {
         // Check if Tone.js is available
         if (typeof Tone === 'undefined') {
             console.warn('HandPan: Tone.js not loaded yet');
+            return false;
+        }
+        
+        // Check if Tone.context exists
+        if (!Tone.context) {
+            console.warn('HandPan: Tone.context not available');
             return false;
         }
         
@@ -431,28 +585,41 @@ export default class HandPan extends HTMLElement {
     }
     
     async playNote(note, duration) {
-        if (this.synth && !this.isMuted) {
-            try {
-                // Ensure audio context is running
-                const audioReady = await this.ensureAudioContextRunning();
-                if (!audioReady) {
-                    console.warn('HandPan: Audio context not ready, skipping note playback');
-                    return;
-                }
-                
-                // Debounce rapid successive calls
-                const now = Date.now();
-                if (now - this.lastPlayTime < 50) { // 50ms debounce
-                    return;
-                }
-                this.lastPlayTime = now;
-                
-                // Use triggerAttackRelease for proper timing - 0.8 second duration
-                this.synth.triggerAttackRelease(note, "8n");
-                
-            } catch (error) {
-                console.warn('HandPan: Error playing note:', error);
+        if (!this.synth || this.isMuted) {
+            return;
+        }
+
+        try {
+            // Ensure audio context is running
+            const audioReady = await this.ensureAudioContextRunning();
+            if (!audioReady) {
+                console.warn('HandPan: Audio context not ready, skipping note playback');
+                return;
             }
+            
+            // Debounce rapid successive calls for performance
+            const now = Date.now();
+            if (now - this.lastPlayTime < 50) { // 50ms debounce
+                return;
+            }
+            this.lastPlayTime = now;
+            
+            // Validate note before playing
+            if (!note || typeof note !== 'string') {
+                console.warn('HandPan: Invalid note provided:', note);
+                return;
+            }
+            
+            // Use triggerAttackRelease for proper timing - 0.8 second duration
+            if (typeof this.synth.triggerAttackRelease === 'function') {
+                this.synth.triggerAttackRelease(note, "8n");
+            } else {
+                console.warn('HandPan: Synthesiser triggerAttackRelease method not available');
+            }
+            
+        } catch (error) {
+            console.warn('HandPan: Error playing note:', error);
+            // Don't throw error to prevent breaking user interaction
         }
     }
 
@@ -549,6 +716,12 @@ export default class HandPan extends HTMLElement {
         try {
             console.log('HandPan: Trying alternative audio initialization...');
             
+            // Check if Tone.context exists before proceeding
+            if (!Tone.context) {
+                console.warn('HandPan: Tone.context not available for alternative initialization');
+                return;
+            }
+            
             // For some mobile browsers, we need to create a silent buffer first
             const silentBuffer = Tone.context.createBuffer(1, 1, 22050);
             const source = Tone.context.createBufferSource();
@@ -566,6 +739,42 @@ export default class HandPan extends HTMLElement {
             this.updateAudioStatusIndicator();
         } catch (error) {
             console.warn('HandPan: Alternative audio initialization failed:', error);
+        }
+    }
+
+    // Cleanup method for memory management
+    cleanup() {
+        try {
+            // Clear active touches and notes
+            this.activeTouches.clear();
+            this.activeNotes.clear();
+            
+            // Remove event listeners
+            if (this.toneFields) {
+                this.toneFields.forEach(field => {
+                    if (field) {
+                        field.removeEventListener('mousedown', this.handleMouseInteraction);
+                        field.removeEventListener('mouseup', this.handleMouseRelease);
+                        field.removeEventListener('touchstart', this.handleTouchStart);
+                        field.removeEventListener('touchend', this.handleTouchEnd);
+                        field.removeEventListener('keydown', this.handleKeyboardInteraction);
+                        field.removeEventListener('keyup', this.handleKeyboardRelease);
+                    }
+                });
+            }
+            
+            // Clean up audio effects if they exist
+            if (this.audioEffects) {
+                Object.values(this.audioEffects).forEach(effect => {
+                    if (effect && typeof effect.dispose === 'function') {
+                        effect.dispose();
+                    }
+                });
+            }
+            
+            console.log('HandPan: Cleanup completed');
+        } catch (error) {
+            console.warn('HandPan: Error during cleanup:', error);
         }
     }
 }
