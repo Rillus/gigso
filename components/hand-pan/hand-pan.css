@@ -53,12 +53,26 @@
     -ms-user-select: none;
     transform-origin: center center;
     will-change: transform;
+    /* Performance optimizations */
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
+    /* Accessibility */
+    outline: none;
+    /* Focus styles for keyboard navigation */
+    transition: all 0.2s ease, outline 0.1s ease;
 }
 
 .tone-field:hover {
     background: linear-gradient(145deg, #4a4a4a, #3a3a3a);
     transform: translate(-50%, -50%) scale(1.05);
     border-color: #5a5a5a;
+}
+
+.tone-field:focus {
+    outline: 2px solid #7a7a7a;
+    outline-offset: 2px;
+    background: linear-gradient(145deg, #4a4a4a, #3a3a3a);
+    transform: translate(-50%, -50%) scale(1.02);
 }
 
 .tone-field.active {
@@ -85,6 +99,8 @@
     }
 }
 
+
+
 .key-indicator {
     position: absolute;
     top: 50%;
@@ -110,6 +126,10 @@
     animation: ripple 0.8s ease-out;
     pointer-events: none;
     border: 1px solid rgba(255,255,255,0.2);
+    /* Performance optimizations */
+    will-change: transform, opacity;
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
 }
 
 @keyframes ripple {
@@ -148,6 +168,9 @@
         width: 50px;
         height: 50px;
         font-size: 10px;
+        /* Ensure touch targets are large enough */
+        min-width: 44px;
+        min-height: 44px;
     }
 }
 
@@ -161,6 +184,9 @@
         width: 40px;
         height: 40px;
         font-size: 9px;
+        /* Ensure touch targets are large enough */
+        min-width: 44px;
+        min-height: 44px;
     }
     
     .key-indicator {
