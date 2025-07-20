@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HandPan Audio Initialization Fix Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            margin: 0;
+            padding: 20px;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        h1 {
+            color: white;
+            text-align: center;
+            margin-bottom: 30px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .test-container {
+            background: rgba(255,255,255,0.1);
+            padding: 30px;
+            border-radius: 20px;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+            margin-bottom: 30px;
+            max-width: 600px;
+        }
+
+        .info-panel {
+            background: rgba(0,0,0,0.3);
+            border-radius: 15px;
+            padding: 20px;
+            margin: 20px 0;
+            color: white;
+        }
+
+        .info-panel h3 {
+            color: #ffd700;
+            margin-top: 0;
+        }
+
+        .controls {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        button {
+            background: rgba(255,255,255,0.2);
+            border: 2px solid rgba(255,255,255,0.3);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(5px);
+        }
+
+        button:hover {
+            background: rgba(255,255,255,0.3);
+            transform: translateY(-2px);
+        }
+
+        button.active {
+            background: rgba(255,255,255,0.4);
+            border-color: rgba(255,255,255,0.6);
+        }
+
+        .event-log {
+            background: rgba(0,0,0,0.3);
+            color: #00ff00;
+            padding: 15px;
+            border-radius: 10px;
+            font-family: monospace;
+            font-size: 12px;
+            max-height: 300px;
+            overflow-y: auto;
+            margin-top: 20px;
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+
+        .event-log h3 {
+            margin-top: 0;
+            color: white;
+        }
+
+        .status-indicator {
+            background: rgba(0,255,0,0.2);
+            border: 2px solid #00ff00;
+            border-radius: 10px;
+            padding: 15px;
+            margin: 20px 0;
+            color: white;
+            text-align: center;
+            font-weight: bold;
+        }
+
+        .status-indicator.error {
+            background: rgba(255,0,0,0.2);
+            border-color: #ff0000;
+        }
+
+        .status-indicator.warning {
+            background: rgba(255,165,0,0.2);
+            border-color: #ffa500;
+        }
+    </style>
+</head>
+<body>
+    <h1>🎵 HandPan Audio Initialization Fix Test</h1>
+    
+    <div class="test-container">
+        <div class="info-panel">
+            <h3>🔧 Audio Initialization Fix</h3>
+            <p><strong>Problem:</strong> The hand pan audio didn't always initialize properly, causing silent notes on first interaction.</p>
+            <p><strong>Solution:</strong> Added robust audio context state checking and automatic initialization.</p>
+            <ul>
+                <li>✅ Automatic audio context state detection</li>
+                <li>✅ One-click audio initialization</li>
+                <li>✅ Visual audio status indicator</li>
+                <li>✅ Graceful error handling</li>
+                <li>✅ Cross-browser compatibility</li>
+            </ul>
+        </div>
+
+        <div class="status-indicator" id="audioStatus">
+            🔊 Audio Status: Checking...
+        </div>
+
+        <div class="controls">
+            <button onclick="changeKey('D', 'minor')" class="active">D Minor</button>
+            <button onclick="changeKey('F', 'major')">F Major</button>
+            <button onclick="changeKey('G', 'minor')">G Minor</button>
+            <button onclick="toggleMute()" id="muteBtn">Mute</button>
+            <button onclick="testAudioContext()">Test Audio Context</button>
+        </div>
+        
+        <hand-pan id="handPan" key="D" scale="minor" size="medium"></hand-pan>
+        
+        <div class="info-panel">
+            <h3>🧪 Test Instructions</h3>
+            <p><strong>1.</strong> Try clicking on tone fields - you should see an audio status indicator if audio isn't ready</p>
+            <p><strong>2.</strong> Click the audio status indicator or any tone field to initialize audio</p>
+            <p><strong>3.</strong> Once audio is initialized, the indicator should disappear and notes should play</p>
+            <p><strong>4.</strong> Use the "Test Audio Context" button to check the current audio state</p>
+        </div>
+    </div>
+
+    <div class="event-log">
+        <h3>Event Log</h3>
+        <div id="eventLog"></div>
+    </div>
+
+    <!-- Load Tone.js -->
+    <script src="https://unpkg.com/tone@14.7.77/build/Tone.js"></script>
+    
+    <!-- Load our component -->
+    <script type="module">
+        import HandPan from './components/hand-pan/hand-pan.js';
+        
+        let audioEnabled = false;
+        let isMuted = false;
+        
+        // Update audio status display
+        function updateAudioStatus() {
+            const statusElement = document.getElementById('audioStatus');
+            if (typeof Tone !== 'undefined' && Tone.context) {
+                const state = Tone.context.state;
+                if (state === 'running') {
+                    statusElement.textContent = '🔊 Audio: Running';
+                    statusElement.className = 'status-indicator';
+                    audioEnabled = true;
+                } else if (state === 'suspended') {
+                    statusElement.textContent = '⏸️ Audio: Suspended (click to enable)';
+                    statusElement.className = 'status-indicator warning';
+                    audioEnabled = false;
+                } else {
+                    statusElement.textContent = '❌ Audio: Not available';
+                    statusElement.className = 'status-indicator error';
+                    audioEnabled = false;
+                }
+            } else {
+                statusElement.textContent = '⏳ Audio: Loading...';
+                statusElement.className = 'status-indicator warning';
+                audioEnabled = false;
+            }
+        }
+        
+        // Test audio context function
+        window.testAudioContext = function() {
+            if (typeof Tone !== 'undefined' && Tone.context) {
+                logEvent(`Audio Context State: ${Tone.context.state}`);
+                logEvent(`Sample Rate: ${Tone.context.sampleRate}Hz`);
+                logEvent(`Current Time: ${Tone.context.currentTime.toFixed(2)}s`);
+            } else {
+                logEvent('Tone.js not loaded yet');
+            }
+        };
+        
+        function changeKey(key, scale) {
+            const handPan = document.getElementById('handPan');
+            handPan.dispatchEvent(new CustomEvent('set-key', {
+                detail: { key, scale }
+            }));
+            
+            // Update button states
+            document.querySelectorAll('.controls button').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            event.target.classList.add('active');
+            
+            logEvent(`Key changed to ${key} ${scale}`);
+        }
+        
+        function toggleMute() {
+            const handPan = document.getElementById('handPan');
+            isMuted = !isMuted;
+            
+            if (isMuted) {
+                handPan.dispatchEvent(new CustomEvent('mute'));
+                document.getElementById('muteBtn').textContent = 'Unmute';
+                logEvent('HandPan muted');
+            } else {
+                handPan.dispatchEvent(new CustomEvent('unmute'));
+                document.getElementById('muteBtn').textContent = 'Mute';
+                logEvent('HandPan unmuted');
+            }
+        }
+        
+        function logEvent(message) {
+            const eventLog = document.getElementById('eventLog');
+            const timestamp = new Date().toLocaleTimeString();
+            const logEntry = document.createElement('div');
+            logEntry.textContent = `[${timestamp}] ${message}`;
+            eventLog.appendChild(logEntry);
+            eventLog.scrollTop = eventLog.scrollHeight;
+        }
+        
+        // Listen for HandPan events
+        document.addEventListener('note-played', (event) => {
+            const { note, frequency, duration, index } = event.detail;
+            logEvent(`🎵 Note played: ${note} (${frequency.toFixed(1)}Hz) - Duration: ${duration}s`);
+        });
+        
+        document.addEventListener('key-changed', (event) => {
+            const { key, scale, notes } = event.detail;
+            logEvent(`🎼 Key changed: ${key} ${scale} - Notes: ${notes.join(', ')}`);
+        });
+        
+        // Make functions global
+        window.changeKey = changeKey;
+        window.toggleMute = toggleMute;
+        
+        // Initialize status updates
+        updateAudioStatus();
+        
+        // Update status periodically
+        setInterval(updateAudioStatus, 1000);
+        
+        // Initial log
+        logEvent('HandPan Audio Initialization Fix Test loaded');
+        logEvent('Testing robust audio context initialization...');
+        
+        // Test that the component is working
+        setTimeout(() => {
+            const handPan = document.getElementById('handPan');
+            console.log('Test: HandPan component:', handPan);
+            console.log('Test: HandPan notes:', handPan.notes);
+            console.log('Test: HandPan current key:', handPan.currentKey);
+            console.log('Test: HandPan current scale:', handPan.currentScale);
+            logEvent('HandPan component initialized successfully');
+        }, 1000);
+    </script>
+</body>
+</html>
