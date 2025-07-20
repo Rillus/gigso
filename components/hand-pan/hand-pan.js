@@ -74,33 +74,33 @@ export default class HandPan extends HTMLElement {
                 type: "triangle"  // Base metallic sound
             },
             envelope: {
-                attack: 0.005,    // Very quick attack for immediate response
-                decay: 0.1,       // Quick decay to sustain level
-                sustain: 0.3,     // Lower sustain for faster fade
-                release: 0.6      // Faster release for quicker note fade
+                attack: 0.062,    // Slightly longer attack for smoother response
+                decay: 0.26,      // Longer decay for richer tone
+                sustain: 0.7,     // Higher sustain for longer notes
+                release: 0.3      // Shorter release for quicker note fade
             }
         });
 
         // Create enhanced reverb for steel drum resonance
         this.reverb = new Tone.Reverb({
-            decay: 0.8,           // Shorter decay for faster note fade
-            wet: 0.25,            // Less reverb for cleaner sound
-            preDelay: 0.02        // Very short pre-delay for quick response
+            decay: 1.4,           // Longer decay for richer resonance
+            wet: 0.8,             // More reverb for atmospheric sound
+            preDelay: 0.04        // Slightly longer pre-delay for depth
         });
 
         // Add chorus for steel drum shimmer
         this.chorus = new Tone.Chorus({
-            frequency: 2.5,
+            frequency: 3.5,
             delayTime: 2.5,
-            depth: 0.7,
-            wet: 0.2
+            depth: 0.35,
+            wet: 0.7
         });
 
         // Add subtle delay for steel drum echo
         this.delay = new Tone.PingPongDelay({
-            delayTime: 0.125,     // Convert from "15n" to seconds
+            delayTime: 0.175,     // Longer delay time for more echo
             feedback: 0.2,
-            wet: 0.15
+            wet: 0.85
         });
 
         // Create effects chain: synth → chorus → delay → reverb → destination

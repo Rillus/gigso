@@ -16,26 +16,26 @@ export default class HandPanWrapper extends HTMLElement {
         // Audio effect properties
         this.audioEffects = {
             reverb: {
-                decay: 0.8,
-                wet: 0.25,
-                preDelay: 0.02
+                decay: 1.4,
+                wet: 0.8,
+                preDelay: 0.04
             },
             chorus: {
-                frequency: 2.5,
+                frequency: 3.5,
                 delayTime: 2.5,
-                depth: 0.7,
-                wet: 0.2
+                depth: 0.35,
+                wet: 0.7
             },
             delay: {
-                delayTime: 0.125, // 15n in seconds
+                delayTime: 0.175, // 15n in seconds
                 feedback: 0.2,
-                wet: 0.15
+                wet: 0.85
             },
             synth: {
-                attack: 0.005,
-                decay: 0.1,
-                sustain: 0.3,
-                release: 0.6
+                attack: 0.062,
+                decay: 0.26,
+                sustain: 0.7,
+                release: 0.3
             }
         };
         
@@ -403,55 +403,61 @@ export default class HandPanWrapper extends HTMLElement {
 
     async playAudioPreview() {
         try {
-            if (!this.previewSynth && this.audioEnabled) {
-                const { default: Tone } = await import('https://unpkg.com/tone@14.7.77/build/Tone.js');
-                
-                // Create a simple synth for preview
-                this.previewSynth = new Tone.Synth({
-                    oscillator: {
-                        type: 'sine'
-                    },
-                    envelope: {
-                        attack: 0.005,
-                        decay: 0.1,
-                        sustain: 0.3,
-                        release: 0.6
-                    }
-                });
-                
-                // Apply current audio effects to the preview synth
-                if (this.audioEffects) {
-                    // Create effects chain
-                    const reverb = new Tone.Reverb({
-                        decay: this.audioEffects.reverb.decay,
-                        preDelay: this.audioEffects.reverb.preDelay
-                    });
-                    reverb.wet.value = this.audioEffects.reverb.wet;
-                    
-                    const chorus = new Tone.Chorus({
-                        frequency: this.audioEffects.chorus.frequency,
-                        delayTime: this.audioEffects.chorus.delayTime,
-                        depth: this.audioEffects.chorus.depth
-                    });
-                    chorus.wet.value = this.audioEffects.chorus.wet;
-                    
-                    const delay = new Tone.FeedbackDelay({
-                        delayTime: this.audioEffects.delay.delayTime,
-                        feedback: this.audioEffects.delay.feedback
-                    });
-                    delay.wet.value = this.audioEffects.delay.wet;
-                    
-                    // Connect the chain
-                    this.previewSynth.chain(reverb, chorus, delay, Tone.Destination);
-                } else {
-                    this.previewSynth.toDestination();
-                }
+            if (!this.audioEnabled) {
+                return;
+            }
+
+            const { default: Tone } = await import('https://unpkg.com/tone@14.7.77/build/Tone.js');
+            
+            // Always dispose and recreate the preview synth to get fresh effects
+            if (this.previewSynth) {
+                this.previewSynth.dispose();
+                this.previewSynth = null;
             }
             
-            // Play C4 note if synth is ready
-            if (this.previewSynth) {
-                this.previewSynth.triggerAttackRelease('C4', '8n');
+            // Create a simple synth for preview
+            this.previewSynth = new Tone.Synth({
+                oscillator: {
+                    type: 'sine'
+                },
+                envelope: {
+                    attack: this.audioEffects.synth.attack,
+                    decay: this.audioEffects.synth.decay,
+                    sustain: this.audioEffects.synth.sustain,
+                    release: this.audioEffects.synth.release
+                }
+            });
+            
+            // Apply current audio effects to the preview synth
+            if (this.audioEffects) {
+                // Create effects chain
+                const reverb = new Tone.Reverb({
+                    decay: this.audioEffects.reverb.decay,
+                    preDelay: this.audioEffects.reverb.preDelay
+                });
+                reverb.wet.value = this.audioEffects.reverb.wet;
+                
+                const chorus = new Tone.Chorus({
+                    frequency: this.audioEffects.chorus.frequency,
+                    delayTime: this.audioEffects.chorus.delayTime,
+                    depth: this.audioEffects.chorus.depth
+                });
+                chorus.wet.value = this.audioEffects.chorus.wet;
+                
+                const delay = new Tone.FeedbackDelay({
+                    delayTime: this.audioEffects.delay.delayTime,
+                    feedback: this.audioEffects.delay.feedback
+                });
+                delay.wet.value = this.audioEffects.delay.wet;
+                
+                // Connect the chain
+                this.previewSynth.chain(reverb, chorus, delay, Tone.Destination);
+            } else {
+                this.previewSynth.toDestination();
             }
+            
+            // Play C4 note
+            this.previewSynth.triggerAttackRelease('C4', '8n');
         } catch (error) {
             console.log('Audio preview error:', error);
         }
@@ -505,26 +511,26 @@ export default class HandPanWrapper extends HTMLElement {
         // Reset to default values
         this.audioEffects = {
             reverb: {
-                decay: 0.8,
-                wet: 0.25,
-                preDelay: 0.02
+                decay: 1.4,
+                wet: 0.8,
+                preDelay: 0.04
             },
             chorus: {
-                frequency: 2.5,
+                frequency: 3.5,
                 delayTime: 2.5,
-                depth: 0.7,
-                wet: 0.2
+                depth: 0.35,
+                wet: 0.7
             },
             delay: {
-                delayTime: 0.125,
+                delayTime: 0.175,
                 feedback: 0.2,
-                wet: 0.15
+                wet: 0.85
             },
             synth: {
-                attack: 0.005,
-                decay: 0.1,
-                sustain: 0.3,
-                release: 0.6
+                attack: 0.062,
+                decay: 0.26,
+                sustain: 0.7,
+                release: 0.3
             }
         };
 
