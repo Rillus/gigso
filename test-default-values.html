@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HandPan Default Values Test</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 20px;
+            background: linear-gradient(135deg, #0f0f23, #1a1a2e);
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            color: #fff;
+            min-height: 100vh;
+        }
+
+        .test-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .test-header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            background: linear-gradient(45deg, #4CAF50, #2196F3);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .test-results {
+            background: rgba(255,255,255,0.1);
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 30px;
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+
+        .test-results h2 {
+            margin-top: 0;
+            color: #4CAF50;
+        }
+
+        .test-item {
+            margin-bottom: 10px;
+            padding: 10px;
+            border-radius: 5px;
+            background: rgba(0,0,0,0.2);
+        }
+
+        .test-pass {
+            border-left: 4px solid #4CAF50;
+            color: #4CAF50;
+        }
+
+        .test-fail {
+            border-left: 4px solid #f44336;
+            color: #f44336;
+        }
+
+        .expected-values {
+            background: rgba(255,255,255,0.05);
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 30px;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .expected-values h2 {
+            margin-top: 0;
+            color: #FF9800;
+        }
+
+        .value-group {
+            margin-bottom: 15px;
+        }
+
+        .value-group h3 {
+            margin: 0 0 10px 0;
+            color: #2196F3;
+        }
+
+        .value-item {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 5px;
+            padding: 5px;
+            background: rgba(0,0,0,0.2);
+            border-radius: 3px;
+        }
+    </style>
+</head>
+<body>
+    <div class="test-header">
+        <h1>🧪 HandPan Default Values Test</h1>
+        <p>Testing the new default values and note preview functionality</p>
+    </div>
+
+    <div class="expected-values">
+        <h2>📋 Expected Default Values</h2>
+        
+        <div class="value-group">
+            <h3>🌊 Reverb</h3>
+            <div class="value-item">
+                <span>Decay:</span>
+                <span>1.400</span>
+            </div>
+            <div class="value-item">
+                <span>Wet:</span>
+                <span>0.800</span>
+            </div>
+            <div class="value-item">
+                <span>Pre-delay:</span>
+                <span>0.040</span>
+            </div>
+        </div>
+
+        <div class="value-group">
+            <h3>🎭 Chorus</h3>
+            <div class="value-item">
+                <span>Frequency:</span>
+                <span>3.500</span>
+            </div>
+            <div class="value-item">
+                <span>Depth:</span>
+                <span>0.350</span>
+            </div>
+            <div class="value-item">
+                <span>Wet:</span>
+                <span>0.700</span>
+            </div>
+        </div>
+
+        <div class="value-group">
+            <h3>⏱️ Delay</h3>
+            <div class="value-item">
+                <span>Time:</span>
+                <span>0.175</span>
+            </div>
+            <div class="value-item">
+                <span>Feedback:</span>
+                <span>0.200</span>
+            </div>
+            <div class="value-item">
+                <span>Wet:</span>
+                <span>0.850</span>
+            </div>
+        </div>
+
+        <div class="value-group">
+            <h3>🎹 Synth</h3>
+            <div class="value-item">
+                <span>Attack:</span>
+                <span>0.062</span>
+            </div>
+            <div class="value-item">
+                <span>Decay:</span>
+                <span>0.260</span>
+            </div>
+            <div class="value-item">
+                <span>Sustain:</span>
+                <span>0.700</span>
+            </div>
+            <div class="value-item">
+                <span>Release:</span>
+                <span>0.300</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- The HandPan Wrapper Component -->
+    <hand-pan-wrapper id="testHandPan"></hand-pan-wrapper>
+
+    <div class="test-results">
+        <h2>✅ Test Results</h2>
+        <div id="testResults">
+            <div class="test-item">Running tests...</div>
+        </div>
+    </div>
+
+    <!-- Load Tone.js -->
+    <script src="https://unpkg.com/tone@14.7.77/build/Tone.js"></script>
+    
+    <!-- Load our components -->
+    <script type="module">
+        import HandPanWrapper from './components/hand-pan-wrapper/hand-pan-wrapper.js';
+        
+        const wrapper = document.getElementById('testHandPan');
+        const testResults = document.getElementById('testResults');
+        
+        function addTestResult(testName, passed, actualValue = null, expectedValue = null) {
+            const testItem = document.createElement('div');
+            testItem.className = `test-item ${passed ? 'test-pass' : 'test-fail'}`;
+            
+            if (passed) {
+                testItem.innerHTML = `✅ ${testName}`;
+            } else {
+                testItem.innerHTML = `❌ ${testName} - Expected: ${expectedValue}, Got: ${actualValue}`;
+            }
+            
+            testResults.appendChild(testItem);
+        }
+
+        function runTests() {
+            testResults.innerHTML = '';
+            
+            // Test reverb defaults
+            addTestResult('Reverb Decay', 
+                Math.abs(wrapper.audioEffects.reverb.decay - 1.4) < 0.001, 
+                wrapper.audioEffects.reverb.decay, 1.4);
+            
+            addTestResult('Reverb Wet', 
+                Math.abs(wrapper.audioEffects.reverb.wet - 0.8) < 0.001, 
+                wrapper.audioEffects.reverb.wet, 0.8);
+            
+            addTestResult('Reverb Pre-delay', 
+                Math.abs(wrapper.audioEffects.reverb.preDelay - 0.04) < 0.001, 
+                wrapper.audioEffects.reverb.preDelay, 0.04);
+            
+            // Test chorus defaults
+            addTestResult('Chorus Frequency', 
+                Math.abs(wrapper.audioEffects.chorus.frequency - 3.5) < 0.001, 
+                wrapper.audioEffects.chorus.frequency, 3.5);
+            
+            addTestResult('Chorus Depth', 
+                Math.abs(wrapper.audioEffects.chorus.depth - 0.35) < 0.001, 
+                wrapper.audioEffects.chorus.depth, 0.35);
+            
+            addTestResult('Chorus Wet', 
+                Math.abs(wrapper.audioEffects.chorus.wet - 0.7) < 0.001, 
+                wrapper.audioEffects.chorus.wet, 0.7);
+            
+            // Test delay defaults
+            addTestResult('Delay Time', 
+                Math.abs(wrapper.audioEffects.delay.delayTime - 0.175) < 0.001, 
+                wrapper.audioEffects.delay.delayTime, 0.175);
+            
+            addTestResult('Delay Feedback', 
+                Math.abs(wrapper.audioEffects.delay.feedback - 0.2) < 0.001, 
+                wrapper.audioEffects.delay.feedback, 0.2);
+            
+            addTestResult('Delay Wet', 
+                Math.abs(wrapper.audioEffects.delay.wet - 0.85) < 0.001, 
+                wrapper.audioEffects.delay.wet, 0.85);
+            
+            // Test synth defaults
+            addTestResult('Synth Attack', 
+                Math.abs(wrapper.audioEffects.synth.attack - 0.062) < 0.001, 
+                wrapper.audioEffects.synth.attack, 0.062);
+            
+            addTestResult('Synth Decay', 
+                Math.abs(wrapper.audioEffects.synth.decay - 0.26) < 0.001, 
+                wrapper.audioEffects.synth.decay, 0.26);
+            
+            addTestResult('Synth Sustain', 
+                Math.abs(wrapper.audioEffects.synth.sustain - 0.7) < 0.001, 
+                wrapper.audioEffects.synth.sustain, 0.7);
+            
+            addTestResult('Synth Release', 
+                Math.abs(wrapper.audioEffects.synth.release - 0.3) < 0.001, 
+                wrapper.audioEffects.synth.release, 0.3);
+            
+            // Test reset functionality
+            wrapper.audioEffects.reverb.decay = 0.5;
+            wrapper.resetEffects();
+            addTestResult('Reset Effects', 
+                Math.abs(wrapper.audioEffects.reverb.decay - 1.4) < 0.001, 
+                wrapper.audioEffects.reverb.decay, 1.4);
+        }
+
+        // Run tests after component is loaded
+        setTimeout(runTests, 1000);
+        
+        // Test note preview functionality
+        setTimeout(() => {
+            addTestResult('Note Preview Toggle Available', 
+                wrapper.shadowRoot.getElementById('audioPreviewToggle') !== null);
+        }, 1500);
+    </script>
+</body>
+</html>
