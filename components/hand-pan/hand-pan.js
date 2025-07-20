@@ -62,6 +62,9 @@ export default class HandPan extends HTMLElement {
         this.addEventListener('unmute', () => {
             this.isMuted = false;
         });
+        
+        // Initialize audio context on first user interaction
+        this.initializeAudioContext();
     }
 
     createHandPanSynth() {
@@ -118,6 +121,7 @@ export default class HandPan extends HTMLElement {
     render() {
         const size = this.getAttribute('size') || 'medium';
         const toneFields = this.createToneFields();
+        const audioStatus = this.getAudioStatusIndicator();
 
         this.shadowRoot.innerHTML = `
             <style>
@@ -130,12 +134,26 @@ export default class HandPan extends HTMLElement {
                 <div class="key-indicator">
                     ${this.currentKey} ${this.currentScale}
                 </div>
+                ${audioStatus}
             </div>
         `;
 
         // Store references to tone fields and re-add event listeners
         this.toneFields = this.shadowRoot.querySelectorAll('.tone-field');
         this.addEventListeners();
+    }
+    
+    getAudioStatusIndicator() {
+        // Only show audio status indicator if audio context is not running
+        if (typeof Tone !== 'undefined' && Tone.context && Tone.context.state === 'running') {
+            return '';
+        }
+        
+        return `
+            <div class="audio-status-indicator" id="audioStatusIndicator">
+                <div class="audio-status-text">🔇 Click to enable audio</div>
+            </div>
+        `;
     }
 
     createToneFields() {
@@ -194,9 +212,19 @@ export default class HandPan extends HTMLElement {
                 this.handleTouchEnd(event, index);
             });
         });
+        
+        // Add click handler for audio status indicator
+        const audioIndicator = this.shadowRoot.getElementById('audioStatusIndicator');
+        if (audioIndicator) {
+            audioIndicator.addEventListener('click', async (event) => {
+                event.stopPropagation();
+                console.log('HandPan: Audio status indicator clicked, attempting to start audio...');
+                await this.ensureAudioContextRunning();
+            });
+        }
     }
 
-    handleMouseInteraction(event, index) {
+    async handleMouseInteraction(event, index) {
         if (this.isMuted) return;
 
         const note = this.sortedNotes[index];
@@ -205,7 +233,7 @@ export default class HandPan extends HTMLElement {
         console.log('HandPan: Mouse interaction - Playing note', note, 'at index', index);
         
         // Play the note
-        this.playNote(note, '2n');
+        await this.playNote(note, '2n');
         
         // Track active note
         this.activeNotes.add(noteId);
@@ -240,7 +268,7 @@ export default class HandPan extends HTMLElement {
         field.classList.remove('active');
     }
 
-    handleTouchStart(event, index) {
+    async handleTouchStart(event, index) {
         if (this.isMuted) return;
 
         const note = this.sortedNotes[index];
@@ -254,7 +282,7 @@ export default class HandPan extends HTMLElement {
         this.activeTouches.set(touchId, { index, noteId });
         
         // Play the note
-        this.playNote(note, '2n');
+        await this.playNote(note, '2n');
         
         // Track active note
         this.activeNotes.add(noteId);
@@ -332,9 +360,65 @@ export default class HandPan extends HTMLElement {
         }, 600);
     }
 
-    playNote(note, duration) {
+    async ensureAudioContextRunning() {
+        // Check if Tone.js is available
+        if (typeof Tone === 'undefined') {
+            console.warn('HandPan: Tone.js not loaded yet');
+            return false;
+        }
+        
+        // Handle different audio context states
+        if (Tone.context.state === 'suspended') {
+            try {
+                console.log('HandPan: Audio context suspended, attempting to resume...');
+                await Tone.context.resume();
+                console.log('HandPan: Audio context resumed successfully');
+                this.updateAudioStatusIndicator();
+                return true;
+            } catch (error) {
+                console.warn('HandPan: Error resuming audio context:', error);
+                return false;
+            }
+        } else if (Tone.context.state !== 'running') {
+            try {
+                console.log('HandPan: Audio context not running, attempting to start...');
+                await Tone.start();
+                console.log('HandPan: Audio context started successfully');
+                this.updateAudioStatusIndicator();
+                return true;
+            } catch (error) {
+                console.warn('HandPan: Error starting audio context:', error);
+                return false;
+            }
+        }
+        return true;
+    }
+    
+    updateAudioStatusIndicator() {
+        const indicator = this.shadowRoot.getElementById('audioStatusIndicator');
+        if (indicator) {
+            if (typeof Tone !== 'undefined' && Tone.context && Tone.context.state === 'running') {
+                indicator.style.display = 'none';
+            } else {
+                indicator.style.display = 'block';
+                const textElement = indicator.querySelector('.audio-status-text');
+                if (textElement) {
+                    textElement.textContent = '🔇 Click to enable audio';
+                }
+            }
+        }
+    }
+    
+    async playNote(note, duration) {
         if (this.synth && !this.isMuted) {
             try {
+                // Ensure audio context is running
+                const audioReady = await this.ensureAudioContextRunning();
+                if (!audioReady) {
+                    console.warn('HandPan: Audio context not ready, skipping note playback');
+                    return;
+                }
+                
                 // Debounce rapid successive calls
                 const now = Date.now();
                 if (now - this.lastPlayTime < 50) { // 50ms debounce
@@ -388,6 +472,61 @@ export default class HandPan extends HTMLElement {
     getNotesForKey(key, scale) {
         // Use the scale utilities to generate notes for any key and scale
         return generateScaleNotes(key, scale);
+    }
+    
+    initializeAudioContext() {
+        // Add a one-time click listener to initialize audio context
+        const initializeAudio = async () => {
+            try {
+                // Check if Tone.js is available
+                if (typeof Tone === 'undefined') {
+                    console.warn('HandPan: Tone.js not loaded yet, waiting...');
+                    return;
+                }
+                
+                if (Tone.context.state !== 'running') {
+                    console.log('HandPan: Initializing audio context on first interaction...');
+                    await Tone.start();
+                    console.log('HandPan: Audio context initialized successfully');
+                    this.updateAudioStatusIndicator();
+                }
+                // Remove the listener after first use
+                document.removeEventListener('click', initializeAudio);
+                document.removeEventListener('touchstart', initializeAudio);
+            } catch (error) {
+                console.warn('HandPan: Error initializing audio context:', error);
+                // Try alternative initialization for mobile browsers
+                this.tryAlternativeAudioInitialization();
+            }
+        };
+        
+        // Add listeners for both mouse and touch interactions
+        document.addEventListener('click', initializeAudio, { once: true });
+        document.addEventListener('touchstart', initializeAudio, { once: true });
+    }
+    
+    async tryAlternativeAudioInitialization() {
+        try {
+            console.log('HandPan: Trying alternative audio initialization...');
+            
+            // For some mobile browsers, we need to create a silent buffer first
+            const silentBuffer = Tone.context.createBuffer(1, 1, 22050);
+            const source = Tone.context.createBufferSource();
+            source.buffer = silentBuffer;
+            source.connect(Tone.context.destination);
+            source.start(0);
+            source.stop(0.001);
+            
+            // Then try to resume the context
+            if (Tone.context.state === 'suspended') {
+                await Tone.context.resume();
+            }
+            
+            console.log('HandPan: Alternative audio initialization completed');
+            this.updateAudioStatusIndicator();
+        } catch (error) {
+            console.warn('HandPan: Alternative audio initialization failed:', error);
+        }
     }
 }
 

@@ -167,4 +167,62 @@
         font-size: 12px;
         padding: 6px 10px;
     }
+}
+
+/* Audio Status Indicator */
+.audio-status-indicator {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: rgba(255, 0, 0, 0.8);
+    color: white;
+    padding: 10px 15px;
+    border-radius: 25px;
+    font-size: 14px;
+    font-weight: bold;
+    text-align: center;
+    z-index: 20;
+    backdrop-filter: blur(10px);
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+    cursor: pointer;
+    transition: all 0.3s ease;
+    animation: audioPulse 2s ease-in-out infinite;
+}
+
+.audio-status-indicator:hover {
+    background: rgba(255, 0, 0, 0.9);
+    transform: translate(-50%, -50%) scale(1.05);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4);
+}
+
+.audio-status-text {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+@keyframes audioPulse {
+    0%, 100% {
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+    }
+    50% {
+        box-shadow: 0 4px 20px rgba(255, 0, 0, 0.4);
+    }
+}
+
+/* Responsive audio status indicator */
+@media (max-width: 768px) {
+    .audio-status-indicator {
+        font-size: 12px;
+        padding: 8px 12px;
+    }
+}
+
+@media (max-width: 480px) {
+    .audio-status-indicator {
+        font-size: 11px;
+        padding: 6px 10px;
+    }
 } 
