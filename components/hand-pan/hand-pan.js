@@ -1,4 +1,5 @@
 import { generateScaleNotes, getNoteFrequency } from '../../helpers/scaleUtils.js';
+import { applyNoteColor, getBaseNote } from '../../helpers/noteColorUtils.js';
 
 export default class HandPan extends HTMLElement {
     constructor() {
@@ -200,6 +201,9 @@ export default class HandPan extends HTMLElement {
         // Store references to tone fields and re-add event listeners
         this.toneFields = this.shadowRoot.querySelectorAll('.tone-field');
         this.addEventListeners();
+        
+        // Apply note colors to tone fields
+        this.applyNoteColors();
         
         // Update audio status indicator
         this.updateAudioStatusIndicator();
@@ -582,6 +586,39 @@ export default class HandPan extends HTMLElement {
                 }
             }
         }
+    }
+
+    /**
+     * Apply note colors to tone fields based on their note assignments
+     */
+    applyNoteColors() {
+        if (!this.toneFields || !this.sortedNotes) return;
+
+        this.toneFields.forEach((field, index) => {
+            const note = this.sortedNotes[index];
+            if (note && field) {
+                // Extract just the note without octave for color mapping
+                const noteWithoutOctave = note.replace(/\d+$/, '');
+                
+                // Apply the note color with hand pan specific styling
+                applyNoteColor(field, noteWithoutOctave, {
+                    useBackground: true,
+                    useTextColor: false,
+                    applySharpFlatStyling: true
+                });
+                
+                // Ensure text remains white for visibility
+                field.style.color = '#fff';
+                field.style.textShadow = '1px 1px 2px rgba(0, 0, 0, 0.8)';
+                
+                // Maintain the metallic gradient overlay
+                const originalBackground = field.style.background;
+                field.style.background = `
+                    linear-gradient(145deg, rgba(255,255,255,0.1), rgba(0,0,0,0.1)),
+                    ${originalBackground}
+                `;
+            }
+        });
     }
     
     async playNote(note, duration) {
