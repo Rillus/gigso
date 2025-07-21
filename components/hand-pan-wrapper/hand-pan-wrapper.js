@@ -1,4 +1,5 @@
 import { getAllKeys, getAllScaleTypes } from '../../helpers/scaleUtils.js';
+import { applyNoteColor, getNoteColor } from '../../helpers/noteColorUtils.js';
 
 export default class HandPanWrapper extends HTMLElement {
     constructor() {
@@ -88,6 +89,14 @@ export default class HandPanWrapper extends HTMLElement {
 
         this.render();
         this.addEventListeners();
+        
+        // Apply note colors after everything is set up
+        setTimeout(() => {
+            this.applyKeyColors();
+        }, 0);
+        
+        // Apply note colors to key buttons after initial render
+        this.applyKeyColors();
     }
 
     render() {
@@ -225,11 +234,11 @@ export default class HandPanWrapper extends HTMLElement {
                         <div class="key-controls">
                             <div class="key-row">
                                 <label>Key:</label>
-                                <select id="keySelect" class="control-select">
+                                <div class="key-buttons-container">
                                     ${this.availableKeys.map(key => 
-                                        `<option value="${key}" ${this.currentKey === key ? 'selected' : ''}>${key}</option>`
+                                        `<button class="key-btn ${this.currentKey === key ? 'active' : ''}" data-key="${key}">${key}</button>`
                                     ).join('')}
-                                </select>
+                                </div>
                             </div>
                             <div class="key-row">
                                 <label>Scale:</label>
@@ -309,11 +318,14 @@ export default class HandPanWrapper extends HTMLElement {
         const resetEffectsBtn = this.shadowRoot.getElementById('resetEffectsBtn');
         resetEffectsBtn.addEventListener('click', () => this.resetEffects());
 
-        // Key selection
-        const keySelect = this.shadowRoot.getElementById('keySelect');
-        keySelect.addEventListener('change', (e) => {
-            this.currentKey = e.target.value;
-            this.updateHandPan();
+        // Key selection buttons
+        const keyBtns = this.shadowRoot.querySelectorAll('.key-btn');
+        keyBtns.forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                this.currentKey = e.target.dataset.key;
+                this.updateKeyButtons();
+                this.updateHandPan();
+            });
         });
 
         const scaleSelect = this.shadowRoot.getElementById('scaleSelect');
@@ -687,6 +699,38 @@ export default class HandPanWrapper extends HTMLElement {
 
     getHandPan() {
         return this.shadowRoot.getElementById('handPan');
+    }
+
+    /**
+     * Apply note colors to key selection buttons
+     */
+    applyKeyColors() {
+        const keyBtns = this.shadowRoot.querySelectorAll('.key-btn');
+        keyBtns.forEach(btn => {
+            const key = btn.dataset.key;
+            if (key) {
+                applyNoteColor(btn, key, {
+                    useBackground: true,
+                    useTextColor: false,
+                    applySharpFlatStyling: true
+                });
+                
+                // Ensure text is white for visibility
+                btn.style.color = '#fff';
+                btn.style.textShadow = '1px 1px 2px rgba(0, 0, 0, 0.8)';
+                btn.style.fontWeight = 'bold';
+            }
+        });
+    }
+
+    /**
+     * Update active state of key buttons
+     */
+    updateKeyButtons() {
+        const keyBtns = this.shadowRoot.querySelectorAll('.key-btn');
+        keyBtns.forEach(btn => {
+            btn.classList.toggle('active', btn.dataset.key === this.currentKey);
+        });
     }
 }
 

@@ -103,6 +103,26 @@ document.body.addEventListener('add-chord', (event) => {
 - Consistent spacing and typography
 - Responsive grid layout
 
+### Note Color System
+The chord palette implements the application's note color system:
+
+#### Color Mapping
+- **C chords**: Red (`#E1453E`)
+- **D chords**: Orange (`#F17947`)
+- **E chords**: Yellow (`#FAB15C`)
+- **F chords**: Green (`#60B05B`)
+- **G chords**: Blue (`#5394C7`)
+- **A chords**: Indigo (`#4b0082`)
+- **B chords**: Violet (`#8F00FF`)
+
+#### Sharp/Flat Variations
+- **Sharp notes**: Base color with lightening effect (`box-shadow: inset 0 0 20px rgba(255, 255, 255, 0.5)`)
+- **Flat notes**: Base color with darkening effect (`box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.3)`)
+
+#### Minor Chord Styling
+- **Minor chords**: Base note color with reduced opacity (0.8) and dark text shadow
+- **Grid positioning**: Minor chords positioned below their major counterparts
+
 ## Testing Requirements
 
 ### Core Functionality
