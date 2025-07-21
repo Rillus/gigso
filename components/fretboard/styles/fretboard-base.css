@@ -1,0 +1,275 @@
+/* Fretboard Base Styles */
+.fretboard-container {
+  width: 100%;
+  height: 100%;
+  position: relative;
+  overflow-x: auto;
+  overflow-y: hidden;
+  background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+  border: 2px solid #dee2e6;
+  border-radius: 12px;
+  padding: 20px;
+  box-sizing: border-box;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.fretboard-svg {
+  display: block;
+  margin: 0 auto;
+  user-select: none;
+  transition: all 0.3s ease;
+}
+
+/* String styles */
+.fretboard-string {
+  stroke: #B8860B;
+  stroke-width: 2;
+  filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.2));
+}
+
+/* Fret styles */
+.fretboard-fret {
+  stroke: #C0C0C0;
+  stroke-width: 2;
+  filter: drop-shadow(0 1px 1px rgba(0, 0, 0, 0.1));
+}
+
+/* Nut styles */
+.fretboard-nut {
+  fill: #8B4513;
+  stroke: #654321;
+  stroke-width: 1;
+}
+
+/* Fret markers */
+.fret-marker {
+  fill: #DDD;
+  stroke: #BBB;
+  stroke-width: 1;
+  opacity: 0.8;
+}
+
+/* String labels */
+.string-label {
+  font-family: 'Arial', sans-serif;
+  font-size: 14px;
+  font-weight: bold;
+  fill: #333;
+  text-anchor: middle;
+}
+
+/* Fret numbers */
+.fret-number {
+  font-family: 'Arial', sans-serif;
+  font-size: 12px;
+  fill: #666;
+  text-anchor: middle;
+}
+
+/* Interactive fret positions */
+.fret-position {
+  fill: transparent;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.fret-position:hover {
+  fill: rgba(0, 123, 255, 0.1);
+  stroke: rgba(0, 123, 255, 0.3);
+  stroke-width: 2;
+}
+
+/* Chord markers */
+.chord-marker {
+  transition: all 0.3s ease;
+}
+
+.chord-marker.open-string {
+  fill: white;
+  stroke: #333;
+  stroke-width: 2;
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2));
+}
+
+.chord-marker.finger-position {
+  fill: #FF6B6B;
+  stroke: #FF4757;
+  stroke-width: 2;
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3));
+}
+
+.chord-marker.finger-number {
+  font-family: 'Arial', sans-serif;
+  font-size: 10px;
+  font-weight: bold;
+  fill: white;
+  text-anchor: middle;
+}
+
+/* Scale markers */
+.scale-marker {
+  transition: all 0.3s ease;
+}
+
+.scale-marker.scale-note {
+  fill: #95E1D3;
+  stroke: #4ECDC4;
+  stroke-width: 2;
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2));
+}
+
+.scale-marker.root-note {
+  fill: #4ECDC4;
+  stroke: #26D0CE;
+  stroke-width: 3;
+  filter: drop-shadow(0 3px 6px rgba(0, 0, 0, 0.3));
+}
+
+.scale-marker.scale-text {
+  font-family: 'Arial', sans-serif;
+  font-weight: bold;
+  fill: #333;
+  text-anchor: middle;
+}
+
+/* Responsive design */
+@media (max-width: 1200px) {
+  .fretboard-container {
+    padding: 15px;
+  }
+  
+  .string-label {
+    font-size: 12px;
+  }
+  
+  .fret-number {
+    font-size: 10px;
+  }
+}
+
+@media (max-width: 768px) {
+  .fretboard-container {
+    padding: 10px;
+    border-radius: 8px;
+  }
+  
+  .string-label {
+    font-size: 11px;
+  }
+  
+  .fret-number {
+    font-size: 9px;
+  }
+  
+  .chord-marker.finger-number {
+    font-size: 8px;
+  }
+  
+  .scale-marker.scale-text {
+    font-size: 7px;
+  }
+}
+
+@media (max-width: 480px) {
+  .fretboard-container {
+    padding: 8px;
+    border-width: 1px;
+  }
+  
+  .fretboard-string {
+    stroke-width: 1.5;
+  }
+  
+  .fretboard-fret {
+    stroke-width: 1.5;
+  }
+  
+  .string-label {
+    font-size: 10px;
+  }
+  
+  .fret-number {
+    font-size: 8px;
+  }
+}
+
+/* Dark theme support */
+@media (prefers-color-scheme: dark) {
+  .fretboard-container {
+    background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
+    border-color: #5a6c7d;
+    color: #ecf0f1;
+  }
+  
+  .string-label,
+  .fret-number {
+    fill: #ecf0f1;
+  }
+  
+  .fret-marker {
+    fill: #7f8c8d;
+    stroke: #95a5a6;
+  }
+  
+  .fretboard-fret {
+    stroke: #7f8c8d;
+  }
+}
+
+/* Animation for chord/scale changes */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: scale(0.8);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.chord-marker,
+.scale-marker {
+  animation: fadeIn 0.3s ease-out;
+}
+
+/* Focus styles for accessibility */
+.fret-position:focus {
+  outline: 2px solid #007bff;
+  outline-offset: 2px;
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+  .fretboard-container {
+    border-color: #000;
+    background: #fff;
+  }
+  
+  .chord-marker.finger-position {
+    fill: #000;
+    stroke: #000;
+  }
+  
+  .scale-marker.scale-note {
+    fill: #000;
+    stroke: #000;
+  }
+  
+  .scale-marker.root-note {
+    fill: #000;
+    stroke: #000;
+    stroke-width: 4;
+  }
+}
+
+/* Reduce motion for accessibility */
+@media (prefers-reduced-motion: reduce) {
+  .fretboard-svg,
+  .chord-marker,
+  .scale-marker,
+  .fret-position {
+    transition: none;
+    animation: none;
+  }
+}

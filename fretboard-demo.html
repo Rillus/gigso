@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fretboard Component Demo</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 12px;
+            padding: 30px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+        
+        h1 {
+            color: #333;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        
+        .controls {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 8px;
+        }
+        
+        .control-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        
+        label {
+            font-weight: 600;
+            color: #495057;
+            font-size: 14px;
+        }
+        
+        select, input, button {
+            padding: 8px 12px;
+            border: 1px solid #ced4da;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+        
+        button {
+            background: #007bff;
+            color: white;
+            border: none;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        
+        button:hover {
+            background: #0056b3;
+        }
+        
+        button.secondary {
+            background: #6c757d;
+        }
+        
+        button.secondary:hover {
+            background: #545b62;
+        }
+        
+        .fretboard-wrapper {
+            margin: 30px 0;
+            border: 2px solid #dee2e6;
+            border-radius: 12px;
+            overflow: hidden;
+            background: white;
+        }
+        
+        .info-panel {
+            margin-top: 20px;
+            padding: 15px;
+            background: #e3f2fd;
+            border-radius: 8px;
+            border-left: 4px solid #2196f3;
+        }
+        
+        .info-panel h3 {
+            margin: 0 0 10px 0;
+            color: #1976d2;
+        }
+        
+        .info-panel p {
+            margin: 5px 0;
+            color: #424242;
+        }
+        
+        .chord-progression {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        
+        .chord-progression button {
+            background: #28a745;
+            min-width: 60px;
+        }
+        
+        .chord-progression button:hover {
+            background: #1e7e34;
+        }
+        
+        .status {
+            text-align: center;
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 4px;
+        }
+        
+        .status.info {
+            background: #d1ecf1;
+            border: 1px solid #bee5eb;
+            color: #0c5460;
+        }
+        
+        @media (max-width: 768px) {
+            .container {
+                padding: 15px;
+            }
+            
+            .controls {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎸 Fretboard Component Demo</h1>
+        
+        <div class="controls">
+            <div class="control-group">
+                <label for="instrument-select">Instrument:</label>
+                <select id="instrument-select">
+                    <option value="guitar">Guitar (6-string)</option>
+                    <option value="ukulele">Ukulele (4-string)</option>
+                    <option value="mandolin">Mandolin (8-string)</option>
+                </select>
+            </div>
+            
+            <div class="control-group">
+                <label for="chord-select">Chord:</label>
+                <select id="chord-select">
+                    <option value="">-- Select Chord --</option>
+                    <option value="C">C Major</option>
+                    <option value="Am">A Minor</option>
+                    <option value="F">F Major</option>
+                    <option value="G">G Major</option>
+                    <option value="Dm">D Minor</option>
+                    <option value="Em">E Minor</option>
+                </select>
+            </div>
+            
+            <div class="control-group">
+                <label for="scale-root">Scale Root:</label>
+                <select id="scale-root">
+                    <option value="">-- Select Root --</option>
+                    <option value="C">C</option>
+                    <option value="D">D</option>
+                    <option value="E">E</option>
+                    <option value="F">F</option>
+                    <option value="G">G</option>
+                    <option value="A">A</option>
+                    <option value="B">B</option>
+                </select>
+            </div>
+            
+            <div class="control-group">
+                <label for="scale-type">Scale Type:</label>
+                <select id="scale-type">
+                    <option value="">-- Select Scale --</option>
+                    <option value="major">Major</option>
+                    <option value="naturalMinor">Natural Minor</option>
+                    <option value="pentatonicMajor">Pentatonic Major</option>
+                    <option value="pentatonicMinor">Pentatonic Minor</option>
+                    <option value="blues">Blues</option>
+                    <option value="dorian">Dorian</option>
+                    <option value="mixolydian">Mixolydian</option>
+                </select>
+            </div>
+            
+            <div class="control-group">
+                <label for="fret-range-start">Fret Range:</label>
+                <div style="display: flex; gap: 5px; align-items: center;">
+                    <input type="number" id="fret-range-start" value="0" min="0" max="20" style="width: 60px;">
+                    <span>to</span>
+                    <input type="number" id="fret-range-end" value="12" min="1" max="24" style="width: 60px;">
+                </div>
+            </div>
+            
+            <div class="control-group">
+                <label>Actions:</label>
+                <div style="display: flex; gap: 8px; flex-direction: column;">
+                    <button id="clear-display">Clear Display</button>
+                    <button id="update-range" class="secondary">Update Range</button>
+                </div>
+            </div>
+        </div>
+        
+        <div class="status info" id="status">
+            Select an instrument, chord, or scale to begin exploring the fretboard!
+        </div>
+        
+        <div class="fretboard-wrapper">
+            <fretboard-component id="main-fretboard"></fretboard-component>
+        </div>
+        
+        <div class="info-panel">
+            <h3>Quick Chord Progressions</h3>
+            <p>Try these common chord progressions:</p>
+            <div class="chord-progression">
+                <button onclick="playProgression(['C', 'Am', 'F', 'G'])">I-vi-IV-V (C-Am-F-G)</button>
+                <button onclick="playProgression(['Am', 'F', 'C', 'G'])">vi-IV-I-V (Am-F-C-G)</button>
+                <button onclick="playProgression(['C', 'F', 'G', 'C'])">I-IV-V-I (C-F-G-C)</button>
+                <button onclick="playProgression(['Dm', 'G', 'C', 'Am'])">ii-V-I-vi (Dm-G-C-Am)</button>
+            </div>
+        </div>
+        
+        <div class="info-panel" id="note-info" style="display: none;">
+            <h3>Last Clicked Note</h3>
+            <p id="note-details"></p>
+        </div>
+    </div>
+
+    <script type="module">
+        import './components/fretboard/fretboard.js';
+        
+        // Get references to DOM elements
+        const fretboard = document.getElementById('main-fretboard');
+        const instrumentSelect = document.getElementById('instrument-select');
+        const chordSelect = document.getElementById('chord-select');
+        const scaleRoot = document.getElementById('scale-root');
+        const scaleType = document.getElementById('scale-type');
+        const fretRangeStart = document.getElementById('fret-range-start');
+        const fretRangeEnd = document.getElementById('fret-range-end');
+        const clearDisplayBtn = document.getElementById('clear-display');
+        const updateRangeBtn = document.getElementById('update-range');
+        const status = document.getElementById('status');
+        const noteInfo = document.getElementById('note-info');
+        const noteDetails = document.getElementById('note-details');
+        
+        // Update status message
+        function updateStatus(message, type = 'info') {
+            status.textContent = message;
+            status.className = `status ${type}`;
+        }
+        
+        // Event Listeners
+        instrumentSelect.addEventListener('change', (e) => {
+            fretboard.setInstrument(e.target.value);
+            updateStatus(`Switched to ${e.target.options[e.target.selectedIndex].text}`);
+        });
+        
+        chordSelect.addEventListener('change', (e) => {
+            if (e.target.value) {
+                fretboard.displayChord(e.target.value);
+                updateStatus(`Displaying ${e.target.value} chord`);
+                // Clear scale selections
+                scaleRoot.value = '';
+                scaleType.value = '';
+            }
+        });
+        
+        function updateScale() {
+            const root = scaleRoot.value;
+            const type = scaleType.value;
+            
+            if (root && type) {
+                fretboard.displayScale(root, type);
+                updateStatus(`Displaying ${root} ${type} scale`);
+                // Clear chord selection
+                chordSelect.value = '';
+            }
+        }
+        
+        scaleRoot.addEventListener('change', updateScale);
+        scaleType.addEventListener('change', updateScale);
+        
+        clearDisplayBtn.addEventListener('click', () => {
+            fretboard.clearDisplay();
+            chordSelect.value = '';
+            scaleRoot.value = '';
+            scaleType.value = '';
+            updateStatus('Display cleared');
+        });
+        
+        updateRangeBtn.addEventListener('click', () => {
+            const start = parseInt(fretRangeStart.value);
+            const end = parseInt(fretRangeEnd.value);
+            
+            if (start >= 0 && end > start && end <= 24) {
+                fretboard.setFretRange(start, end);
+                updateStatus(`Fret range updated: ${start} to ${end}`);
+            } else {
+                updateStatus('Invalid fret range. Start must be >= 0, end must be > start and <= 24', 'error');
+            }
+        });
+        
+        // Listen for note clicks
+        fretboard.onNoteClick((event) => {
+            const { string, fret, note } = event.detail;
+            noteDetails.textContent = `String ${string + 1}, Fret ${fret}, Note: ${note}`;
+            noteInfo.style.display = 'block';
+            updateStatus(`Clicked: String ${string + 1}, Fret ${fret}, Note ${note}`);
+        });
+        
+        // Chord progression functionality
+        window.playProgression = function(chords) {
+            let index = 0;
+            chordSelect.value = '';
+            scaleRoot.value = '';
+            scaleType.value = '';
+            
+            function playNext() {
+                if (index < chords.length) {
+                    const chord = chords[index];
+                    fretboard.displayChord(chord);
+                    updateStatus(`Playing progression: ${chord} (${index + 1}/${chords.length})`);
+                    index++;
+                    setTimeout(playNext, 2000);
+                } else {
+                    updateStatus('Chord progression complete');
+                }
+            }
+            
+            playNext();
+        };
+        
+        // Initialize with default settings
+        updateStatus('Fretboard component loaded! Try selecting a chord or scale.');
+    </script>
+</body>
+</html>
