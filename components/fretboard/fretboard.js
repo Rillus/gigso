@@ -3,6 +3,7 @@ import FretboardRenderer from "./fretboard-renderer.js";
 import FretboardCalculator from "./fretboard-calculator.js";
 import chordLibrary from "../../chord-library.js";
 import State from "../../state/state.js";
+import ScaleKey from "../scale-key/scale-key.js";
 
 const { instrument: instrumentState, currentChord } = State;
 
@@ -44,6 +45,7 @@ export default class Fretboard extends BaseComponent {
     this.theme = options.theme || 'default';
     this.currentChord = null;
     this.currentScale = null;
+    this.scaleKey = null;
     
     // Initialize calculator and renderer
     this.calculator = new FretboardCalculator();
@@ -52,6 +54,9 @@ export default class Fretboard extends BaseComponent {
       this.instrument,
       options
     );
+    
+    // Initialize scale key component for enhanced scale operations
+    this.initializeScaleKey(options);
 
     // Set up event listeners
     this.setupEventListeners();
@@ -93,6 +98,42 @@ export default class Fretboard extends BaseComponent {
       case 'practice-level':
         this.setPracticeLevel(parseInt(newValue) || 1);
         break;
+    }
+  }
+
+  /**
+   * Initialize the ScaleKey component for enhanced scale operations
+   * @param {Object} options - Initialization options
+   */
+  initializeScaleKey(options = {}) {
+    try {
+      this.scaleKey = new ScaleKey({
+        instrument: this.instrument,
+        defaultKey: options.defaultKey || 'C',
+        defaultScale: options.defaultScale || 'major',
+        cache: options.cache !== false
+      });
+      
+      // Listen for scale key events
+      this.scaleKey.addEventListener('scale-changed', (event) => {
+        this.dispatchEvent(new CustomEvent('scale-key-changed', {
+          detail: event.detail,
+          bubbles: true,
+          composed: true
+        }));
+      });
+      
+      this.scaleKey.addEventListener('key-changed', (event) => {
+        this.dispatchEvent(new CustomEvent('key-signature-changed', {
+          detail: event.detail,
+          bubbles: true,
+          composed: true
+        }));
+      });
+      
+    } catch (error) {
+      console.warn('ScaleKey component initialization failed:', error);
+      this.scaleKey = null;
     }
   }
 
@@ -152,18 +193,61 @@ export default class Fretboard extends BaseComponent {
   }
 
   displayScale(rootNote, scaleType, key = 'C') {
-    const scalePositions = this.calculator.getEnhancedScalePositions(
-      this.instrument,
-      rootNote,
-      scaleType
-    );
+    // Use ScaleKey component if available for enhanced scale operations
+    if (this.scaleKey) {
+      try {
+        // Generate scale using ScaleKey component
+        const scaleData = this.scaleKey.generateScale(rootNote, scaleType, {
+          key: key,
+          instrument: this.instrument
+        });
+        
+        // Get enhanced positions from calculator
+        const scalePositions = this.calculator.getEnhancedScalePositions(
+          this.instrument,
+          rootNote,
+          scaleType
+        );
 
-    this.currentScale = {
-      root: rootNote,
-      type: scaleType,
-      key: key,
-      positions: scalePositions
-    };
+        this.currentScale = {
+          root: rootNote,
+          type: scaleType,
+          key: key,
+          positions: scalePositions,
+          scaleData: scaleData
+        };
+        
+      } catch (error) {
+        console.warn('ScaleKey scale generation failed, falling back to calculator:', error);
+        // Fallback to calculator method
+        const scalePositions = this.calculator.getEnhancedScalePositions(
+          this.instrument,
+          rootNote,
+          scaleType
+        );
+
+        this.currentScale = {
+          root: rootNote,
+          type: scaleType,
+          key: key,
+          positions: scalePositions
+        };
+      }
+    } else {
+      // Fallback to calculator method
+      const scalePositions = this.calculator.getEnhancedScalePositions(
+        this.instrument,
+        rootNote,
+        scaleType
+      );
+
+      this.currentScale = {
+        root: rootNote,
+        type: scaleType,
+        key: key,
+        positions: scalePositions
+      };
+    }
 
     this.renderer.setCurrentScale(this.currentScale);
     this.renderer.renderScale(this.currentScale);
@@ -187,6 +271,16 @@ export default class Fretboard extends BaseComponent {
 
     this.instrument = instrumentType;
     this.renderer.setInstrument(instrumentType);
+    
+    // Update ScaleKey component if available
+    if (this.scaleKey) {
+      try {
+        this.scaleKey.instrument = instrumentType;
+      } catch (error) {
+        console.warn('Failed to update ScaleKey instrument:', error);
+      }
+    }
+    
     this.render();
     
     // Re-render current chord/scale for new instrument
@@ -284,6 +378,26 @@ export default class Fretboard extends BaseComponent {
   transposeScale(newKey) {
     if (!this.currentScale) return;
     
+    // Use ScaleKey component if available for enhanced transposition
+    if (this.scaleKey) {
+      try {
+        const transposedNotes = this.scaleKey.transposeKey(
+          this.currentScale.root,
+          newKey,
+          this.scaleKey.getScaleNotes(this.currentScale.root, this.currentScale.type)
+        );
+        
+        // Find the new root note (first note of transposed scale)
+        const newRoot = transposedNotes[0];
+        
+        this.displayScale(newRoot, this.currentScale.type, newKey);
+        return;
+      } catch (error) {
+        console.warn('ScaleKey transposition failed, falling back to calculator:', error);
+      }
+    }
+    
+    // Fallback to calculator method
     const transposed = this.calculator.transposeScale(
       this.currentScale.root,
       this.currentScale.type,
@@ -347,6 +461,138 @@ export default class Fretboard extends BaseComponent {
    */
   static getIntervalInfo(interval) {
     return this.calculator?.constructor.getIntervalInfo(interval) || null;
+  }
+
+  // Phase 3 Enhanced Methods with ScaleKey Integration
+
+  /**
+   * Get chord suggestions based on current scale
+   * @returns {Array} Array of suggested chords
+   */
+  getChordSuggestions() {
+    if (!this.currentScale || !this.scaleKey) return [];
+    
+    try {
+      return this.scaleKey.getChordSuggestions(this.currentScale.root, this.currentScale.type);
+    } catch (error) {
+      console.warn('Failed to get chord suggestions:', error);
+      return [];
+    }
+  }
+
+  /**
+   * Get scale notes with frequencies
+   * @param {string} rootNote - Root note of the scale
+   * @param {string} scaleType - Type of scale
+   * @param {number} octave - Starting octave
+   * @returns {Array} Array of notes with frequencies
+   */
+  getScaleNotesWithFrequencies(rootNote, scaleType, octave = 4) {
+    if (!this.scaleKey) return [];
+    
+    try {
+      const notes = this.scaleKey.getScaleNotes(rootNote, scaleType, octave);
+      return notes.map(note => ({
+        note: note,
+        frequency: this.scaleKey.getNoteFrequency(note)
+      }));
+    } catch (error) {
+      console.warn('Failed to get scale notes with frequencies:', error);
+      return [];
+    }
+  }
+
+  /**
+   * Get interval from root note
+   * @param {string} rootNote - Root note
+   * @param {string} targetNote - Target note
+   * @returns {Object} Interval information
+   */
+  getIntervalFromRoot(rootNote, targetNote) {
+    if (!this.scaleKey) return null;
+    
+    try {
+      return this.scaleKey.getIntervalFromRoot(rootNote, targetNote);
+    } catch (error) {
+      console.warn('Failed to get interval from root:', error);
+      return null;
+    }
+  }
+
+  /**
+   * Validate key and scale combination
+   * @param {string} key - Musical key
+   * @param {string} scaleType - Scale type
+   * @returns {boolean} Whether the combination is valid
+   */
+  validateKeyScale(key, scaleType) {
+    if (!this.scaleKey) return false;
+    
+    try {
+      return this.scaleKey.validateKeyScale(key, scaleType);
+    } catch (error) {
+      console.warn('Failed to validate key-scale combination:', error);
+      return false;
+    }
+  }
+
+  /**
+   * Get scale types by category
+   * @param {string} category - Category name
+   * @returns {Array} Array of scale types in category
+   */
+  getScaleTypesByCategory(category) {
+    if (!this.scaleKey) return [];
+    
+    try {
+      return this.scaleKey.getScaleTypesByCategory(category);
+    } catch (error) {
+      console.warn('Failed to get scale types by category:', error);
+      return [];
+    }
+  }
+
+  /**
+   * Get current scale key state
+   * @returns {Object} Current state information
+   */
+  getScaleKeyState() {
+    if (!this.scaleKey) return null;
+    
+    try {
+      return this.scaleKey.getCurrentState();
+    } catch (error) {
+      console.warn('Failed to get scale key state:', error);
+      return null;
+    }
+  }
+
+  /**
+   * Clear scale key cache
+   */
+  clearScaleKeyCache() {
+    if (this.scaleKey) {
+      try {
+        this.scaleKey.clearCache();
+      } catch (error) {
+        console.warn('Failed to clear scale key cache:', error);
+      }
+    }
+  }
+
+  /**
+   * Get scale key cache statistics
+   * @returns {Object} Cache statistics
+   */
+  getScaleKeyCacheStats() {
+    if (!this.scaleKey) return null;
+    
+    try {
+      return this.scaleKey.getCacheStats();
+    } catch (error) {
+      console.warn('Failed to get scale key cache stats:', error);
+      return null;
+    }
   }
 }
 
