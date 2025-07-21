@@ -40,7 +40,9 @@
             border: 1px solid rgba(255, 255, 255, 0.2);
             border-radius: 8px;
             padding: 10px 0;
-            min-width: 180px;
+            min-width: 220px;
+            max-height: 80vh;
+            overflow-y: auto;
             opacity: 0;
             visibility: hidden;
             transform: translateY(-10px);
@@ -79,6 +81,21 @@
             border-radius: 0 0 8px 8px;
         }
         
+        .demo-dropdown .category-header {
+            color: #fff;
+            font-weight: bold;
+            font-size: 12px;
+            padding: 10px 15px 5px 15px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            margin-top: 5px;
+        }
+        
+        .demo-dropdown .category-header:first-child {
+            margin-top: 0;
+        }
+        
         @media (max-width: 768px) {
             .demo-menu {
                 position: static;
@@ -92,6 +109,7 @@
                 transform: none;
                 opacity: 1;
                 visibility: visible;
+                max-height: none;
             }
             
             .demo-menu:hover .demo-dropdown,
@@ -103,11 +121,35 @@
 </head>
 <body>
     <div class="demo-menu">
-        <button class="demo-menu-button" tabindex="0" onclick="handleDemoMenuClick(event)">🎵 HandPan Demos</button>
+        <button class="demo-menu-button" tabindex="0" onclick="handleDemoMenuClick(event)">🎵 Demo Pages</button>
         <div class="demo-dropdown">
+            <div class="category-header">Main Application</div>
+            <a href="index.html">Main App (Current)</a>
+            
+            <div class="category-header">HandPan Demos</div>
             <a href="hand-pan-wrapper-demo.html">HandPan Wrapper</a>
-            <a href="test-phase2-manual.html">Phase 2 Tests</a>
-            <a href="test-hand-pan.html">Basic Tests</a>
+            <a href="test-hand-pan.html">Basic HandPan Tests</a>
+            <a href="test-hand-pan-scales.html">HandPan Scales</a>
+            <a href="test-steel-drum-hand-pan.html">Steel Drum HandPan</a>
+            
+            <div class="category-header">Fretboard Demos</div>
+            <a href="fretboard-demo.html">Fretboard Demo</a>
+            <a href="test-phase2-fretboard.html">Phase 2 Fretboard</a>
+            <a href="test-phase3-fretboard-multi-instrument.html">Phase 3 Multi-Instrument</a>
+            
+            <div class="category-header">Phase Testing</div>
+            <a href="test-phase2-manual.html">Phase 2 Manual Tests</a>
+            <a href="test-phase3-key-changes.html">Phase 3 Key Changes</a>
+            <a href="test-phase4-improvements.html">Phase 4 Improvements</a>
+            <a href="test-phase5-metallic-accelerometer.html">Phase 5 Metallic Accelerometer</a>
+            
+            <div class="category-header">Audio & Effects</div>
+            <a href="test-audio-effects.html">Audio Effects</a>
+            <a href="test-audio-initialization-fix.html">Audio Initialization Fix</a>
+            
+            <div class="category-header">Utilities & Scales</div>
+            <a href="test-scale-utils.html">Scale Utilities</a>
+            <a href="test-default-values.html">Default Values</a>
         </div>
     </div>
     
