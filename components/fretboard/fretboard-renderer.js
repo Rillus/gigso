@@ -1,4 +1,4 @@
-import { INSTRUMENT_CONFIG } from './fretboard-calculator.js';
+import { INSTRUMENT_CONFIG, SCALE_PATTERNS, INTERVALS } from './fretboard-calculator.js';
 
 export default class FretboardRenderer {
   constructor(container, instrument, options = {}) {
@@ -9,6 +9,14 @@ export default class FretboardRenderer {
       theme: 'default',
       showNoteNames: true,
       showFretNumbers: true,
+      showScaleDegrees: true,
+      showIntervals: false,
+      highlightRoot: true,
+      highlightThirds: false,
+      highlightFifths: false,
+      highlightSevenths: false,
+      practiceMode: false,
+      practiceLevel: 1,
       ...options
     };
     
@@ -304,43 +312,86 @@ export default class FretboardRenderer {
     const startX = this.dimensions.nutWidth + 20;
     const startY = 30;
     
-    scaleData.positions.forEach(position => {
-      const { string, fret, note, degree } = position;
+    // Filter positions based on practice mode
+    let positionsToRender = scaleData.positions;
+    if (this.options.practiceMode) {
+      const scalePattern = SCALE_PATTERNS[scaleData.type];
+      const maxInterval = scalePattern.intervals[Math.min(this.options.practiceLevel - 1, scalePattern.intervals.length - 1)];
+      positionsToRender = scaleData.positions.filter(position => 
+        position.interval <= maxInterval
+      );
+    }
+    
+    positionsToRender.forEach(position => {
+      const { string, fret, note, degree, interval, isRoot, isThird, isFifth, isSeventh } = position;
       const fretIndex = fret - this.options.fretRange.start;
       
       if (fretIndex >= 0 && fretIndex < (this.options.fretRange.end - this.options.fretRange.start)) {
         const x = startX + (fretIndex * this.dimensions.fretWidth) + (this.dimensions.fretWidth / 2);
         const y = startY + (string * this.dimensions.stringSpacing);
         
-        this.renderScalePosition(x, y, note, degree, note === scaleData.root);
+        this.renderScalePosition(x, y, note, degree, interval, isRoot, isThird, isFifth, isSeventh);
       }
     });
   }
 
-  renderScalePosition(x, y, note, degree, isRoot) {
+  renderScalePosition(x, y, note, degree, interval, isRoot, isThird, isFifth, isSeventh) {
+    // Determine colors based on highlighting options
+    let fillColor = '#95E1D3';
+    let strokeColor = '#4ECDC4';
+    let radius = 8;
+    
+    if (isRoot && this.options.highlightRoot) {
+      fillColor = '#4ECDC4';
+      strokeColor = '#26D0CE';
+      radius = 12;
+    } else if (isThird && this.options.highlightThirds) {
+      fillColor = '#F7DC6F';
+      strokeColor = '#F4D03F';
+      radius = 10;
+    } else if (isFifth && this.options.highlightFifths) {
+      fillColor = '#82E0AA';
+      strokeColor = '#58D68D';
+      radius = 10;
+    } else if (isSeventh && this.options.highlightSevenths) {
+      fillColor = '#D7BDE2';
+      strokeColor = '#BB8FCE';
+      radius = 10;
+    } else if (interval !== undefined && INTERVALS[interval]) {
+      fillColor = INTERVALS[interval].color;
+      strokeColor = this.darkenColor(INTERVALS[interval].color, 0.2);
+    }
+    
     const circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
     circle.setAttribute('cx', x);
     circle.setAttribute('cy', y);
-    circle.setAttribute('r', isRoot ? '12' : '8');
-    circle.setAttribute('fill', isRoot ? '#4ECDC4' : '#95E1D3');
-    circle.setAttribute('stroke', isRoot ? '#26D0CE' : '#4ECDC4');
+    circle.setAttribute('r', radius);
+    circle.setAttribute('fill', fillColor);
+    circle.setAttribute('stroke', strokeColor);
     circle.setAttribute('stroke-width', '2');
     circle.setAttribute('class', `scale-marker ${isRoot ? 'root-note' : 'scale-note'}`);
     
     this.svg.appendChild(circle);
     
-    // Add note name or degree
+    // Add note name, degree, or interval
     const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
     text.setAttribute('x', x);
     text.setAttribute('y', y + 3);
     text.setAttribute('text-anchor', 'middle');
     text.setAttribute('font-family', 'Arial, sans-serif');
-    text.setAttribute('font-size', isRoot ? '10' : '8');
+    text.setAttribute('font-size', radius > 8 ? '10' : '8');
     text.setAttribute('font-weight', 'bold');
     text.setAttribute('fill', '#333');
     text.setAttribute('class', 'scale-marker scale-text');
-    text.textContent = this.options.showNoteNames ? note : degree;
     
+    let textContent = note;
+    if (this.options.showScaleDegrees && !this.options.showIntervals) {
+      textContent = degree;
+    } else if (this.options.showIntervals && interval !== undefined) {
+      textContent = interval.toString();
+    }
+    
+    text.textContent = textContent;
     this.svg.appendChild(text);
   }
 
@@ -383,5 +434,135 @@ export default class FretboardRenderer {
     this.options.fretRange = { start, end };
     this.dimensions = this.calculateDimensions();
     this.createSVG();
+  }
+
+  // Phase 2 Helper Methods
+
+  /**
+   * Darken a hex color by a given percentage
+   * @param {string} hexColor - Hex color string
+   * @param {number} percent - Percentage to darken (0-1)
+   * @returns {string} Darkened hex color
+   */
+  darkenColor(hexColor, percent) {
+    const num = parseInt(hexColor.replace('#', ''), 16);
+    const amt = Math.round(2.55 * percent * 100);
+    const R = (num >> 16) - amt;
+    const G = (num >> 8 & 0x00FF) - amt;
+    const B = (num & 0x0000FF) - amt;
+    return '#' + (0x1000000 + (R < 255 ? R < 1 ? 0 : R : 255) * 0x10000 +
+      (G < 255 ? G < 1 ? 0 : G : 255) * 0x100 +
+      (B < 255 ? B < 1 ? 0 : B : 255)).toString(16).slice(1);
+  }
+
+  /**
+   * Set scale display options for Phase 2
+   * @param {Object} options - Display options
+   */
+  setScaleDisplayOptions(options) {
+    this.options = { ...this.options, ...options };
+    if (this.currentScale) {
+      this.renderScale(this.currentScale);
+    }
+  }
+
+  /**
+   * Enable/disable practice mode
+   * @param {boolean} enabled - Whether practice mode is enabled
+   * @param {number} level - Practice level (1-7)
+   */
+  setPracticeMode(enabled, level = 1) {
+    this.options.practiceMode = enabled;
+    this.options.practiceLevel = level;
+    if (this.currentScale) {
+      this.renderScale(this.currentScale);
+    }
+  }
+
+  /**
+   * Highlight specific intervals
+   * @param {Object} highlights - Object with boolean values for each interval type
+   */
+  setIntervalHighlights(highlights) {
+    this.options.highlightRoot = highlights.root !== undefined ? highlights.root : this.options.highlightRoot;
+    this.options.highlightThirds = highlights.thirds !== undefined ? highlights.thirds : this.options.highlightThirds;
+    this.options.highlightFifths = highlights.fifths !== undefined ? highlights.fifths : this.options.highlightFifths;
+    this.options.highlightSevenths = highlights.sevenths !== undefined ? highlights.sevenths : this.options.highlightSevenths;
+    
+    if (this.currentScale) {
+      this.renderScale(this.currentScale);
+    }
+  }
+
+  /**
+   * Render key signature information
+   * @param {Object} keySignature - Key signature data
+   */
+  renderKeySignature(keySignature) {
+    if (!keySignature) return;
+    
+    // Clear existing key signature display
+    this.clearKeySignature();
+    
+    const keySignatureGroup = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+    keySignatureGroup.setAttribute('class', 'key-signature');
+    
+    // Position for key signature display
+    const x = this.dimensions.width - 150;
+    const y = 30;
+    
+    // Key name
+    const keyText = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+    keyText.setAttribute('x', x);
+    keyText.setAttribute('y', y);
+    keyText.setAttribute('font-family', 'Arial, sans-serif');
+    keyText.setAttribute('font-size', '14');
+    keyText.setAttribute('font-weight', 'bold');
+    keyText.setAttribute('fill', '#333');
+    keyText.textContent = `Key: ${keySignature.key || 'C'}`;
+    
+    keySignatureGroup.appendChild(keyText);
+    
+    // Sharps or flats
+    if (keySignature.sharps > 0) {
+      const sharpsText = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+      sharpsText.setAttribute('x', x);
+      sharpsText.setAttribute('y', y + 20);
+      sharpsText.setAttribute('font-family', 'Arial, sans-serif');
+      sharpsText.setAttribute('font-size', '12');
+      sharpsText.setAttribute('fill', '#666');
+      sharpsText.textContent = `Sharps: ${keySignature.sharpsList?.join(', ') || keySignature.sharps}`;
+      
+      keySignatureGroup.appendChild(sharpsText);
+    } else if (keySignature.flats > 0) {
+      const flatsText = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+      flatsText.setAttribute('x', x);
+      flatsText.setAttribute('y', y + 20);
+      flatsText.setAttribute('font-family', 'Arial, sans-serif');
+      flatsText.setAttribute('font-size', '12');
+      flatsText.setAttribute('fill', '#666');
+      flatsText.textContent = `Flats: ${keySignature.flatsList?.join(', ') || keySignature.flats}`;
+      
+      keySignatureGroup.appendChild(flatsText);
+    }
+    
+    this.svg.appendChild(keySignatureGroup);
+  }
+
+  /**
+   * Clear key signature display
+   */
+  clearKeySignature() {
+    const keySignature = this.svg.querySelector('.key-signature');
+    if (keySignature) {
+      keySignature.remove();
+    }
+  }
+
+  /**
+   * Store current scale for re-rendering
+   */
+  setCurrentScale(scaleData) {
+    this.currentScale = scaleData;
   }
 }

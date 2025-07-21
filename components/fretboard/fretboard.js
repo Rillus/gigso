@@ -61,7 +61,7 @@ export default class Fretboard extends BaseComponent {
   }
 
   static get observedAttributes() {
-    return ['instrument', 'chord', 'scale-root', 'scale-type'];
+    return ['instrument', 'chord', 'scale-root', 'scale-type', 'key', 'practice-mode', 'practice-level'];
   }
 
   attributeChangedCallback(name, oldValue, newValue) {
@@ -83,6 +83,15 @@ export default class Fretboard extends BaseComponent {
         if (this.getAttribute('scale-root')) {
           this.displayScale(this.getAttribute('scale-root'), newValue);
         }
+        break;
+      case 'key':
+        this.setKey(newValue);
+        break;
+      case 'practice-mode':
+        this.setPracticeMode(newValue === 'true');
+        break;
+      case 'practice-level':
+        this.setPracticeLevel(parseInt(newValue) || 1);
         break;
     }
   }
@@ -143,7 +152,7 @@ export default class Fretboard extends BaseComponent {
   }
 
   displayScale(rootNote, scaleType, key = 'C') {
-    const scalePositions = this.calculator.getScalePositions(
+    const scalePositions = this.calculator.getEnhancedScalePositions(
       this.instrument,
       rootNote,
       scaleType
@@ -156,7 +165,21 @@ export default class Fretboard extends BaseComponent {
       positions: scalePositions
     };
 
+    this.renderer.setCurrentScale(this.currentScale);
     this.renderer.renderScale(this.currentScale);
+    
+    // Render key signature if available
+    const keySignature = this.calculator.getKeySignature(rootNote);
+    if (keySignature) {
+      this.renderer.renderKeySignature({ ...keySignature, key: rootNote });
+    }
+    
+    // Dispatch scale change event
+    this.dispatchEvent(new CustomEvent('scale-changed', {
+      detail: this.currentScale,
+      bubbles: true,
+      composed: true
+    }));
   }
 
   setInstrument(instrumentType) {
@@ -207,6 +230,123 @@ export default class Fretboard extends BaseComponent {
 
   onScaleChange(callback) {
     this.addEventListener('scale-changed', callback);
+  }
+
+  // Phase 2 Enhanced API Methods
+
+  /**
+   * Set the musical key
+   * @param {string} key - The musical key
+   */
+  setKey(key) {
+    if (this.currentScale) {
+      this.displayScale(this.currentScale.root, this.currentScale.type, key);
+    }
+  }
+
+  /**
+   * Enable or disable practice mode
+   * @param {boolean} enabled - Whether practice mode is enabled
+   * @param {number} level - Practice level (1-7)
+   */
+  setPracticeMode(enabled, level = 1) {
+    this.renderer.setPracticeMode(enabled, level);
+  }
+
+  /**
+   * Set practice level
+   * @param {number} level - Practice level (1-7)
+   */
+  setPracticeLevel(level) {
+    this.renderer.setPracticeMode(true, level);
+  }
+
+  /**
+   * Highlight specific intervals
+   * @param {Object} highlights - Object with boolean values for each interval type
+   */
+  highlightIntervals(highlights) {
+    this.renderer.setIntervalHighlights(highlights);
+  }
+
+  /**
+   * Set scale display options
+   * @param {Object} options - Display options
+   */
+  setScaleDisplayOptions(options) {
+    this.renderer.setScaleDisplayOptions(options);
+  }
+
+  /**
+   * Transpose the current scale to a different key
+   * @param {string} newKey - New key to transpose to
+   */
+  transposeScale(newKey) {
+    if (!this.currentScale) return;
+    
+    const transposed = this.calculator.transposeScale(
+      this.currentScale.root,
+      this.currentScale.type,
+      newKey
+    );
+    
+    this.displayScale(transposed.root, transposed.type, newKey);
+  }
+
+  /**
+   * Get relative key for current scale
+   * @returns {string} Relative key
+   */
+  getRelativeKey() {
+    if (!this.currentScale) return null;
+    return this.calculator.getRelativeKey(this.currentScale.root);
+  }
+
+  /**
+   * Get parallel key for current scale
+   * @returns {Object} Parallel keys
+   */
+  getParallelKey() {
+    if (!this.currentScale) return null;
+    return this.calculator.getParallelKey(this.currentScale.root);
+  }
+
+  /**
+   * Get scale positions grouped by intervals
+   * @returns {Object} Scale positions grouped by intervals
+   */
+  getScalePositionsByInterval() {
+    if (!this.currentScale) return null;
+    return this.calculator.getScalePositionsByInterval(
+      this.instrument,
+      this.currentScale.root,
+      this.currentScale.type
+    );
+  }
+
+  /**
+   * Get all available keys
+   * @returns {Array} Array of available keys
+   */
+  static getAvailableKeys() {
+    return this.calculator?.constructor.getAvailableKeys() || [];
+  }
+
+  /**
+   * Get all available scale types
+   * @returns {Array} Array of available scale types
+   */
+  static getAvailableScales() {
+    return this.calculator?.constructor.getAvailableScales() || [];
+  }
+
+  /**
+   * Get interval information
+   * @param {number} interval - Interval in semitones
+   * @returns {Object} Interval information
+   */
+  static getIntervalInfo(interval) {
+    return this.calculator?.constructor.getIntervalInfo(interval) || null;
   }
 }
 
