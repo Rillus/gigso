@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hand Pan Phase 5 - Metallic Sheen & Accelerometer Reflections</title>
+    <script src="https://unpkg.com/tone@14.7.77/build/Tone.js"></script>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            color: white;
+        }
+
+        .container {
+            max-width: 1200px;
+            width: 100%;
+            text-align: center;
+        }
+
+        h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+        }
+
+        .subtitle {
+            font-size: 1.2em;
+            margin-bottom: 30px;
+            opacity: 0.9;
+        }
+
+        .features {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .feature {
+            background: rgba(255,255,255,0.1);
+            padding: 20px;
+            border-radius: 15px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+
+        .feature h3 {
+            margin-top: 0;
+            color: #ffd700;
+        }
+
+        .controls {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            justify-content: center;
+            margin-bottom: 30px;
+            padding: 20px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 15px;
+            backdrop-filter: blur(10px);
+        }
+
+        .control-group {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+        }
+
+        label {
+            font-weight: bold;
+            font-size: 0.9em;
+        }
+
+        select, button {
+            padding: 8px 15px;
+            border: none;
+            border-radius: 8px;
+            background: rgba(255,255,255,0.2);
+            color: white;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        select:hover, button:hover {
+            background: rgba(255,255,255,0.3);
+            transform: translateY(-2px);
+        }
+
+        select option {
+            background: #2a5298;
+            color: white;
+        }
+
+        .accelerometer-status {
+            background: rgba(255,255,255,0.1);
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            backdrop-filter: blur(10px);
+        }
+
+        .status-indicator {
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            margin-right: 10px;
+        }
+
+        .status-active {
+            background: #4CAF50;
+            box-shadow: 0 0 10px #4CAF50;
+        }
+
+        .status-inactive {
+            background: #f44336;
+            box-shadow: 0 0 10px #f44336;
+        }
+
+        .hand-pan-container {
+            display: flex;
+            justify-content: center;
+            margin: 20px 0;
+        }
+
+        .instructions {
+            background: rgba(255,255,255,0.1);
+            padding: 20px;
+            border-radius: 15px;
+            margin-top: 30px;
+            backdrop-filter: blur(10px);
+            text-align: left;
+        }
+
+        .instructions h3 {
+            color: #ffd700;
+            margin-top: 0;
+        }
+
+        .instructions ul {
+            margin: 10px 0;
+            padding-left: 20px;
+        }
+
+        .instructions li {
+            margin: 8px 0;
+        }
+
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 2em;
+            }
+            
+            .controls {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .control-group {
+                width: 100%;
+                max-width: 200px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎵 Hand Pan Phase 5</h1>
+        <p class="subtitle">Metallic Sheen & Accelerometer Reflections</p>
+
+        <div class="features">
+            <div class="feature">
+                <h3>✨ Enhanced Ripple Effect</h3>
+                <p>Restored and improved ripple animations with metallic shimmer effects that respond to touch interactions.</p>
+            </div>
+            <div class="feature">
+                <h3>🔮 Metallic Sheen</h3>
+                <p>Advanced metallic surface with realistic reflections, highlights, and depth that mimics authentic steel drum surfaces.</p>
+            </div>
+            <div class="feature">
+                <h3>📱 Accelerometer Integration</h3>
+                <p>Dynamic reflections that move based on device orientation, creating an immersive 3D effect on mobile devices.</p>
+            </div>
+        </div>
+
+        <div class="accelerometer-status">
+            <span class="status-indicator status-inactive" id="accelerometerStatus"></span>
+            <span id="accelerometerText">Accelerometer: Checking availability...</span>
+        </div>
+
+        <div class="controls">
+            <div class="control-group">
+                <label for="keySelect">Key:</label>
+                <select id="keySelect">
+                    <option value="C">C</option>
+                    <option value="C#">C#</option>
+                    <option value="D" selected>D</option>
+                    <option value="D#">D#</option>
+                    <option value="E">E</option>
+                    <option value="F">F</option>
+                    <option value="F#">F#</option>
+                    <option value="G">G</option>
+                    <option value="G#">G#</option>
+                    <option value="A">A</option>
+                    <option value="A#">A#</option>
+                    <option value="B">B</option>
+                </select>
+            </div>
+
+            <div class="control-group">
+                <label for="scaleSelect">Scale:</label>
+                <select id="scaleSelect">
+                    <option value="major">Major</option>
+                    <option value="minor" selected>Minor</option>
+                    <option value="pentatonic">Pentatonic</option>
+                </select>
+            </div>
+
+            <div class="control-group">
+                <label for="sizeSelect">Size:</label>
+                <select id="sizeSelect">
+                    <option value="small">Small</option>
+                    <option value="medium" selected>Medium</option>
+                    <option value="large">Large</option>
+                </select>
+            </div>
+
+            <div class="control-group">
+                <label for="metallicIntensity">Metallic Intensity:</label>
+                <input type="range" id="metallicIntensity" min="0" max="100" value="80" style="width: 100px;">
+            </div>
+
+            <div class="control-group">
+                <label for="reflectionSpeed">Reflection Speed:</label>
+                <input type="range" id="reflectionSpeed" min="0" max="100" value="50" style="width: 100px;">
+            </div>
+        </div>
+
+        <div class="hand-pan-container">
+            <hand-pan id="handPan" key="D" scale="minor" size="medium"></hand-pan>
+        </div>
+
+        <div class="instructions">
+            <h3>🎯 How to Use Phase 5 Features:</h3>
+            <ul>
+                <li><strong>Touch/Click:</strong> Play notes with enhanced ripple effects and metallic shimmer</li>
+                <li><strong>Mobile Tilt:</strong> Tilt your device to see reflections move dynamically</li>
+                <li><strong>Metallic Intensity:</strong> Adjust the slider to control the metallic sheen intensity</li>
+                <li><strong>Reflection Speed:</strong> Control how quickly reflections respond to device movement</li>
+                <li><strong>Key/Scale Changes:</strong> Experiment with different musical keys and scales</li>
+            </ul>
+            
+            <h3>🔧 Technical Enhancements:</h3>
+            <ul>
+                <li>Advanced CSS gradients for realistic metallic surfaces</li>
+                <li>DeviceMotion API integration for accelerometer data</li>
+                <li>Performance-optimized animations with GPU acceleration</li>
+                <li>Responsive design that works on all device sizes</li>
+                <li>Enhanced accessibility with proper ARIA labels</li>
+            </ul>
+        </div>
+    </div>
+
+    <script type="module">
+        import HandPan from './components/hand-pan/hand-pan.js';
+        import { generateScaleNotes } from './helpers/scaleUtils.js';
+
+        // Initialize the hand pan
+        const handPan = document.getElementById('handPan');
+        const keySelect = document.getElementById('keySelect');
+        const scaleSelect = document.getElementById('scaleSelect');
+        const sizeSelect = document.getElementById('sizeSelect');
+        const metallicIntensity = document.getElementById('metallicIntensity');
+        const reflectionSpeed = document.getElementById('reflectionSpeed');
+        const accelerometerStatus = document.getElementById('accelerometerStatus');
+        const accelerometerText = document.getElementById('accelerometerText');
+
+        // Control event listeners
+        keySelect.addEventListener('change', () => {
+            handPan.setAttribute('key', keySelect.value);
+        });
+
+        scaleSelect.addEventListener('change', () => {
+            handPan.setAttribute('scale', scaleSelect.value);
+        });
+
+        sizeSelect.addEventListener('change', () => {
+            handPan.setAttribute('size', sizeSelect.value);
+        });
+
+        // Metallic intensity control
+        metallicIntensity.addEventListener('input', (e) => {
+            const intensity = e.target.value;
+            handPan.style.setProperty('--metallic-intensity', intensity + '%');
+        });
+
+        // Reflection speed control
+        reflectionSpeed.addEventListener('input', (e) => {
+            const speed = e.target.value;
+            handPan.style.setProperty('--reflection-speed', speed + '%');
+        });
+
+        // Accelerometer integration
+        function updateAccelerometerStatus(available) {
+            const statusElement = accelerometerStatus;
+            const textElement = accelerometerText;
+            
+            if (available) {
+                statusElement.className = 'status-indicator status-active';
+                textElement.textContent = 'Accelerometer: Active - Tilt device to see reflections move';
+            } else {
+                statusElement.className = 'status-indicator status-inactive';
+                textElement.textContent = 'Accelerometer: Not available - Reflections will be static';
+            }
+        }
+
+        // Initialize accelerometer
+        function initAccelerometer() {
+            // Listen for accelerometer events from the hand pan component
+            handPan.addEventListener('accelerometer-enabled', (event) => {
+                updateAccelerometerStatus(true);
+            });
+            
+            // Check if accelerometer is available
+            if (window.DeviceMotionEvent) {
+                // Request permission on iOS
+                if (typeof DeviceMotionEvent.requestPermission === 'function') {
+                    // Try to request permission on first user interaction
+                    document.addEventListener('click', () => {
+                        handPan.requestAccelerometerAccess();
+                    }, { once: true });
+                } else {
+                    // Android and other devices - accelerometer should be enabled automatically
+                    setTimeout(() => {
+                        if (handPan.isAccelerometerAvailable) {
+                            updateAccelerometerStatus(true);
+                        } else {
+                            updateAccelerometerStatus(false);
+                        }
+                    }, 1000);
+                }
+            } else {
+                updateAccelerometerStatus(false);
+            }
+        }
+
+        // Initialize on page load
+        document.addEventListener('DOMContentLoaded', () => {
+            // Set initial CSS custom properties
+            handPan.style.setProperty('--metallic-intensity', '80%');
+            handPan.style.setProperty('--reflection-speed', '50%');
+            handPan.style.setProperty('--reflection-x', '0px');
+            handPan.style.setProperty('--reflection-y', '0px');
+            
+            // Initialize accelerometer
+            initAccelerometer();
+        });
+
+        // Listen for note played events
+        handPan.addEventListener('note-played', (event) => {
+            console.log('Note played:', event.detail);
+        });
+
+        // Listen for key changed events
+        handPan.addEventListener('key-changed', (event) => {
+            console.log('Key changed:', event.detail);
+        });
+    </script>
+</body>
+</html>

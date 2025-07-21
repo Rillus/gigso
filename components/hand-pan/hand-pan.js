@@ -66,6 +66,9 @@ export default class HandPan extends HTMLElement {
         
         // Initialize audio context on first user interaction
         this.initializeAudioContext();
+        
+        // Initialize accelerometer support
+        this.initializeAccelerometer();
     }
 
     disconnectedCallback() {
@@ -779,6 +782,82 @@ export default class HandPan extends HTMLElement {
         }
     }
 
+    // Initialize accelerometer support
+    initializeAccelerometer() {
+        this.accelerometerData = { x: 0, y: 0, z: 0 };
+        this.isAccelerometerAvailable = false;
+        
+        if (window.DeviceMotionEvent) {
+            // Request permission on iOS
+            if (typeof DeviceMotionEvent.requestPermission === 'function') {
+                // Store the permission request for later use
+                this.requestAccelerometerPermission = () => {
+                    DeviceMotionEvent.requestPermission()
+                        .then(permissionState => {
+                            if (permissionState === 'granted') {
+                                this.enableAccelerometer();
+                            } else {
+                                console.log('HandPan: Accelerometer permission denied');
+                            }
+                        })
+                        .catch(error => {
+                            console.warn('HandPan: Error requesting accelerometer permission:', error);
+                        });
+                };
+            } else {
+                // Android and other devices
+                this.enableAccelerometer();
+            }
+        } else {
+            console.log('HandPan: DeviceMotionEvent not supported');
+        }
+    }
+
+    // Enable accelerometer tracking
+    enableAccelerometer() {
+        this.isAccelerometerAvailable = true;
+        this.handleDeviceMotion = this.handleDeviceMotion.bind(this);
+        window.addEventListener('devicemotion', this.handleDeviceMotion);
+        console.log('HandPan: Accelerometer enabled');
+        
+        // Dispatch event to notify parent components
+        this.dispatchEvent(new CustomEvent('accelerometer-enabled', {
+            detail: { available: true }
+        }));
+    }
+
+    // Handle device motion events
+    handleDeviceMotion(event) {
+        if (event.accelerationIncludingGravity) {
+            const { x, y, z } = event.accelerationIncludingGravity;
+            this.accelerometerData = { x: x || 0, y: y || 0, z: z || 0 };
+            
+            // Update hand pan reflections based on device orientation
+            this.updateReflections();
+        }
+    }
+
+    // Update reflections based on accelerometer data
+    updateReflections() {
+        if (!this.isAccelerometerAvailable) return;
+        
+        // Calculate reflection offset based on accelerometer data
+        const maxOffset = 15; // Maximum pixel offset
+        const xOffset = (this.accelerometerData.x / 9.8) * maxOffset; // Normalize to gravity
+        const yOffset = (this.accelerometerData.y / 9.8) * maxOffset;
+        
+        // Apply reflection transform to hand pan
+        this.style.setProperty('--reflection-x', xOffset + 'px');
+        this.style.setProperty('--reflection-y', yOffset + 'px');
+    }
+
+    // Request accelerometer permission (for iOS)
+    requestAccelerometerAccess() {
+        if (this.requestAccelerometerPermission) {
+            this.requestAccelerometerPermission();
+        }
+    }
+
     // Cleanup method for memory management
     cleanup() {
         try {
@@ -798,6 +877,11 @@ export default class HandPan extends HTMLElement {
                         field.removeEventListener('keyup', this.handleKeyboardRelease);
                     }
                 });
+            }
+            
+            // Clean up accelerometer
+            if (this.handleDeviceMotion) {
+                window.removeEventListener('devicemotion', this.handleDeviceMotion);
             }
             
             // Clean up audio effects if they exist
