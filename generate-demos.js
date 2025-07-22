@@ -8,147 +8,147 @@ const components = [
         icon: '🥁',
         description: 'Interactive hand pan (hang drum) instrument for touch-screen play with soothing synthesized tones',
         file: 'components/hand-pan/hand-pan.js',
-        demoFile: 'demos/hand-pan-demo.html'
+        demoFile: 'hand-pan-demo.html'
     },
     {
         name: 'HandPanWrapper',
         icon: '🥁',
         description: 'Complete drop-in wrapper component with audio management, key selection, size controls, and event logging',
         file: 'components/hand-pan-wrapper/hand-pan-wrapper.js',
-        demoFile: 'demos/hand-pan-wrapper-demo.html'
+        demoFile: 'hand-pan-wrapper-demo.html'
     },
     {
         name: 'Fretboard',
         icon: '🎸',
         description: 'Interactive guitar fretboard component for chord and scale visualization',
         file: 'components/fretboard/fretboard.js',
-        demoFile: 'demos/fretboard-demo.html'
+        demoFile: 'fretboard-demo.html'
     },
     {
         name: 'PianoRoll',
         icon: '🎹',
         description: 'Visual timeline interface for arranging and playing chord progressions',
         file: 'components/piano-roll/piano-roll.js',
-        demoFile: 'demos/piano-roll-demo.html'
+        demoFile: 'piano-roll-demo.html'
     },
     {
         name: 'ChordPalette',
         icon: '🎼',
         description: 'Pre-defined chord library for quick chord selection',
         file: 'components/chord-palette/chord-palette.js',
-        demoFile: 'demos/chord-palette-demo.html'
+        demoFile: 'chord-palette-demo.html'
     },
     {
         name: 'AddChord',
         icon: '➕',
         description: 'Form interface for creating custom chords',
         file: 'components/add-chord/add-chord.js',
-        demoFile: 'demos/add-chord-demo.html'
+        demoFile: 'add-chord-demo.html'
     },
     {
         name: 'GigsoKeyboard',
         icon: '🎹',
         description: 'Interactive piano keyboard for note playback and visual feedback',
         file: 'components/gigso-keyboard/gigso-keyboard.js',
-        demoFile: 'demos/gigso-keyboard-demo.html'
+        demoFile: 'gigso-keyboard-demo.html'
     },
     {
         name: 'CurrentChord',
         icon: '🎵',
         description: 'Displays the currently selected or playing chord',
         file: 'components/current-chord/current-chord.js',
-        demoFile: 'demos/current-chord-demo.html'
+        demoFile: 'current-chord-demo.html'
     },
     {
         name: 'ChordDiagram',
         icon: '📊',
         description: 'Visual representation of chord fingerings',
         file: 'components/chord-diagram/chord-diagram.js',
-        demoFile: 'demos/chord-diagram-demo.html'
+        demoFile: 'chord-diagram-demo.html'
     },
     {
         name: 'TransportControls',
         icon: '⏯️',
         description: 'Container component for playback control buttons',
         file: 'components/transport-controls/transport-controls.js',
-        demoFile: 'demos/transport-controls-demo.html'
+        demoFile: 'transport-controls-demo.html'
     },
     {
         name: 'PlayButton',
         icon: '▶️',
         description: 'Initiates playback of the current song',
         file: 'components/play-button/play-button.js',
-        demoFile: 'demos/play-button-demo.html'
+        demoFile: 'play-button-demo.html'
     },
     {
         name: 'StopButton',
         icon: '⏹️',
         description: 'Stops playback and resets to beginning',
         file: 'components/stop-button/stop-button.js',
-        demoFile: 'demos/stop-button-demo.html'
+        demoFile: 'stop-button-demo.html'
     },
     {
         name: 'LoopButton',
         icon: '🔁',
         description: 'Toggles loop playback mode',
         file: 'components/loop-button/loop-button.js',
-        demoFile: 'demos/loop-button-demo.html'
+        demoFile: 'loop-button-demo.html'
     },
     {
         name: 'RecordCollection',
         icon: '📚',
         description: 'Displays and loads songs from the song library',
         file: 'components/record-collection/record-collection.js',
-        demoFile: 'demos/record-collection-demo.html'
+        demoFile: 'record-collection-demo.html'
     },
     {
         name: 'GigsoMenu',
         icon: '☰',
         description: 'Toggle interface for showing/hiding components',
         file: 'components/gigso-menu/gigso-menu.js',
-        demoFile: 'demos/gigso-menu-demo.html'
+        demoFile: 'gigso-menu-demo.html'
     },
     {
         name: 'ChromaticTuner',
         icon: '🎵',
         description: 'Chromatic tuner for instrument tuning',
         file: 'components/chromatic-tuner/chromatic-tuner.js',
-        demoFile: 'demos/chromatic-tuner-demo.html'
+        demoFile: 'chromatic-tuner-demo.html'
     },
     {
         name: 'EQDisplay',
         icon: '📊',
         description: 'Equalizer display component',
         file: 'components/eq-display/eq-display.js',
-        demoFile: 'demos/eq-display-demo.html'
+        demoFile: 'eq-display-demo.html'
     },
     {
         name: 'FrequencyMonitor',
         icon: '📈',
         description: 'Frequency monitoring and analysis component',
         file: 'components/frequency-monitor/frequency-monitor.js',
-        demoFile: 'demos/frequency-monitor-demo.html'
+        demoFile: 'frequency-monitor-demo.html'
     },
     {
         name: 'GigsoLogo',
         icon: '🎵',
         description: 'Gigso application logo component',
         file: 'components/gigso-logo/gigso-logo.js',
-        demoFile: 'demos/gigso-logo-demo.html'
+        demoFile: 'gigso-logo-demo.html'
     },
     {
         name: 'ScaleKey',
         icon: '🎼',
         description: 'Scale and key selection component',
         file: 'components/scale-key/scale-key.js',
-        demoFile: 'demos/scale-key-demo.html'
+        demoFile: 'scale-key-demo.html'
     },
     {
         name: 'VUMeter',
         icon: '📊',
         description: 'Volume unit meter for audio visualization',
         file: 'components/vu-meter/vu-meter.js',
-        demoFile: 'demos/vu-meter-demo.html'
+        demoFile: 'vu-meter-demo.html'
     }
 ];
 

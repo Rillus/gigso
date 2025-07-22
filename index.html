@@ -3,172 +3,427 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gigso</title>
-    <link rel="stylesheet" href="styles.css">
+    <title>Gigso Component Demos</title>
+    <link rel="stylesheet" href="styles/demo-main.css">
     <style>
-        .demo-menu {
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            z-index: 1000;
+        /* Index-specific styles */
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 60px 20px;
+            text-align: center;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
         }
         
-        .demo-menu-button {
-            background: rgba(0, 0, 0, 0.8);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            border-radius: 8px;
-            padding: 10px 15px;
-            color: #fff;
-            cursor: pointer;
-            font-size: 14px;
+        .header h1 {
+            margin: 0 0 20px 0;
+            font-size: 3em;
+            font-weight: 300;
+        }
+        
+        .header p {
+            margin: 0;
+            font-size: 1.3em;
+            opacity: 0.9;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        
+        .category {
+            background: white;
+            border-radius: 16px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+        }
+        
+        .category h2 {
+            color: #2c3e50;
+            margin: 0 0 25px 0;
+            font-size: 1.8em;
+            border-bottom: 2px solid #e9ecef;
+            padding-bottom: 15px;
+        }
+        
+        .components-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 20px;
+        }
+        
+        .component-card {
+            background: #f8f9fa;
+            border-radius: 12px;
+            padding: 25px;
+            border: 2px solid #e9ecef;
             transition: all 0.3s ease;
-            outline: none;
-        }
-        
-        .demo-menu-button:hover,
-        .demo-menu-button:focus {
-            background: rgba(0, 0, 0, 0.9);
-            border-color: rgba(76, 175, 80, 0.5);
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
-        }
-        
-        .demo-dropdown {
-            position: absolute;
-            top: 100%;
-            right: 0;
-            background: rgba(0, 0, 0, 0.9);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            border-radius: 8px;
-            padding: 10px 0;
-            min-width: 220px;
-            max-height: 80vh;
-            overflow-y: auto;
-            opacity: 0;
-            visibility: hidden;
-            transform: translateY(-10px);
-            transition: all 0.3s ease;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
-        }
-        
-        .demo-menu:hover .demo-dropdown,
-        .demo-menu:focus-within .demo-dropdown {
-            opacity: 1;
-            visibility: visible;
-            transform: translateY(0);
-        }
-        
-        .demo-dropdown a {
-            display: block;
-            color: #4CAF50;
             text-decoration: none;
-            padding: 8px 15px;
-            font-size: 13px;
+            color: inherit;
+            display: block;
+        }
+        
+        .component-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 12px 40px rgba(0,0,0,0.15);
+            border-color: #667eea;
+        }
+        
+        .component-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        
+        .component-icon {
+            font-size: 2em;
+            margin-right: 15px;
+        }
+        
+        .component-title {
+            font-size: 1.3em;
+            font-weight: 600;
+            color: #2c3e50;
+            margin: 0;
+        }
+        
+        .component-description {
+            color: #6c757d;
+            margin: 0 0 20px 0;
+            line-height: 1.5;
+        }
+        
+        .component-link {
+            display: inline-block;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 500;
             transition: all 0.2s ease;
         }
         
-        .demo-dropdown a:hover,
-        .demo-dropdown a:focus {
-            background: rgba(76, 175, 80, 0.1);
-            color: #45a049;
-            padding-left: 20px;
+        .component-link:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
         }
         
-        .demo-dropdown a:first-child {
-            border-radius: 8px 8px 0 0;
+        .stats {
+            background: white;
+            border-radius: 16px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+            text-align: center;
         }
         
-        .demo-dropdown a:last-child {
-            border-radius: 0 0 8px 8px;
+        .stats h2 {
+            color: #2c3e50;
+            margin: 0 0 20px 0;
+            font-size: 1.8em;
         }
         
-        .demo-dropdown .category-header {
-            color: #fff;
-            font-weight: bold;
-            font-size: 12px;
-            padding: 10px 15px 5px 15px;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-            margin-top: 5px;
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
         }
         
-        .demo-dropdown .category-header:first-child {
-            margin-top: 0;
+        .stat-item {
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 12px;
+            border: 2px solid #e9ecef;
+        }
+        
+        .stat-number {
+            font-size: 2.5em;
+            font-weight: 700;
+            color: #667eea;
+            margin: 0;
+        }
+        
+        .stat-label {
+            color: #6c757d;
+            margin: 5px 0 0 0;
+            font-weight: 500;
+        }
+        
+        .footer {
+            background: #2c3e50;
+            color: white;
+            text-align: center;
+            padding: 30px 20px;
+            margin-top: 40px;
+        }
+        
+        .footer p {
+            margin: 0;
+            opacity: 0.8;
         }
         
         @media (max-width: 768px) {
-            .demo-menu {
-                position: static;
-                margin: 10px;
-                text-align: center;
+            .header h1 {
+                font-size: 2.5em;
             }
             
-            .demo-dropdown {
-                position: static;
-                margin-top: 10px;
-                transform: none;
-                opacity: 1;
-                visibility: visible;
-                max-height: none;
+            .components-grid {
+                grid-template-columns: 1fr;
             }
             
-            .demo-menu:hover .demo-dropdown,
-            .demo-menu:focus-within .demo-dropdown {
-                transform: none;
+            .stats-grid {
+                grid-template-columns: 1fr;
             }
         }
     </style>
 </head>
 <body>
-    <div class="demo-menu">
-        <button class="demo-menu-button" tabindex="0" onclick="handleDemoMenuClick(event)">🎵 Demo Pages</button>
-        <div class="demo-dropdown">
-            <a href="demos/index.html">🏠 All Demos Overview</a>
-            
-            <div class="category-header">Main Application</div>
-            <a href="index.html">Main App (Current)</a>
-            
-            <div class="category-header">HandPan Demos</div>
-            <a href="hand-pan-wrapper-demo.html">HandPan Wrapper</a>
-            <a href="test-hand-pan.html">Basic HandPan Tests</a>
-            <a href="test-hand-pan-scales.html">HandPan Scales</a>
-            <a href="test-steel-drum-hand-pan.html">Steel Drum HandPan</a>
-            
-            <div class="category-header">Fretboard Demos</div>
-            <a href="fretboard-demo.html">Fretboard Demo</a>
-            <a href="test-phase2-fretboard.html">Phase 2 Fretboard</a>
-            <a href="test-phase3-fretboard-multi-instrument.html">Phase 3 Multi-Instrument</a>
-            
-            <div class="category-header">Phase Testing</div>
-            <a href="test-phase2-manual.html">Phase 2 Manual Tests</a>
-            <a href="test-phase3-key-changes.html">Phase 3 Key Changes</a>
-            <a href="test-phase4-improvements.html">Phase 4 Improvements</a>
-            <a href="test-phase5-metallic-accelerometer.html">Phase 5 Metallic Accelerometer</a>
-            
-            <div class="category-header">Audio & Effects</div>
-            <a href="test-audio-effects.html">Audio Effects</a>
-            <a href="test-audio-initialization-fix.html">Audio Initialization Fix</a>
-            
-            <div class="category-header">Utilities & Scales</div>
-            <a href="test-scale-utils.html">Scale Utilities</a>
-            <a href="test-default-values.html">Default Values</a>
+    <div class="header">
+        <h1>🎵 Gigso Component Demos</h1>
+        <p>Interactive demonstrations of all Gigso music application components with documentation, API references, and live examples.</p>
+    </div>
+    
+    <div class="container">
+        <div class="stats">
+            <h2>Component Overview</h2>
+            <div class="stats-grid">
+                <div class="stat-item">
+                    <p class="stat-number">21</p>
+                    <p class="stat-label">Total Components</p>
+                </div>
+                <div class="stat-item">
+                    <p class="stat-number">5</p>
+                    <p class="stat-label">Categories</p>
+                </div>
+                <div class="stat-item">
+                    <p class="stat-number">100%</p>
+                    <p class="stat-label">Interactive Demos</p>
+                </div>
+                <div class="stat-item">
+                    <p class="stat-number">📚</p>
+                    <p class="stat-label">Full Documentation</p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="category">
+            <h2>🎹 Music Creation Components</h2>
+            <div class="components-grid">
+                <a href="piano-roll-demo.html" class="component-card">
+                    <div class="component-header">
+                        <div class="component-icon">🎹</div>
+                        <h3 class="component-title">PianoRoll</h3>
+                    </div>
+                    <p class="component-description">Visual timeline interface for arranging and playing chord progressions</p>
+                    <span class="component-link">View Demo →</span>
+                </a>
+                
+                <a href="chord-palette-demo.html" class="component-card">
+                    <div class="component-header">
+                        <div class="component-icon">🎼</div>
+                        <h3 class="component-title">ChordPalette</h3>
+                    </div>
+                    <p class="component-description">Pre-defined chord library for quick chord selection</p>
+                    <span class="component-link">View Demo →</span>
+                </a>
+                
+                <a href="add-chord-demo.html" class="component-card">
+                    <div class="component-header">
+                        <div class="component-icon">➕</div>
+                        <h3 class="component-title">AddChord</h3>
+                    </div>
+                    <p class="component-description">Form interface for creating custom chords</p>
+                    <span class="component-link">View Demo →</span>
+                </a>
+                
+                <a href="gigso-keyboard-demo.html" class="component-card">
+                    <div class="component-header">
+                        <div class="component-icon">🎹</div>
+                        <h3 class="component-title">GigsoKeyboard</h3>
+                    </div>
+                    <p class="component-description">Interactive piano keyboard for note playback and visual feedback</p>
+                    <span class="component-link">View Demo →</span>
+                </a>
+                
+                <a href="hand-pan-demo.html" class="component-card">
+                    <div class="component-header">
+                        <div class="component-icon">🥁</div>
+                        <h3 class="component-title">HandPan</h3>
+                    </div>
+                    <p class="component-description">Interactive hand pan (hang drum) instrument for touch-screen play</p>
+                    <span class="component-link">View Demo →</span>
+                </a>
+                
+                <a href="hand-pan-wrapper-demo.html" class="component-card">
+                    <div class="component-header">
+                        <div class="component-icon">🥁</div>
+                        <h3 class="component-title">HandPanWrapper</h3>
+                    </div>
+                    <p class="component-description">Complete drop-in wrapper component with audio management and controls</p>
+                    <span class="component-link">View Demo →</span>
+                </a>
+            </div>
+        </div>
+        
+        <div class="category">
+            <h2>🎸 Instrument Components</h2>
+            <div class="components-grid">
+                <a href="fretboard-demo.html" class="component-card">
+                    <div class="component-header">
+                        <div class="component-icon">🎸</div>
+                        <h3 class="component-title">Fretboard</h3>
+                    </div>
+                    <p class="component-description">Interactive guitar fretboard component for chord and scale visualization</p>
+                    <span class="component-link">View Demo →</span>
+                </a>
+                
+                <a href="chord-diagram-demo.html" class="component-card">
+                    <div class="component-header">
+                        <div class="component-icon">📊</div>
+                        <h3 class="component-title">ChordDiagram</h3>
+                    </div>
+                    <p class="component-description">Visual representation of chord fingerings</p>
+                    <span class="component-link">View Demo →</span>
+                </a>
+                
+                <a href="chromatic-tuner-demo.html" class="component-card">
+                    <div class="component-header">
+                        <div class="component-icon">🎵</div>
+                        <h3 class="component-title">ChromaticTuner</h3>
+                    </div>
+                    <p class="component-description">Chromatic tuner for instrument tuning</p>
+                    <span class="component-link">View Demo →</span>
+                </a>
+                
+                <a href="scale-key-demo.html" class="component-card">
+                    <div class="component-header">
+                        <div class="component-icon">🎼</div>
+                        <h3 class="component-title">ScaleKey</h3>
+                    </div>
+                    <p class="component-description">Scale and key selection component</p>
+                    <span class="component-link">View Demo →</span>
+                </a>
+            </div>
+        </div>
+        
+        <div class="category">
+            <h2>⏯️ Playback Controls</h2>
+            <div class="components-grid">
+                <a href="transport-controls-demo.html" class="component-card">
+                    <div class="component-header">
+                        <div class="component-icon">⏯️</div>
+                        <h3 class="component-title">TransportControls</h3>
+                    </div>
+                    <p class="component-description">Container component for playback control buttons</p>
+                    <span class="component-link">View Demo →</span>
+                </a>
+                
+                <a href="play-button-demo.html" class="component-card">
+                    <div class="component-header">
+                        <div class="component-icon">▶️</div>
+                        <h3 class="component-title">PlayButton</h3>
+                    </div>
+                    <p class="component-description">Initiates playback of the current song</p>
+                    <span class="component-link">View Demo →</span>
+                </a>
+                
+                <a href="stop-button-demo.html" class="component-card">
+                    <div class="component-header">
+                        <div class="component-icon">⏹️</div>
+                        <h3 class="component-title">StopButton</h3>
+                    </div>
+                    <p class="component-description">Stops playback and resets to beginning</p>
+                    <span class="component-link">View Demo →</span>
+                </a>
+                
+                <a href="loop-button-demo.html" class="component-card">
+                    <div class="component-header">
+                        <div class="component-icon">🔁</div>
+                        <h3 class="component-title">LoopButton</h3>
+                    </div>
+                    <p class="component-description">Toggles loop playback mode</p>
+                    <span class="component-link">View Demo →</span>
+                </a>
+            </div>
+        </div>
+        
+        <div class="category">
+            <h2>📊 Visual Feedback</h2>
+            <div class="components-grid">
+                <a href="current-chord-demo.html" class="component-card">
+                    <div class="component-header">
+                        <div class="component-icon">🎵</div>
+                        <h3 class="component-title">CurrentChord</h3>
+                    </div>
+                    <p class="component-description">Displays the currently selected or playing chord</p>
+                    <span class="component-link">View Demo →</span>
+                </a>
+                
+                <a href="eq-display-demo.html" class="component-card">
+                    <div class="component-header">
+                        <div class="component-icon">📊</div>
+                        <h3 class="component-title">EQDisplay</h3>
+                    </div>
+                    <p class="component-description">Equalizer display component</p>
+                    <span class="component-link">View Demo →</span>
+                </a>
+                
+                <a href="frequency-monitor-demo.html" class="component-card">
+                    <div class="component-header">
+                        <div class="component-icon">📈</div>
+                        <h3 class="component-title">FrequencyMonitor</h3>
+                    </div>
+                    <p class="component-description">Frequency monitoring and analysis component</p>
+                    <span class="component-link">View Demo →</span>
+                </a>
+                
+                <a href="vu-meter-demo.html" class="component-card">
+                    <div class="component-header">
+                        <div class="component-icon">📊</div>
+                        <h3 class="component-title">VUMeter</h3>
+                    </div>
+                    <p class="component-description">Volume unit meter for audio visualization</p>
+                    <span class="component-link">View Demo →</span>
+                </a>
+            </div>
+        </div>
+        
+        <div class="category">
+            <h2>🔧 Interface & Management</h2>
+            <div class="components-grid">
+                <a href="gigso-menu-demo.html" class="component-card">
+                    <div class="component-header">
+                        <div class="component-icon">☰</div>
+                        <h3 class="component-title">GigsoMenu</h3>
+                    </div>
+                    <p class="component-description">Toggle interface for showing/hiding components</p>
+                    <span class="component-link">View Demo →</span>
+                </a>
+                
+                <a href="record-collection-demo.html" class="component-card">
+                    <div class="component-header">
+                        <div class="component-icon">📚</div>
+                        <h3 class="component-title">RecordCollection</h3>
+                    </div>
+                    <p class="component-description">Displays and loads songs from the song library</p>
+                    <span class="component-link">View Demo →</span>
+                </a>
+                
+                <a href="gigso-logo-demo.html" class="component-card">
+                    <div class="component-header">
+                        <div class="component-icon">🎵</div>
+                        <h3 class="component-title">GigsoLogo</h3>
+                    </div>
+                    <p class="component-description">Gigso application logo component</p>
+                    <span class="component-link">View Demo →</span>
+                </a>
+            </div>
         </div>
     </div>
     
-    <div id="app"></div>
-    <script type="module" src="main.js"></script>
-    <script>
-        function handleDemoMenuClick(event) {
-            // Prevent any event bubbling that might interfere with the main app
-            event.preventDefault();
-            event.stopPropagation();
-            event.stopImmediatePropagation();
-            
-            console.log('Demo menu button clicked - preventing interference with main app');
-            
-            // The dropdown will still work via CSS :hover and :focus-within
-            // This just prevents any unwanted side effects
-        }
-    </script>
+    <div class="footer">
+        <p>🎵 Gigso Music Application - Component Demo Suite</p>
+        <p>Each demo includes interactive controls, API documentation, event logging, and usage examples</p>
+    </div>
 </body>
-</html> 
+</html>
