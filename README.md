@@ -44,6 +44,15 @@ Create music with the HandPan and Fretboard components - featuring dynamic key a
 
 ## 🚀 Quick Start
 
+### 🎵 Component Demos
+1. **View All Component Demos**: Open `demos/index.html` in your browser
+2. **Run Demo Server**: `node serve-demos.js` and visit `http://localhost:8000/demos/`
+3. **Try Individual Demos**: 
+   - HandPan: `demos/hand-pan-demo.html`
+   - Fretboard: `demos/fretboard-demo.html`
+   - PianoRoll: `demos/piano-roll-demo.html`
+
+### 🧪 Test Pages
 1. **Try the HandPan Phase 4 Demo**: Open `test-phase4-improvements.html` in your browser
 2. **Try the Fretboard Phase 2 Demo**: Open `test-phase2-fretboard.html` in your browser
 3. **Run the Tests**: `npm test` to see all test suites
@@ -64,3 +73,4 @@ Create music with the HandPan and Fretboard components - featuring dynamic key a
 ### General
 - [Component Specifications](documents/COMPONENT-SPECIFICATIONS.md) - Technical specs
 - [PRD](documents/PRD.md) - Product requirements document
+- [Component Demos](demos/README.md) - Interactive demo system documentation
