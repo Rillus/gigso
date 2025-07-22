@@ -1,0 +1,64 @@
+/* Demo Tabs Styles - Tab system for documentation sections */
+
+/* Tabs for documentation */
+.tabs {
+    display: flex;
+    border-bottom: 2px solid #e9ecef;
+    margin-bottom: 20px;
+}
+
+.tab {
+    padding: 12px 20px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-weight: 500;
+    color: #6c757d;
+    border-bottom: 2px solid transparent;
+    transition: all 0.2s ease;
+}
+
+.tab:hover {
+    color: #667eea;
+    background: rgba(102, 126, 234, 0.05);
+}
+
+.tab.active {
+    color: #667eea;
+    border-bottom-color: #667eea;
+}
+
+.tab-content {
+    display: none;
+}
+
+.tab-content.active {
+    display: block;
+}
+
+/* Tab content animations */
+.tab-content {
+    opacity: 0;
+    transform: translateY(10px);
+    transition: all 0.3s ease;
+}
+
+.tab-content.active {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+/* Responsive tabs */
+@media (max-width: 768px) {
+    .tabs {
+        flex-wrap: wrap;
+    }
+    
+    .tab {
+        flex: 1;
+        min-width: 120px;
+        text-align: center;
+        font-size: 14px;
+        padding: 10px 12px;
+    }
+}
