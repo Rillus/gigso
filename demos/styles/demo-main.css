@@ -1,0 +1,104 @@
+/* Demo Main Styles - Main entry point for all demo styles */
+
+/* Import all demo style modules */
+@import url('./demo-base.css');
+@import url('./demo-tabs.css');
+@import url('./demo-tables.css');
+@import url('./demo-code.css');
+@import url('./demo-events.css');
+
+/* Additional global styles specific to demos */
+
+/* Smooth scrolling for the entire page */
+html {
+    scroll-behavior: smooth;
+}
+
+/* Focus styles for accessibility */
+*:focus {
+    outline: 2px solid #667eea;
+    outline-offset: 2px;
+}
+
+/* Loading states */
+.loading {
+    opacity: 0.6;
+    pointer-events: none;
+}
+
+.loading::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 20px;
+    height: 20px;
+    margin: -10px 0 0 -10px;
+    border: 2px solid #667eea;
+    border-top: 2px solid transparent;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* Print styles */
+@media print {
+    .demo-header,
+    .controls-section,
+    .event-log {
+        display: none;
+    }
+    
+    .component-showcase,
+    .docs-section {
+        box-shadow: none;
+        border: 1px solid #ccc;
+    }
+    
+    .code-block {
+        background: #f8f9fa !important;
+        color: #333 !important;
+        border: 1px solid #ccc;
+    }
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+    .demo-header {
+        background: #000;
+        color: #fff;
+    }
+    
+    .component-showcase,
+    .controls-section,
+    .docs-section {
+        border: 2px solid #000;
+    }
+    
+    .control-group button {
+        background: #000;
+        color: #fff;
+        border: 2px solid #000;
+    }
+}
+
+/* Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+    * {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+    }
+    
+    .event:hover {
+        transform: none;
+    }
+    
+    .control-group button:hover {
+        transform: none;
+    }
+}

@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PianoRoll Component Demo</title>
+    <link rel="stylesheet" href="styles/demo-main.css">
+</head>
+<body>
+    <div class="demo-header">
+        <h1>🎹 PianoRoll Component Demo</h1>
+        <p>Visual timeline interface for arranging and playing chord progressions</p>
+    </div>
+    
+    <div class="container">
+        <!-- Component Showcase -->
+        <div class="component-showcase">
+            <div class="showcase-header">
+                <h2>Component Preview</h2>
+                <p>Interactive demonstration of the PianoRoll component</p>
+            </div>
+            <div class="component-container" id="component-container">
+<pianoroll id="demo-component"></pianoroll>
+</div>
+        </div>
+        
+        <!-- Controls Section -->
+        <div class="controls-section">
+            <div class="controls-header">
+                <h3>Interactive Controls</h3>
+            </div>
+            <div class="controls-grid" id="controls-grid">
+
+                <div class="control-group">
+                    <label for="tempo-input">Tempo (BPM):</label>
+                    <input type="number" id="tempo-input" value="120" min="60" max="200">
+                </div>
+                <div class="control-group">
+                    <label for="time-signature">Time Signature:</label>
+                    <select id="time-signature">
+                        <option value="4/4" selected>4/4</option>
+                        <option value="3/4">3/4</option>
+                        <option value="6/8">6/8</option>
+                    </select>
+                </div>
+                <div class="control-group">
+                    <label>Actions:</label>
+                    <button id="play-roll">Play</button>
+                    <button id="stop-roll" class="secondary">Stop</button>
+                    <button id="clear-roll">Clear</button>
+                </div>
+            
+</div>
+            <div id="status" class="status info">
+                PianoRoll component loaded! Use the controls above to interact with the component.
+            </div>
+        </div>
+        
+        <!-- Documentation Section -->
+        <div class="docs-section">
+            <div class="tabs">
+                <button class="tab active" onclick="showTab('overview')">Overview</button>
+                <button class="tab" onclick="showTab('api')">API Reference</button>
+                <button class="tab" onclick="showTab('events')">Events</button>
+                <button class="tab" onclick="showTab('examples')">Examples</button>
+                <button class="tab" onclick="showTab('events-log')">Event Log</button>
+            </div>
+            
+            <!-- Overview Tab -->
+            <div id="overview" class="tab-content active">
+                <h3>Component Overview</h3>
+                <p>Visual timeline interface for arranging and playing chord progressions</p>
+            </div>
+            
+            <!-- API Reference Tab -->
+            <div id="api" class="tab-content">
+                <h3>API Reference</h3>
+                <p>API documentation will be available soon.</p>
+            </div>
+            
+            <!-- Events Tab -->
+            <div id="events" class="tab-content">
+                <h3>Events</h3>
+                <p>Events documentation will be available soon.</p>
+            </div>
+            
+            <!-- Examples Tab -->
+            <div id="examples" class="tab-content">
+                <h3>Usage Examples</h3>
+                <p>Usage examples will be available soon.</p>
+            </div>
+            
+            <!-- Event Log Tab -->
+            <div id="events-log" class="tab-content">
+                <h3>Event Log</h3>
+                <div class="event-log" id="event-log">
+                    <div class="event info">Component initialized</div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // Tab functionality
+        function showTab(tabName) {
+            // Hide all tab contents
+            const tabContents = document.querySelectorAll('.tab-content');
+            tabContents.forEach(content => content.classList.remove('active'));
+            
+            // Remove active class from all tabs
+            const tabs = document.querySelectorAll('.tab');
+            tabs.forEach(tab => tab.classList.remove('active'));
+            
+            // Show selected tab content
+            document.getElementById(tabName).classList.add('active');
+            
+            // Add active class to clicked tab
+            event.target.classList.add('active');
+        }
+        
+        // Status update function
+        function updateStatus(message, type = 'info') {
+            const status = document.getElementById('status');
+            status.textContent = message;
+            status.className = `status ${type}`;
+        }
+        
+        // Event logging function
+        function logEvent(message, type = 'info') {
+            const eventLog = document.getElementById('event-log');
+            const eventDiv = document.createElement('div');
+            eventDiv.className = `event ${type}`;
+            eventDiv.textContent = `[${new Date().toLocaleTimeString()}] ${message}`;
+            eventLog.appendChild(eventDiv);
+            eventLog.scrollTop = eventLog.scrollHeight;
+        }
+        
+        // Initialize component
+        document.addEventListener('DOMContentLoaded', function() {
+            logEvent('PianoRoll demo page loaded', 'success');
+        });
+    </script>
+    
+    <!-- Component-specific script will be inserted here -->
+    
+    <script type="module">
+        import './components/piano-roll/piano-roll.js';
+        
+        document.addEventListener('DOMContentLoaded', function() {
+            const component = document.getElementById('demo-component');
+            
+            // Component-specific event listeners
+            
+                // PianoRoll specific controls
+                const tempoInput = document.getElementById('tempo-input');
+                const timeSignature = document.getElementById('time-signature');
+                const playRollBtn = document.getElementById('play-roll');
+                const stopRollBtn = document.getElementById('stop-roll');
+                const clearRollBtn = document.getElementById('clear-roll');
+                
+                tempoInput.addEventListener('change', (e) => {
+                    component.setTempo(parseInt(e.target.value));
+                    logEvent('Tempo changed to ' + e.target.value + ' BPM', 'info');
+                    updateStatus('Tempo updated to ' + e.target.value + ' BPM');
+                });
+                
+                timeSignature.addEventListener('change', (e) => {
+                    component.setTimeSignature(e.target.value);
+                    logEvent('Time signature changed to ' + e.target.value, 'info');
+                    updateStatus('Time signature updated to ' + e.target.value);
+                });
+                
+                playRollBtn.addEventListener('click', () => {
+                    component.play();
+                    logEvent('PianoRoll playback started', 'success');
+                    updateStatus('PianoRoll playing');
+                });
+                
+                stopRollBtn.addEventListener('click', () => {
+                    component.stop();
+                    logEvent('PianoRoll playback stopped', 'warning');
+                    updateStatus('PianoRoll stopped');
+                });
+                
+                clearRollBtn.addEventListener('click', () => {
+                    component.clear();
+                    logEvent('PianoRoll cleared', 'info');
+                    updateStatus('PianoRoll cleared');
+                });
+            
+            
+            // Log component initialization
+            logEvent('PianoRoll component initialized', 'success');
+            updateStatus('PianoRoll component ready for interaction');
+        });
+    </script>
+    
+</body>
+</html>

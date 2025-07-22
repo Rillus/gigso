@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ChordPalette Component Demo</title>
+    <link rel="stylesheet" href="styles/demo-main.css">
+</head>
+<body>
+    <div class="demo-header">
+        <h1>🎼 ChordPalette Component Demo</h1>
+        <p>Pre-defined chord library for quick chord selection</p>
+    </div>
+    
+    <div class="container">
+        <!-- Component Showcase -->
+        <div class="component-showcase">
+            <div class="showcase-header">
+                <h2>Component Preview</h2>
+                <p>Interactive demonstration of the ChordPalette component</p>
+            </div>
+            <div class="component-container" id="component-container">
+<chordpalette id="demo-component"></chordpalette>
+</div>
+        </div>
+        
+        <!-- Controls Section -->
+        <div class="controls-section">
+            <div class="controls-header">
+                <h3>Interactive Controls</h3>
+            </div>
+            <div class="controls-grid" id="controls-grid">
+
+                <div class="control-group">
+                    <label for="category-select">Category:</label>
+                    <select id="category-select">
+                        <option value="major">Major</option>
+                        <option value="minor">Minor</option>
+                        <option value="diminished">Diminished</option>
+                        <option value="augmented">Augmented</option>
+                    </select>
+                </div>
+                <div class="control-group">
+                    <label for="root-select">Root Note:</label>
+                    <select id="root-select">
+                        <option value="C">C</option>
+                        <option value="D">D</option>
+                        <option value="E">E</option>
+                        <option value="F">F</option>
+                        <option value="G">G</option>
+                        <option value="A">A</option>
+                        <option value="B">B</option>
+                    </select>
+                </div>
+                <div class="control-group">
+                    <label>Actions:</label>
+                    <button id="add-chord">Add to Progression</button>
+                    <button id="clear-progression" class="secondary">Clear Progression</button>
+                </div>
+            
+</div>
+            <div id="status" class="status info">
+                ChordPalette component loaded! Use the controls above to interact with the component.
+            </div>
+        </div>
+        
+        <!-- Documentation Section -->
+        <div class="docs-section">
+            <div class="tabs">
+                <button class="tab active" onclick="showTab('overview')">Overview</button>
+                <button class="tab" onclick="showTab('api')">API Reference</button>
+                <button class="tab" onclick="showTab('events')">Events</button>
+                <button class="tab" onclick="showTab('examples')">Examples</button>
+                <button class="tab" onclick="showTab('events-log')">Event Log</button>
+            </div>
+            
+            <!-- Overview Tab -->
+            <div id="overview" class="tab-content active">
+                <h3>Component Overview</h3>
+                <p>Pre-defined chord library for quick chord selection</p>
+            </div>
+            
+            <!-- API Reference Tab -->
+            <div id="api" class="tab-content">
+                <h3>API Reference</h3>
+                <p>API documentation will be available soon.</p>
+            </div>
+            
+            <!-- Events Tab -->
+            <div id="events" class="tab-content">
+                <h3>Events</h3>
+                <p>Events documentation will be available soon.</p>
+            </div>
+            
+            <!-- Examples Tab -->
+            <div id="examples" class="tab-content">
+                <h3>Usage Examples</h3>
+                <p>Usage examples will be available soon.</p>
+            </div>
+            
+            <!-- Event Log Tab -->
+            <div id="events-log" class="tab-content">
+                <h3>Event Log</h3>
+                <div class="event-log" id="event-log">
+                    <div class="event info">Component initialized</div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // Tab functionality
+        function showTab(tabName) {
+            // Hide all tab contents
+            const tabContents = document.querySelectorAll('.tab-content');
+            tabContents.forEach(content => content.classList.remove('active'));
+            
+            // Remove active class from all tabs
+            const tabs = document.querySelectorAll('.tab');
+            tabs.forEach(tab => tab.classList.remove('active'));
+            
+            // Show selected tab content
+            document.getElementById(tabName).classList.add('active');
+            
+            // Add active class to clicked tab
+            event.target.classList.add('active');
+        }
+        
+        // Status update function
+        function updateStatus(message, type = 'info') {
+            const status = document.getElementById('status');
+            status.textContent = message;
+            status.className = `status ${type}`;
+        }
+        
+        // Event logging function
+        function logEvent(message, type = 'info') {
+            const eventLog = document.getElementById('event-log');
+            const eventDiv = document.createElement('div');
+            eventDiv.className = `event ${type}`;
+            eventDiv.textContent = `[${new Date().toLocaleTimeString()}] ${message}`;
+            eventLog.appendChild(eventDiv);
+            eventLog.scrollTop = eventLog.scrollHeight;
+        }
+        
+        // Initialize component
+        document.addEventListener('DOMContentLoaded', function() {
+            logEvent('ChordPalette demo page loaded', 'success');
+        });
+    </script>
+    
+    <!-- Component-specific script will be inserted here -->
+    
+    <script type="module">
+        import './components/chord-palette/chord-palette.js';
+        
+        document.addEventListener('DOMContentLoaded', function() {
+            const component = document.getElementById('demo-component');
+            
+            // Component-specific event listeners
+            
+                // Generic component controls
+                const testBtn = document.getElementById('test-component');
+                const resetBtn = document.getElementById('reset-component');
+                
+                testBtn.addEventListener('click', () => {
+                    logEvent('ChordPalette component tested', 'success');
+                    updateStatus('ChordPalette component test completed');
+                });
+                
+                resetBtn.addEventListener('click', () => {
+                    logEvent('ChordPalette component reset', 'info');
+                    updateStatus('ChordPalette component reset');
+                });
+                
+                // Listen for component events
+                component.addEventListener('*', (e) => {
+                    logEvent('Event: ' + e.type, 'info');
+                });
+            
+            
+            // Log component initialization
+            logEvent('ChordPalette component initialized', 'success');
+            updateStatus('ChordPalette component ready for interaction');
+        });
+    </script>
+    
+</body>
+</html>
