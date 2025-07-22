@@ -62,6 +62,32 @@ Gigso is a web-based music creation application built with vanilla JavaScript, W
 - Place tests alongside components
 - Use appropriate naming conventions
 
+## Cloudflare Pages Deployment
+**CRITICAL**: This project is deployed on Cloudflare Pages as a static site at https://gigso.pages.dev
+
+### Deployment Configuration Files
+- `_headers` - Sets MIME types and security headers for proper file serving
+- `_redirects` - Controls URL routing (currently redirects root `/` to `/index.html`)
+
+### Important Deployment Rules
+1. **Never use `/*` redirects** - This breaks subdirectory access (like `/demos/`)
+2. **Always set proper MIME types** in `_headers` for CSS and JS files
+3. **Static sites with ES6 modules** must be served over HTTP/HTTPS, not `file://`
+4. **CSS files** must have `Content-Type: text/css`
+5. **JavaScript files** must have `Content-Type: application/javascript`
+
+### Common Issues
+- MIME type errors occur when server returns HTML instead of CSS/JS
+- Redirect loops happen with overly broad `/*` redirects
+- ES6 modules fail when served with wrong MIME types
+- Subdirectory access breaks with root-level redirects
+
+### Testing Deployment
+- Always test locally with a web server (not `file://` protocol)
+- Use `npx serve .` or `python3 -m http.server 8000` for local testing
+- Verify MIME types are correct in browser dev tools
+- Check that subdirectories like `/demos/` are accessible
+
 ## When Making Changes
 1. **First**: Check PRD for existing specifications
 2. **Update PRD** if specifications are incomplete or missing
@@ -69,6 +95,7 @@ Gigso is a web-based music creation application built with vanilla JavaScript, W
 4. **Use British English** in all code and comments
 5. **Reference PRD** for data structures and interfaces
 6. **Maintain consistency** with existing codebase patterns
+7. **Test deployment configuration** when changing `_headers` or `_redirects`
 
 ## AI Assistant Guidelines
 - Always check `documents/PRD.md` before implementing features
@@ -77,6 +104,7 @@ Gigso is a web-based music creation application built with vanilla JavaScript, W
 - Implement TDD approach for all new features
 - Maintain the established architecture patterns
 - Reference the PRD for any architectural decisions
+- **CRITICAL**: When working with deployment files (`_headers`, `_redirects`), ensure proper MIME types and avoid overly broad redirects
 
 ## Key Files to Reference
 - `documents/PRD.md` - Complete project specification
@@ -86,4 +114,6 @@ Gigso is a web-based music creation application built with vanilla JavaScript, W
 - `components/base-component.js` - Base component architecture
 - `state/state.js` - State management patterns
 - `actions/actions.js` - Business logic examples
-- `main.js` - Application entry point and component registration 
+- `main.js` - Application entry point and component registration
+- `_headers` - Cloudflare Pages MIME type and security configuration
+- `_redirects` - Cloudflare Pages URL routing configuration 
