@@ -31,7 +31,7 @@ const server = http.createServer((req, res) => {
     
     // Default to index.html for root
     if (pathname === '/') {
-        pathname = '/demos/index.html';
+        pathname = '/index.html';
     }
     
     // Remove leading slash and resolve path
@@ -53,7 +53,7 @@ const server = http.createServer((req, res) => {
                         <body>
                             <h1>404 - File Not Found</h1>
                             <p>The requested file ${pathname} was not found.</p>
-                            <p><a href="/demos/">Go to Demo Index</a></p>
+                            <p><a href="/">Go to Demo Index</a></p>
                         </body>
                     </html>
                 `);
@@ -66,7 +66,7 @@ const server = http.createServer((req, res) => {
                         <body>
                             <h1>500 - Server Error</h1>
                             <p>An error occurred while processing your request.</p>
-                            <p><a href="/demos/">Go to Demo Index</a></p>
+                            <p><a href="/">Go to Demo Index</a></p>
                         </body>
                     </html>
                 `);
@@ -82,17 +82,17 @@ const server = http.createServer((req, res) => {
 
 server.listen(PORT, () => {
     console.log(`🎵 Gigso Demo Server running at http://localhost:${PORT}`);
-    console.log(`📁 Demo Index: http://localhost:${PORT}/demos/`);
+    console.log(`📁 Demo Index: http://localhost:${PORT}/`);
     console.log(`🚀 Press Ctrl+C to stop the server`);
     console.log('');
     console.log('Available demo pages:');
-    console.log('  • HandPan: http://localhost:8000/demos/hand-pan-demo.html');
-    console.log('  • Fretboard: http://localhost:8000/demos/fretboard-demo.html');
-    console.log('  • PianoRoll: http://localhost:8000/demos/piano-roll-demo.html');
-    console.log('  • ChordPalette: http://localhost:8000/demos/chord-palette-demo.html');
+    console.log('  • HandPan: http://localhost:8000/hand-pan-demo.html');
+    console.log('  • Fretboard: http://localhost:8000/fretboard-demo.html');
+    console.log('  • PianoRoll: http://localhost:8000/piano-roll-demo.html');
+    console.log('  • ChordPalette: http://localhost:8000/chord-palette-demo.html');
     console.log('  • And many more...');
     console.log('');
-    console.log('💡 Tip: Open http://localhost:8000/demos/ to see all available demos');
+    console.log('💡 Tip: Open http://localhost:8000/ to see all available demos');
 });
 
 // Graceful shutdown

@@ -299,7 +299,7 @@ export default class FretboardRenderer {
     text.setAttribute('font-weight', 'bold');
     text.setAttribute('fill', 'white');
     text.setAttribute('class', 'chord-marker finger-number');
-    text.textContent = fretNumber;
+    text.textContent = fretNumber - 1;
     
     this.svg.appendChild(text);
   }
