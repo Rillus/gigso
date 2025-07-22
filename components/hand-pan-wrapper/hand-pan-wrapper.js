@@ -102,7 +102,7 @@ export default class HandPanWrapper extends HTMLElement {
     render() {
         this.shadowRoot.innerHTML = `
             <style>
-                @import "./components/hand-pan-wrapper/hand-pan-wrapper.css";
+                @import "../../hand-pan-wrapper.css";
             </style>
             
             <div class="hand-pan-wrapper">

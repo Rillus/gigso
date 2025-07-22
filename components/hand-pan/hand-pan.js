@@ -188,7 +188,7 @@ export default class HandPan extends HTMLElement {
 
         this.shadowRoot.innerHTML = `
             <style>
-                @import "./components/hand-pan/hand-pan.css";
+                @import "../../hand-pan.css";
             </style>
             <div class="hand-pan ${size}">
                 <div class="tone-fields-container">
