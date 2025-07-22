@@ -17,6 +17,38 @@
 /*.png
   Cache-Control: public, max-age=31536000, immutable
 
+/chord-library.js
+  Content-Type: application/javascript
+  Cache-Control: public, max-age=31536000, immutable
+
+/song-library.js
+  Content-Type: application/javascript
+  Cache-Control: public, max-age=31536000, immutable
+
+/components/*
+  X-Frame-Options: DENY
+  X-Content-Type-Options: nosniff
+
+/components/*.js
+  Content-Type: application/javascript
+  Cache-Control: public, max-age=31536000, immutable
+
+/helpers/*
+  X-Frame-Options: DENY
+  X-Content-Type-Options: nosniff
+
+/helpers/*.js
+  Content-Type: application/javascript
+  Cache-Control: public, max-age=31536000, immutable
+
+/state/*
+  X-Frame-Options: DENY
+  X-Content-Type-Options: nosniff
+
+/state/*.js
+  Content-Type: application/javascript
+  Cache-Control: public, max-age=31536000, immutable
+
 /demos/*
   X-Frame-Options: DENY
   X-Content-Type-Options: nosniff

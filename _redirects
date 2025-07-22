@@ -1,1 +1,5 @@
-/    /index.html   200 /demos/styles.css    /demos/styles/demo-main.css    200
+# Serve demo files directly without redirecting
+/demos/*    /demos/:splat    200
+
+# Serve the main index.html for the root
+/    /index.html    200
