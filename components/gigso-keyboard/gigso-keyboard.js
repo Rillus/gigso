@@ -94,7 +94,7 @@ export default class GigsoKeyboard extends HTMLElement {
 
         this.shadowRoot.innerHTML = `
             <style>
-                @import "./components/gigso-keyboard/gigso-keyboard.css";
+                @import "../../gigso-keyboard.css";
 
                 .keyboard {
                     --octaves: ${octaves};
