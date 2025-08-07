@@ -85,3 +85,35 @@ piano-roll {
   display: block;
   width: 100%;
 }
+
+/* Demo page status styles */
+.status {
+  padding: 10px 15px;
+  border-radius: 5px;
+  margin: 10px 0;
+  font-weight: 500;
+}
+
+.status.info {
+  background: #e3f2fd;
+  border: 1px solid #2196f3;
+  color: #1976d2;
+}
+
+.status.success {
+  background: #e8f5e8;
+  border: 1px solid #4caf50;
+  color: #2e7d32;
+}
+
+.status.warning {
+  background: #fff3e0;
+  border: 1px solid #ff9800;
+  color: #f57c00;
+}
+
+.status.error {
+  background: #ffebee;
+  border: 1px solid #f44336;
+  color: #d32f2f;
+}

@@ -5,6 +5,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>HandPan Component Demo</title>
     <link rel="stylesheet" href="demo-main.css">
+    <!-- Load Tone.js for audio functionality -->
+    <script src="https://unpkg.com/tone@14.7.77/build/Tone.js"></script>
+    <!-- Load HandPan component -->
+    <script type="module">
+        import '../components/hand-pan/hand-pan.js';
+    </script>
 </head>
 <body>
     <div class="demo-header">
@@ -20,7 +26,7 @@
                 <p>Interactive demonstration of the HandPan component</p>
             </div>
             <div class="component-container" id="component-container">
-<handpan id="demo-component"></handpan>
+<hand-pan id="demo-component"></hand-pan>
 </div>
         </div>
         
@@ -137,6 +143,7 @@
             const status = document.getElementById('status');
             status.textContent = message;
             status.className = `status ${type}`;
+            console.log('HandPan Demo Status:', message, type);
         }
         
         // Event logging function
@@ -158,10 +165,28 @@
     <!-- Component-specific script will be inserted here -->
     
     <script type="module">
-        import '../components/hand-pan/hand-pan.js';
-        
         document.addEventListener('DOMContentLoaded', function() {
+            console.log('HandPan Demo: DOM loaded');
             const component = document.getElementById('demo-component');
+            
+            if (!component) {
+                console.error('HandPan Demo: Component element not found');
+                updateStatus('Error: Component element not found', 'error');
+                return;
+            }
+            
+            console.log('HandPan Demo: Component element found', component);
+            
+            // Wait for component to be fully initialized
+            setTimeout(() => {
+                if (component.shadowRoot) {
+                    console.log('HandPan Demo: Component shadow DOM ready');
+                    updateStatus('HandPan component ready for interaction');
+                } else {
+                    console.error('HandPan Demo: Component shadow DOM not ready');
+                    updateStatus('Error: Component not properly initialized', 'error');
+                }
+            }, 500);
             
             // Component-specific event listeners
             
