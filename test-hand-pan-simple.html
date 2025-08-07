@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HandPan Component Test</title>
+    <script src="https://unpkg.com/tone@14.7.77/build/Tone.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            background: #f0f0f0;
+        }
+        .test-container {
+            max-width: 600px;
+            margin: 0 auto;
+            text-align: center;
+        }
+        .status {
+            margin: 20px 0;
+            padding: 10px;
+            border-radius: 5px;
+            background: #e8f5e8;
+            border: 1px solid #4caf50;
+        }
+        .error {
+            background: #ffebee;
+            border-color: #f44336;
+        }
+    </style>
+</head>
+<body>
+    <div class="test-container">
+        <h1>HandPan Component Test</h1>
+        <div id="status" class="status">Loading component...</div>
+        
+        <div id="component-container">
+            <hand-pan id="test-component" key="D" scale="minor" size="medium"></hand-pan>
+        </div>
+        
+        <div id="controls">
+            <button onclick="changeKey('C')">Key: C</button>
+            <button onclick="changeKey('D')">Key: D</button>
+            <button onclick="changeKey('E')">Key: E</button>
+            <button onclick="changeScale('major')">Major</button>
+            <button onclick="changeScale('minor')">Minor</button>
+        </div>
+    </div>
+
+    <script type="module">
+        import './components/hand-pan/hand-pan.js';
+        
+        const status = document.getElementById('status');
+        const component = document.getElementById('test-component');
+        
+        function updateStatus(message, isError = false) {
+            status.textContent = message;
+            status.className = `status ${isError ? 'error' : ''}`;
+            console.log(message);
+        }
+        
+        // Test component loading
+        document.addEventListener('DOMContentLoaded', function() {
+            updateStatus('Page loaded, checking component...');
+            
+            // Wait a bit for the component to initialize
+            setTimeout(() => {
+                if (component && component.shadowRoot) {
+                    updateStatus('✅ HandPan component loaded successfully!');
+                    
+                    // Test component functionality
+                    const handPanElement = component.shadowRoot.querySelector('.hand-pan');
+                    if (handPanElement) {
+                        updateStatus('✅ Component rendered with shadow DOM');
+                    } else {
+                        updateStatus('❌ Component shadow DOM not found', true);
+                    }
+                    
+                    // Test tone fields
+                    const toneFields = component.shadowRoot.querySelectorAll('.tone-field');
+                    if (toneFields.length > 0) {
+                        updateStatus(`✅ Found ${toneFields.length} tone fields`);
+                    } else {
+                        updateStatus('❌ No tone fields found', true);
+                    }
+                    
+                } else {
+                    updateStatus('❌ Component not found or not initialized', true);
+                }
+            }, 1000);
+        });
+        
+        // Test functions
+        window.changeKey = function(key) {
+            component.setAttribute('key', key);
+            updateStatus(`Changed key to ${key}`);
+        };
+        
+        window.changeScale = function(scale) {
+            component.setAttribute('scale', scale);
+            updateStatus(`Changed scale to ${scale}`);
+        };
+    </script>
+</body>
+</html>

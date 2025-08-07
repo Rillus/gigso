@@ -36,6 +36,8 @@ export default class HandPan extends HTMLElement {
     }
 
     connectedCallback() {
+        console.log('HandPan: Component connected to DOM');
+        
         // Set default attributes if not provided
         if (!this.hasAttribute('key')) {
             this.setAttribute('key', 'D');
@@ -69,6 +71,8 @@ export default class HandPan extends HTMLElement {
         
         // Initialize accelerometer support
         this.initializeAccelerometer();
+        
+        console.log('HandPan: Component initialization complete');
     }
 
     disconnectedCallback() {
@@ -182,13 +186,371 @@ export default class HandPan extends HTMLElement {
     }
 
     render() {
+        console.log('HandPan: Rendering component');
         const size = this.getAttribute('size') || 'medium';
         const toneFields = this.createToneFields();
         const audioStatus = this.getAudioStatusIndicator();
 
         this.shadowRoot.innerHTML = `
             <style>
-                @import "../../hand-pan.css";
+                /* HandPan Component Styles */
+                .hand-pan {
+                    position: relative;
+                    width: 300px;
+                    height: 300px;
+                    border-radius: 50%;
+                    background: 
+                        radial-gradient(circle at 30% 30%, 
+                            rgba(255,255,255,0.15) 0%, 
+                            rgba(255,255,255,0.05) 20%, 
+                            transparent 50%),
+                        radial-gradient(circle at 70% 70%, 
+                            rgba(255,255,255,0.1) 0%, 
+                            rgba(255,255,255,0.02) 30%, 
+                            transparent 60%),
+                        linear-gradient(145deg, 
+                            hsl(0, 0%, 25%) 0%, 
+                            hsl(0, 0%, 15%) 50%, 
+                            hsl(0, 0%, 10%) 100%);
+                    box-shadow: 
+                        inset 0 0 30px rgba(0,0,0,0.7),
+                        inset 0 0 60px rgba(0,0,0,0.3),
+                        0 0 30px rgba(255,255,255,0.1),
+                        0 0 60px rgba(255,255,255,0.05);
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    margin: 20px auto;
+                    transition: all 0.3s ease;
+                    --metallic-intensity: 80%;
+                    --reflection-speed: 50%;
+                    --reflection-x: 0px;
+                    --reflection-y: 0px;
+                    background: 
+                        radial-gradient(circle at calc(30% + var(--reflection-x)) calc(30% + var(--reflection-y)), 
+                            rgba(255,255,255,calc(0.2 * var(--metallic-intensity) / 100)) 0%, 
+                            rgba(255,255,255,calc(0.08 * var(--metallic-intensity) / 100)) 20%, 
+                            transparent 50%),
+                        radial-gradient(circle at calc(70% + var(--reflection-x)) calc(70% + var(--reflection-y)), 
+                            rgba(255,255,255,calc(0.15 * var(--metallic-intensity) / 100)) 0%, 
+                            rgba(255,255,255,calc(0.03 * var(--metallic-intensity) / 100)) 30%, 
+                            transparent 60%),
+                        linear-gradient(145deg, 
+                            hsl(0, 0%, calc(25 + var(--metallic-intensity) / 4)) 0%, 
+                            hsl(0, 0%, calc(15 + var(--metallic-intensity) / 6)) 50%, 
+                            hsl(0, 0%, calc(10 + var(--metallic-intensity) / 8)) 100%);
+                    transition: all calc(0.3s * var(--reflection-speed) / 50) ease;
+                }
+
+                .hand-pan.small {
+                    width: 200px;
+                    height: 200px;
+                }
+
+                .hand-pan.large {
+                    width: 400px;
+                    height: 400px;
+                }
+
+                .tone-fields-container {
+                    position: relative;
+                    width: 100%;
+                    height: 100%;
+                }
+
+                .tone-field {
+                    position: absolute;
+                    width: 60px;
+                    height: 60px;
+                    border-radius: 50%;
+                    background: 
+                        radial-gradient(circle at 25% 25%, 
+                            rgba(255,255,255,0.2) 0%, 
+                            rgba(255,255,255,0.05) 40%, 
+                            transparent 70%),
+                        linear-gradient(145deg, 
+                            hsl(0, 0%, 35%) 0%, 
+                            hsl(0, 0%, 25%) 50%, 
+                            hsl(0, 0%, 20%) 100%);
+                    border: 2px solid #5a5a5a;
+                    cursor: pointer;
+                    transition: all 0.2s ease;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    font-size: 12px;
+                    color: #ddd;
+                    font-weight: bold;
+                    user-select: none;
+                    -webkit-user-select: none;
+                    -moz-user-select: none;
+                    -ms-user-select: none;
+                    transform-origin: center center;
+                    will-change: transform;
+                    backface-visibility: hidden;
+                    -webkit-backface-visibility: hidden;
+                    outline: none;
+                    transition: all 0.2s ease, outline 0.1s ease;
+                    box-shadow: 
+                        inset 0 2px 4px rgba(255,255,255,0.1),
+                        inset 0 -2px 4px rgba(0,0,0,0.3),
+                        0 2px 8px rgba(0,0,0,0.4);
+                }
+
+                .tone-field:hover {
+                    background: 
+                        radial-gradient(circle at 25% 25%, 
+                            rgba(255,255,255,0.3) 0%, 
+                            rgba(255,255,255,0.08) 40%, 
+                            transparent 70%),
+                        linear-gradient(145deg, 
+                            hsl(0, 0%, 45%) 0%, 
+                            hsl(0, 0%, 35%) 50%, 
+                            hsl(0, 0%, 30%) 100%);
+                    transform: translate(-50%, -50%) scale(1.05);
+                    border-color: #6a6a6a;
+                    box-shadow: 
+                        inset 0 2px 6px rgba(255,255,255,0.15),
+                        inset 0 -2px 6px rgba(0,0,0,0.4),
+                        0 4px 12px rgba(0,0,0,0.5),
+                        0 0 15px rgba(255,255,255,0.1);
+                }
+
+                .tone-field:focus {
+                    outline: 2px solid #7a7a7a;
+                    outline-offset: 2px;
+                    background: 
+                        radial-gradient(circle at 25% 25%, 
+                            rgba(255,255,255,0.25) 0%, 
+                            rgba(255,255,255,0.06) 40%, 
+                            transparent 70%),
+                        linear-gradient(145deg, 
+                            hsl(0, 0%, 40%) 0%, 
+                            hsl(0, 0%, 30%) 50%, 
+                            hsl(0, 0%, 25%) 100%);
+                    transform: translate(-50%, -50%) scale(1.02);
+                    box-shadow: 
+                        inset 0 2px 5px rgba(255,255,255,0.12),
+                        inset 0 -2px 5px rgba(0,0,0,0.35),
+                        0 3px 10px rgba(0,0,0,0.45);
+                }
+
+                .tone-field.active {
+                    background: 
+                        radial-gradient(circle at 25% 25%, 
+                            rgba(255,255,255,0.4) 0%, 
+                            rgba(255,255,255,0.15) 40%, 
+                            transparent 70%),
+                        linear-gradient(145deg, 
+                            hsl(0, 0%, 65%) 0%, 
+                            hsl(0, 0%, 55%) 50%, 
+                            hsl(0, 0%, 50%) 100%) !important;
+                    border-color: #8a8a8a !important;
+                    box-shadow: 
+                        inset 0 2px 8px rgba(255,255,255,0.25),
+                        inset 0 -2px 8px rgba(0,0,0,0.5),
+                        0 0 25px rgba(255,255,255,0.5),
+                        0 0 50px rgba(255,255,255,0.3) !important;
+                    animation: metallicPulse 0.4s ease-out;
+                    transform-origin: center center !important;
+                    color: #fff !important;
+                }
+
+                @keyframes metallicPulse {
+                    0% {
+                        box-shadow: 
+                            inset 0 2px 4px rgba(255,255,255,0.1),
+                            inset 0 -2px 4px rgba(0,0,0,0.3),
+                            0 2px 8px rgba(0,0,0,0.4);
+                    }
+                    50% {
+                        box-shadow: 
+                            inset 0 2px 8px rgba(255,255,255,0.3),
+                            inset 0 -2px 8px rgba(0,0,0,0.6),
+                            0 0 30px rgba(255,255,255,0.6),
+                            0 0 60px rgba(255,255,255,0.4);
+                    }
+                    100% {
+                        box-shadow: 
+                            inset 0 2px 8px rgba(255,255,255,0.25),
+                            inset 0 -2px 8px rgba(0,0,0,0.5),
+                            0 0 25px rgba(255,255,255,0.5),
+                            0 0 50px rgba(255,255,255,0.3);
+                    }
+                }
+
+                .key-indicator {
+                    position: absolute;
+                    top: 50%;
+                    left: 50%;
+                    transform: translate(-50%, -50%);
+                    background: rgba(0,0,0,0.7);
+                    color: #fff;
+                    padding: 8px 12px;
+                    border-radius: 20px;
+                    font-size: 14px;
+                    font-weight: bold;
+                    text-align: center;
+                    z-index: 10;
+                    backdrop-filter: blur(5px);
+                    border: 1px solid rgba(255,255,255,0.2);
+                }
+
+                .ripple {
+                    position: absolute;
+                    border-radius: 50%;
+                    background: 
+                        radial-gradient(circle, 
+                            rgba(255,255,255,0.6) 0%, 
+                            rgba(255,255,255,0.3) 30%, 
+                            rgba(255,255,255,0.1) 60%, 
+                            transparent 100%);
+                    transform: scale(0);
+                    animation: metallicRipple 1s ease-out;
+                    pointer-events: none;
+                    border: 2px solid rgba(255,255,255,0.4);
+                    will-change: transform, opacity;
+                    backface-visibility: hidden;
+                    -webkit-backface-visibility: hidden;
+                    box-shadow: 
+                        0 0 10px rgba(255,255,255,0.3),
+                        inset 0 0 5px rgba(255,255,255,0.2);
+                }
+
+                @keyframes metallicRipple {
+                    0% {
+                        transform: scale(0);
+                        opacity: 1;
+                        box-shadow: 
+                            0 0 5px rgba(255,255,255,0.4),
+                            inset 0 0 3px rgba(255,255,255,0.3);
+                    }
+                    25% {
+                        transform: scale(1.5);
+                        opacity: 0.9;
+                        box-shadow: 
+                            0 0 15px rgba(255,255,255,0.5),
+                            inset 0 0 8px rgba(255,255,255,0.4);
+                    }
+                    50% {
+                        transform: scale(2.5);
+                        opacity: 0.7;
+                        box-shadow: 
+                            0 0 25px rgba(255,255,255,0.4),
+                            inset 0 0 12px rgba(255,255,255,0.3);
+                    }
+                    75% {
+                        transform: scale(3.5);
+                        opacity: 0.4;
+                        box-shadow: 
+                            0 0 35px rgba(255,255,255,0.3),
+                            inset 0 0 15px rgba(255,255,255,0.2);
+                    }
+                    100% {
+                        transform: scale(4.5);
+                        opacity: 0;
+                        box-shadow: 
+                            0 0 45px rgba(255,255,255,0.1),
+                            inset 0 0 18px rgba(255,255,255,0.1);
+                    }
+                }
+
+                .audio-status-indicator {
+                    position: absolute;
+                    top: 50%;
+                    left: 50%;
+                    transform: translate(-50%, -50%);
+                    background: rgba(255, 0, 0, 0.8);
+                    color: white;
+                    padding: 10px 15px;
+                    border-radius: 25px;
+                    font-size: 14px;
+                    font-weight: bold;
+                    text-align: center;
+                    z-index: 20;
+                    backdrop-filter: blur(10px);
+                    border: 2px solid rgba(255, 255, 255, 0.3);
+                    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+                    cursor: pointer;
+                    transition: all 0.3s ease;
+                    animation: audioPulse 2s ease-in-out infinite;
+                }
+
+                .audio-status-indicator:hover {
+                    background: rgba(255, 0, 0, 0.9);
+                    transform: translate(-50%, -50%) scale(1.05);
+                    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4);
+                }
+
+                .audio-status-text {
+                    display: flex;
+                    align-items: center;
+                    gap: 8px;
+                }
+
+                @keyframes audioPulse {
+                    0%, 100% {
+                        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+                    }
+                    50% {
+                        box-shadow: 0 4px 20px rgba(255, 0, 0, 0.4);
+                    }
+                }
+
+                @media (max-width: 768px) {
+                    .hand-pan {
+                        width: 250px;
+                        height: 250px;
+                    }
+                    
+                    .hand-pan.small {
+                        width: 180px;
+                        height: 180px;
+                    }
+                    
+                    .hand-pan.large {
+                        width: 320px;
+                        height: 320px;
+                    }
+                    
+                    .tone-field {
+                        width: 50px;
+                        height: 50px;
+                        font-size: 10px;
+                        min-width: 44px;
+                        min-height: 44px;
+                    }
+                    
+                    .audio-status-indicator {
+                        font-size: 12px;
+                        padding: 8px 12px;
+                    }
+                }
+
+                @media (max-width: 480px) {
+                    .hand-pan {
+                        width: 200px;
+                        height: 200px;
+                    }
+                    
+                    .tone-field {
+                        width: 40px;
+                        height: 40px;
+                        font-size: 9px;
+                        min-width: 44px;
+                        min-height: 44px;
+                    }
+                    
+                    .key-indicator {
+                        font-size: 12px;
+                        padding: 6px 10px;
+                    }
+                    
+                    .audio-status-indicator {
+                        font-size: 11px;
+                        padding: 6px 10px;
+                    }
+                }
             </style>
             <div class="hand-pan ${size}">
                 <div class="tone-fields-container">
@@ -900,4 +1262,5 @@ export default class HandPan extends HTMLElement {
     }
 }
 
-customElements.define('hand-pan', HandPan); 
+customElements.define('hand-pan', HandPan);
+console.log('HandPan: Custom element registered as "hand-pan"'); 
