@@ -13,13 +13,70 @@ export default class UkuleleSongLibrary {
             strummingNotes: 'Down-Down-Up-Up-Down-Up pattern, repeat for each chord',
             tags: ['beginner-friendly', 'practice'],
             lyrics: `
-                [Verse 1]
-                Just a small town girl
-                Livin' in a lonely world
-                She took the midnight train going anywhere
-                Just a city boy
-                Born and raised in South Detroit
-                He took the midnight train going anywhere
+                [Intro]
+{C}   {G}   {Am}   {F}
+{C}   {G}   {F}
+ 
+[Verse 1]
+{C}   Just a {G}small town girl,{Am}  livin' in a {F}lonely world
+{C}   She took the {G}midnight train going {F}anywhere{F}
+{C}   Just a {G}city boy,{Am}    born and raised in {F}South Detroit
+{C}   He took the {G}midnight train going {F}anywhere
+ 
+[Instrumental]
+{C}   {G}   {Am}   {F}
+{C}   {G}   {F}   {F}
+ 
+[Verse 2]
+{C}A singer in a {G}smoky room, {Am}the smell of wine and {F}cheap perfume
+{C}  For a smile they can {G}share the night, it goes {F}on and on {F}and on and on
+ 
+[Chorus]
+{F}Strangers waitin'   {C}up and down the boulevard
+Their {F}shadows searchin' in the {C}night
+{F}Streetlights, people, {C}livin' just to find emotion
+{F}Hidin', somewhere in the {G}ni{C}ght {G} {C} {F}
+ 
+[Break]
+C   G   Am   F
+ 
+[Verse 3]
+C                  G           Am           F
+   Workin' hard to get my fill,    everybody wants a thrill
+C                     G                   Em       F
+   Payin' anything to roll the dice, just one more time
+C              G               Am                  F
+   Some'll win, some will lose,    some are born to sing the blues
+C                G                   Em            F
+   Oh, the movie never ends; it goes on and on and on and on
+ 
+[Chorus]
+F                 C
+Strangers waitin'   up and down the boulevard
+      F                         C
+Their shadows searchin' in the night
+F                     C
+Streetlights, people,   livin' just to find emotion
+F                         G  C    G  C F
+Hidin', somewhere in the night
+ 
+[Guitar Solo]
+C   G   Am   F
+C   G   Em   F
+ 
+[Outro]
+C            G        Am                 F
+Don't stop believin',     hold on to that feelin'
+C             G             Em   F
+Streetlights, people, oh-oh-o-------h
+C            G        Am        F
+Don't stop believin',    hold o-----n
+C             G             Em   F
+Streetlights, people, oh-oh-o-------h
+C            G        Am                 F
+Don't stop believin',     hold on to that feelin'
+C             G             Em   F
+Streetlights, people, oh-oh-o-------h
 
                 [Verse 2]
                 A singer in a smokey room
@@ -52,7 +109,7 @@ export default class UkuleleSongLibrary {
                 Streetlights, people
                 Livin' just to find emotion
                 Hidin', somewhere in the night
-                
+
                 [Outro]
                 Don't stop believin'
                 Hold on to that feelin'
@@ -63,100 +120,6 @@ export default class UkuleleSongLibrary {
                 Don't stop believin'
                 Hold on to that feelin'
                 Streetlights, people`,
-            chordPositions: {
-                'Just a small town girl': [
-                    { position: 0, chord: 'C' }
-                ],
-                'Livin\' in a lonely world': [
-                    { position: 0, chord: 'G' }
-                ],
-                'She took the midnight train going anywhere': [
-                    { position: 0, chord: 'Am' },
-                    { position: 25, chord: 'F' }
-                ],
-                'Just a city boy': [
-                    { position: 0, chord: 'C' }
-                ],
-                'Born and raised in South Detroit': [
-                    { position: 0, chord: 'G' }
-                ],
-                'He took the midnight train going anywhere': [
-                    { position: 0, chord: 'Am' },
-                    { position: 24, chord: 'F' }
-                ],
-                'A singer in a smokey room': [
-                    { position: 0, chord: 'C' }
-                ],
-                'A smell of wine and cheap perfume': [
-                    { position: 0, chord: 'G' }
-                ],
-                'For a smile they can share the night': [
-                    { position: 0, chord: 'Am' },
-                    { position: 20, chord: 'F' }
-                ],
-                'It goes on and on and on and on': [
-                    { position: 0, chord: 'C' },
-                    { position: 15, chord: 'G' }
-                ],
-                'Strangers waitin\'': [
-                    { position: 0, chord: 'C' }
-                ],
-                'Up and down the boulevard': [
-                    { position: 0, chord: 'G' }
-                ],
-                'Their shadows searchin\' in the night': [
-                    { position: 0, chord: 'Am' },
-                    { position: 20, chord: 'F' }
-                ],
-                'Streetlights, people': [
-                    { position: 0, chord: 'C' }
-                ],
-                'Livin\' just to find emotion': [
-                    { position: 0, chord: 'G' }
-                ],
-                'Hidin\' somewhere in the night': [
-                    { position: 0, chord: 'Am' },
-                    { position: 15, chord: 'F' }
-                ],
-                'Hidin\', somewhere in the night': [
-                    { position: 0, chord: 'Am' },
-                    { position: 16, chord: 'F' }
-                ],
-                'Workin\' hard to get my fill': [
-                    { position: 0, chord: 'C' }
-                ],
-                'Everybody wants a thrill': [
-                    { position: 0, chord: 'G' }
-                ],
-                'Payin\' anything to roll the dice': [
-                    { position: 0, chord: 'Am' },
-                    { position: 20, chord: 'F' }
-                ],
-                'Just one more time': [
-                    { position: 0, chord: 'C' }
-                ],
-                'Some\'ll win, some will lose': [
-                    { position: 0, chord: 'G' }
-                ],
-                'Some are born to sing the blues': [
-                    { position: 0, chord: 'Am' },
-                    { position: 18, chord: 'F' }
-                ],
-                'Whoa, the movie never ends': [
-                    { position: 0, chord: 'C' }
-                ],
-                'Don\'t stop believin\'': [
-                    { position: 0, chord: 'C' },
-                    { position: 10, chord: 'G' }
-                ],
-                'Hold on to that feelin\'': [
-                    { position: 0, chord: 'Am' },
-                    { position: 12, chord: 'F' }
-                ],
-                'Hold on': [
-                    { position: 0, chord: 'G' }
-                ]
-            }
         },
         {
             id: 'ipsum-ballad',
@@ -205,24 +168,6 @@ Ipsam voluptatem quia voluptas
 Sit aspernatur aut odit aut
 Fugit sed quia consequuntur
 Magni dolores eos qui`,
-            chordPositions: {
-                'Sed ut perspiciatis unde omnis': [
-                    { position: 0, chord: 'C' },
-                    { position: 20, chord: 'G' }
-                ],
-                'Iste natus error sit voluptatem': [
-                    { position: 0, chord: 'Am' },
-                    { position: 22, chord: 'F' }
-                ],
-                'Ipsam voluptatem quia voluptas': [
-                    { position: 0, chord: 'C' },
-                    { position: 15, chord: 'G' }
-                ],
-                'Sit aspernatur aut odit aut': [
-                    { position: 0, chord: 'Am' },
-                    { position: 20, chord: 'F' }
-                ]
-            }
         },
         {
             id: 'dolor-rhythm',
@@ -265,24 +210,6 @@ Fuga et harum quidem
 Rerum facilis est et
 Expedita distinctio nam
 Libero tempore cum`,
-            chordPositions: {
-                'At vero eos et accusamus': [
-                    { position: 0, chord: 'C' },
-                    { position: 15, chord: 'F' }
-                ],
-                'Et iusto odio dignissimos': [
-                    { position: 0, chord: 'G' },
-                    { position: 18, chord: 'C' }
-                ],
-                'Deleniti atque corrupti': [
-                    { position: 0, chord: 'C' },
-                    { position: 15, chord: 'F' }
-                ],
-                'Quos dolores et quas': [
-                    { position: 0, chord: 'G' },
-                    { position: 15, chord: 'C' }
-                ]
-            }
         }
     ];
 }

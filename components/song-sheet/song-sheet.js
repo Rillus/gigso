@@ -695,7 +695,7 @@ export default class SongSheet extends BaseComponent {
             <div class="lyrics-section">
                 <h3>🎤 Lyrics & Chords</h3>
                 <div class="lyrics-content">
-                    ${this.formatLyrics(song.lyrics, song.chordPositions)}
+                    ${this.formatLyrics(song.lyrics)}
                 </div>
             </div>
         `;
@@ -743,7 +743,7 @@ export default class SongSheet extends BaseComponent {
         return display;
     }
     
-    formatLyrics(lyrics, chordPositions) {
+    formatLyrics(lyrics) {
         if (!lyrics) return '<p>Lyrics not available</p>';
         
         const lines = lyrics.split('\n');
@@ -754,8 +754,11 @@ export default class SongSheet extends BaseComponent {
             const trimmedLine = line.trim();
             
             // Check for section markers
-            if (trimmedLine.match(/^\[(verse|chorus|bridge|intro|outro)\s*\d*\]$/i)) {
-                const sectionType = trimmedLine.toLowerCase().replace(/[\[\]]/g, '').replace(/\s*\d*$/, '');
+            if (trimmedLine.match(/^\[(verse|chorus|bridge|intro|outro|pre-chorus)\s*\d*\]$/i)) {
+                const sectionType = trimmedLine.toLowerCase()
+                    .replace(/[\[\]]/g, '')
+                    .replace(/\s*\d*$/, '')
+                    .replace('-', '-'); // Keep pre-chorus hyphen
                 currentSection = sectionType;
                 formattedLyrics += `<div class="${sectionType}">`;
                 formattedLyrics += `<div class="section-label">${trimmedLine.replace(/[\[\]]/g, '')}</div>`;
@@ -774,20 +777,26 @@ export default class SongSheet extends BaseComponent {
                 return;
             }
             
-            // Process chord positions if available
+            // Parse inline chords format: {C}word {Am}another word
             let chordsHtml = '';
-            let lyricsText = trimmedLine;
+            let lyricsText = '';
+            let currentPosition = 0;
             
-            if (chordPositions && chordPositions[trimmedLine]) {
-                const positions = chordPositions[trimmedLine];
-                
-                // Create chord spans with absolute positioning
-                positions.forEach(pos => {
-                    // Calculate position in characters, convert to approximate ems
-                    const leftPosition = pos.position * 0.6; // Approximate character width in ems
-                    chordsHtml += `<span class="chord-above" style="left: ${leftPosition}em;">${pos.chord}</span>`;
-                });
-            }
+            // Split by chord markers and process
+            const parts = trimmedLine.split(/(\{[^}]+\})/);
+            
+            parts.forEach(part => {
+                if (part.match(/^\{[^}]+\}$/)) {
+                    // This is a chord marker like {C} or {Am}
+                    const chord = part.replace(/[{}]/g, '');
+                    const leftPosition = currentPosition * 0.6; // Approximate character width in ems
+                    chordsHtml += `<span class="chord-above" style="left: ${leftPosition}em;">${chord}</span>`;
+                } else if (part) {
+                    // This is lyrics text
+                    lyricsText += part;
+                    currentPosition += part.length;
+                }
+            });
             
             // Create the line with relative positioning container
             formattedLyrics += `<div class="lyrics-line">${chordsHtml}${lyricsText}</div>`;
