@@ -1,56 +1,160 @@
 export default class UkuleleSongLibrary {
     static songs = [
         {
-            id: 'lorem-song-1',
-            title: 'Lorem Melody',
-            artist: 'Sample Artist',
+            id: 'don-t-stop-believin',
+            title: 'Don\'t Stop Believin\'',
+            artist: 'Journey',
             key: 'C',
             difficulty: 'beginner',
-            genre: 'folk',
+            genre: 'rock',
             tempo: 120,
             chordProgression: ['C', 'Am', 'F', 'G'],
             strummingPattern: 'D-D-U-U-D-U',
             strummingNotes: 'Down-Down-Up-Up-Down-Up pattern, repeat for each chord',
             tags: ['beginner-friendly', 'practice'],
-            lyrics: `[Verse 1]
-Lorem ipsum dolor sit amet
-Consectetur adipiscing elit
-Sed do eiusmod tempor incididunt
-Ut labore et dolore magna
+            lyrics: `
+                [Verse 1]
+                Just a small town girl
+                Livin' in a lonely world
+                She took the midnight train going anywhere
+                Just a city boy
+                Born and raised in South Detroit
+                He took the midnight train going anywhere
 
-[Chorus]  
-Aliqua enim ad minim veniam
-Quis nostrud exercitation
-Ullamco laboris nisi ut aliquip
-Ex ea commodo consequat
+                [Verse 2]
+                A singer in a smokey room
+                A smell of wine and cheap perfume
+                For a smile they can share the night
+                It goes on and on and on and on
 
-[Verse 2]
-Duis aute irure dolor in
-Reprehenderit in voluptate velit
-Esse cillum dolore eu fugiat
-Nulla pariatur excepteur sint
+                [Chorus]
+                Strangers waitin'
+                Up and down the boulevard
+                Their shadows searchin' in the night
+                Streetlights, people
+                Livin' just to find emotion
+                Hidin' somewhere in the night
 
-[Chorus]
-Aliqua enim ad minim veniam
-Quis nostrud exercitation
-Ullamco laboris nisi ut aliquip
-Ex ea commodo consequat`,
+                [Verse 3]
+                Workin' hard to get my fill
+                Everybody wants a thrill
+                Payin' anything to roll the dice
+                Just one more time
+                Some'll win, some will lose
+                Some are born to sing the blues
+                Whoa, the movie never ends
+                It goes on and on and on and on
+
+                [Chorus]
+                Strangers waitin'
+                Up and down the boulevard
+                Their shadows searchin' in the night
+                Streetlights, people
+                Livin' just to find emotion
+                Hidin', somewhere in the night
+                
+                [Outro]
+                Don't stop believin'
+                Hold on to that feelin'
+                Streetlights, people
+                Don't stop believin'
+                Hold on
+                Streetlights, people
+                Don't stop believin'
+                Hold on to that feelin'
+                Streetlights, people`,
             chordPositions: {
-                'Lorem ipsum dolor sit amet': [
+                'Just a small town girl': [
+                    { position: 0, chord: 'C' }
+                ],
+                'Livin\' in a lonely world': [
+                    { position: 0, chord: 'G' }
+                ],
+                'She took the midnight train going anywhere': [
+                    { position: 0, chord: 'Am' },
+                    { position: 25, chord: 'F' }
+                ],
+                'Just a city boy': [
+                    { position: 0, chord: 'C' }
+                ],
+                'Born and raised in South Detroit': [
+                    { position: 0, chord: 'G' }
+                ],
+                'He took the midnight train going anywhere': [
+                    { position: 0, chord: 'Am' },
+                    { position: 24, chord: 'F' }
+                ],
+                'A singer in a smokey room': [
+                    { position: 0, chord: 'C' }
+                ],
+                'A smell of wine and cheap perfume': [
+                    { position: 0, chord: 'G' }
+                ],
+                'For a smile they can share the night': [
+                    { position: 0, chord: 'Am' },
+                    { position: 20, chord: 'F' }
+                ],
+                'It goes on and on and on and on': [
                     { position: 0, chord: 'C' },
-                    { position: 18, chord: 'Am' }
+                    { position: 15, chord: 'G' }
                 ],
-                'Consectetur adipiscing elit': [
-                    { position: 0, chord: 'F' },
-                    { position: 20, chord: 'G' }
+                'Strangers waitin\'': [
+                    { position: 0, chord: 'C' }
                 ],
-                'Aliqua enim ad minim veniam': [
+                'Up and down the boulevard': [
+                    { position: 0, chord: 'G' }
+                ],
+                'Their shadows searchin\' in the night': [
+                    { position: 0, chord: 'Am' },
+                    { position: 20, chord: 'F' }
+                ],
+                'Streetlights, people': [
+                    { position: 0, chord: 'C' }
+                ],
+                'Livin\' just to find emotion': [
+                    { position: 0, chord: 'G' }
+                ],
+                'Hidin\' somewhere in the night': [
+                    { position: 0, chord: 'Am' },
+                    { position: 15, chord: 'F' }
+                ],
+                'Hidin\', somewhere in the night': [
+                    { position: 0, chord: 'Am' },
+                    { position: 16, chord: 'F' }
+                ],
+                'Workin\' hard to get my fill': [
+                    { position: 0, chord: 'C' }
+                ],
+                'Everybody wants a thrill': [
+                    { position: 0, chord: 'G' }
+                ],
+                'Payin\' anything to roll the dice': [
+                    { position: 0, chord: 'Am' },
+                    { position: 20, chord: 'F' }
+                ],
+                'Just one more time': [
+                    { position: 0, chord: 'C' }
+                ],
+                'Some\'ll win, some will lose': [
+                    { position: 0, chord: 'G' }
+                ],
+                'Some are born to sing the blues': [
+                    { position: 0, chord: 'Am' },
+                    { position: 18, chord: 'F' }
+                ],
+                'Whoa, the movie never ends': [
+                    { position: 0, chord: 'C' }
+                ],
+                'Don\'t stop believin\'': [
                     { position: 0, chord: 'C' },
-                    { position: 15, chord: 'Am' }
+                    { position: 10, chord: 'G' }
                 ],
-                'Quis nostrud exercitation': [
-                    { position: 0, chord: 'F' },
-                    { position: 18, chord: 'G' }
+                'Hold on to that feelin\'': [
+                    { position: 0, chord: 'Am' },
+                    { position: 12, chord: 'F' }
+                ],
+                'Hold on': [
+                    { position: 0, chord: 'G' }
                 ]
             }
         },

@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Print Layout Test - Unclelele Song Sheet</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        
+        .test-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        h1 {
+            color: #2E8B57;
+            text-align: center;
+        }
+        
+        .instructions {
+            background: #e3f2fd;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            border-left: 4px solid #2196f3;
+        }
+        
+        .test-button {
+            background: #F7931E;
+            color: white;
+            border: none;
+            padding: 15px 25px;
+            border-radius: 6px;
+            cursor: pointer;
+            margin: 10px;
+            font-size: 1em;
+            font-weight: bold;
+        }
+        
+        .test-button:hover {
+            background: #e8821a;
+            transform: translateY(-2px);
+        }
+    </style>
+</head>
+<body>
+    <div class="test-container">
+        <h1>🖨️ Print Layout Test</h1>
+        
+        <div class="instructions">
+            <h3>How to test the print layout:</h3>
+            <ol>
+                <li>Click one of the song buttons below to load a song sheet</li>
+                <li>Use <strong>Ctrl+P</strong> (or Cmd+P on Mac) to open print preview</li>
+                <li>Check that:
+                    <ul>
+                        <li>Navigation buttons are hidden</li>
+                        <li>Content fits on one page</li>
+                        <li>Chord diagrams are readable</li>
+                        <li>Small URL and branding appear at the bottom</li>
+                        <li>Colors convert properly to black and white</li>
+                    </ul>
+                </li>
+            </ol>
+        </div>
+        
+        <div>
+            <button class="test-button" onclick="loadSong('don-t-stop-believin')">📄 Don't Stop Believin'</button>
+            <button class="test-button" onclick="loadSong('lorem-song-1')">📄 Lorem Melody</button>
+            <button class="test-button" onclick="loadSong('ipsum-ballad')">📄 Ipsum Ballad</button>
+            <button class="test-button" onclick="loadSong('dolor-rhythm')">📄 Dolor Rhythm</button>
+        </div>
+        
+        <div id="song-container" style="margin-top: 30px;">
+            <!-- Song sheet will appear here -->
+        </div>
+    </div>
+    
+    <script type="module">
+        import SongSheet from './components/song-sheet/song-sheet.js';
+        
+        window.loadSong = function(songId) {
+            const container = document.getElementById('song-container');
+            container.innerHTML = `<song-sheet song-id="${songId}"></song-sheet>`;
+            
+            // Scroll to the song sheet
+            setTimeout(() => {
+                container.scrollIntoView({ behavior: 'smooth' });
+            }, 100);
+        };
+        
+        // Show instructions on how to test print
+        console.log(`
+🖨️ PRINT TESTING GUIDE:
+
+1. Load a song sheet using the buttons above
+2. Press Ctrl+P (Cmd+P on Mac) to open print preview
+3. Look for these print optimizations:
+   ✓ Navigation hidden
+   ✓ Clean black & white layout
+   ✓ Readable chord diagrams
+   ✓ Small branding footer
+   ✓ Professional one-page layout
+
+The print CSS should:
+- Hide .no-print elements
+- Show .print-only elements  
+- Use proper print typography (pt sizes)
+- Optimize for letter-size paper
+- Include page break controls
+        `);
+    </script>
+</body>
+</html>
