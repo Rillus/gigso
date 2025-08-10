@@ -4,7 +4,7 @@ The Fretboard component is a comprehensive visual representation system for stri
 
 ## Overview
 
-This component integrates seamlessly with the existing Songstructor application architecture, extending the current chord diagram functionality to provide a full fretboard visualization experience.
+This component integrates seamlessly with the existing Gigso application architecture, extending the current chord diagram functionality to provide a full fretboard visualization experience.
 
 ## Features
 

@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Unclelele - Ukulele Workshops & Song Sheets</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        :root {
+            --unclelele-primary: #2E8B57;
+            --unclelele-secondary: #98D8C8;
+            --unclelele-accent: #F7931E;
+            --unclelele-warm: #FFF8DC;
+        }
+        
+        body {
+            font-family: 'Georgia', serif;
+            margin: 0;
+            padding: 0;
+            background: linear-gradient(135deg, var(--unclelele-warm) 0%, var(--unclelele-secondary) 100%);
+            min-height: 100vh;
+        }
+        
+        .unclelele-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        .unclelele-header {
+            text-align: center;
+            padding: 40px 0;
+            background: rgba(255,255,255,0.9);
+            border-radius: 15px;
+            margin-bottom: 30px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+        }
+        
+        .unclelele-logo {
+            font-size: 3.5em;
+            font-weight: bold;
+            color: var(--unclelele-primary);
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+            margin: 0;
+        }
+        
+        .unclelele-tagline {
+            font-size: 1.2em;
+            color: #666;
+            margin: 10px 0;
+            font-style: italic;
+        }
+        
+        .workshop-info {
+            background: rgba(255,255,255,0.9);
+            border-radius: 15px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+        }
+        
+        .workshop-info h2 {
+            color: var(--unclelele-primary);
+            border-bottom: 2px solid var(--unclelele-accent);
+            padding-bottom: 10px;
+        }
+        
+        .song-sheets-section {
+            background: rgba(255,255,255,0.9);
+            border-radius: 15px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+        }
+        
+        .cta-button {
+            display: inline-block;
+            background: var(--unclelele-accent);
+            color: white;
+            padding: 15px 30px;
+            text-decoration: none;
+            border-radius: 8px;
+            font-weight: bold;
+            font-size: 1.1em;
+            transition: transform 0.2s, box-shadow 0.2s;
+            margin: 10px;
+        }
+        
+        .cta-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(247, 147, 30, 0.3);
+        }
+        
+        .gigso-link {
+            background: var(--unclelele-primary);
+        }
+        
+        .gigso-link:hover {
+            box-shadow: 0 6px 20px rgba(46, 139, 87, 0.3);
+        }
+        
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+        
+        .feature-card {
+            background: var(--unclelele-warm);
+            padding: 20px;
+            border-radius: 10px;
+            border-left: 4px solid var(--unclelele-accent);
+        }
+        
+        .feature-card h3 {
+            color: var(--unclelele-primary);
+            margin-top: 0;
+        }
+        
+        .navigation-section {
+            text-align: center;
+            background: rgba(255,255,255,0.9);
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+        }
+        
+        @media (max-width: 768px) {
+            .unclelele-logo {
+                font-size: 2.5em;
+            }
+            
+            .features-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .unclelele-container {
+                padding: 10px;
+            }
+        }
+        
+        .hidden {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="unclelele-container">
+        <header class="unclelele-header">
+            <h1 class="unclelele-logo">🎵 Unclelele 🎶</h1>
+            <p class="unclelele-tagline">Your friendly guide to ukulele mastery</p>
+        </header>
+        
+        <section class="workshop-info">
+            <h2>🏫 Ukulele Workshops</h2>
+            <p>Join our friendly community workshops where beginners become strummers and strummers become songwriters!</p>
+            
+            <div class="features-grid">
+                <div class="feature-card">
+                    <h3>🌱 Beginner Friendly</h3>
+                    <p>Never touched a ukulele? No problem! We start from the very basics and build your confidence one chord at a time.</p>
+                </div>
+                
+                <div class="feature-card">
+                    <h3>🎼 Song-Based Learning</h3>
+                    <p>Learn through your favorite songs! Every lesson focuses on real music you'll love to play.</p>
+                </div>
+                
+                <div class="feature-card">
+                    <h3>👨‍👩‍👧‍👦 Community Focused</h3>
+                    <p>Join a welcoming community of learners. Play together, learn together, grow together.</p>
+                </div>
+                
+                <div class="feature-card">
+                    <h3>🎯 Practical Skills</h3>
+                    <p>Focus on techniques that matter: strumming patterns, chord transitions, and rhythm.</p>
+                </div>
+            </div>
+        </section>
+        
+        <section class="song-sheets-section">
+            <h2>📜 Ukulele Song Sheets</h2>
+            <p>Access our growing library of printable song sheets, specially formatted for ukulele players. Each sheet includes:</p>
+            <ul>
+                <li>✅ Ukulele chord diagrams</li>
+                <li>✅ Strumming patterns</li>
+                <li>✅ Full lyrics with chord positions</li>
+                <li>✅ Print-optimized layout</li>
+                <li>✅ Interactive digital version</li>
+            </ul>
+            
+            <div style="text-align: center; margin-top: 20px;">
+                <a href="#song-search" class="cta-button" id="browse-songs-btn">🔍 Browse Song Sheets</a>
+            </div>
+        </section>
+        
+        <section class="navigation-section">
+            <h2>🚀 Ready to Start Playing?</h2>
+            <p>Explore our tools and resources</p>
+            
+            <div>
+                <a href="index.html" class="cta-button gigso-link">🎹 Gigso App</a>
+                <a href="#song-search" class="cta-button" id="search-songs-btn">📚 Find Songs</a>
+            </div>
+        </section>
+        
+        <!-- Song Search Section (initially hidden) -->
+        <div id="song-search-section" class="hidden">
+            <unclelele-search></unclelele-search>
+        </div>
+        
+        <!-- Song Sheet Display Section (initially hidden) -->
+        <div id="song-sheet-section" class="hidden">
+            <song-sheet></song-sheet>
+        </div>
+    </div>
+    
+    <script type="module">
+        // Import components
+        import UncleleleSearch from './components/unclelele-search/unclelele-search.js';
+        import SongSheet from './components/song-sheet/song-sheet.js';
+        
+        // Navigation handlers
+        document.getElementById('browse-songs-btn').addEventListener('click', (e) => {
+            e.preventDefault();
+            showSection('song-search');
+        });
+        
+        document.getElementById('search-songs-btn').addEventListener('click', (e) => {
+            e.preventDefault();
+            showSection('song-search');
+        });
+        
+        // Listen for song selection
+        document.addEventListener('song-selected', (event) => {
+            const songSheet = document.querySelector('song-sheet');
+            songSheet.setAttribute('song-id', event.detail.id);
+            showSection('song-sheet');
+        });
+        
+        // Listen for back navigation
+        document.addEventListener('navigate-back', (event) => {
+            if (event.detail.to === 'search') {
+                showSection('song-search');
+            } else if (event.detail.to === 'home') {
+                showSection('home');
+            }
+        });
+        
+        function showSection(section) {
+            // Hide all sections
+            document.querySelectorAll('.workshop-info, .song-sheets-section, .navigation-section').forEach(el => {
+                el.style.display = section === 'home' ? 'block' : 'none';
+            });
+            
+            document.getElementById('song-search-section').classList.toggle('hidden', section !== 'song-search');
+            document.getElementById('song-sheet-section').classList.toggle('hidden', section !== 'song-sheet');
+            
+            // Scroll to top
+            window.scrollTo(0, 0);
+        }
+    </script>
+</body>
+</html>

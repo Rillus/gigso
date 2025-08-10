@@ -1,4 +1,4 @@
-# Songstructor 🎵
+# Gigso 🎵
 
 Create music with the HandPan and Fretboard components - featuring dynamic key and scale changing, plus comprehensive fretboard visualization!
 
