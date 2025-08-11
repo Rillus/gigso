@@ -1,6 +1,7 @@
 import BaseComponent from '../base-component.js';
 import UkuleleSongLibrary from '../../ukulele-song-library.js';
 import ChordLibrary from '../../chord-library.js';
+import ChordDiagram from '../chord-diagram/chord-diagram.js';
 
 export default class SongSheet extends BaseComponent {
     constructor() {
@@ -142,6 +143,14 @@ export default class SongSheet extends BaseComponent {
                 grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
                 gap: 20px;
                 margin-bottom: 20px;
+            }
+            
+            .chord-diagram-wrapper {
+                text-align: center;
+                background: rgba(255, 248, 220, 0.5);
+                padding: 15px;
+                border-radius: 8px;
+                border: 1px solid #e0e0e0;
             }
             
             .chord-diagram {
@@ -425,6 +434,13 @@ export default class SongSheet extends BaseComponent {
                     page-break-inside: avoid;
                 }
                 
+                .chord-diagram-wrapper {
+                    background: transparent !important;
+                    border: 1px solid black;
+                    padding: 8pt;
+                    page-break-inside: avoid;
+                }
+                
                 .chord-diagram {
                     background: transparent !important;
                     border: 1px solid black;
@@ -654,8 +670,8 @@ export default class SongSheet extends BaseComponent {
         const song = this.currentSong;
         const contentDiv = this.shadowRoot.getElementById('song-content');
         
-        // Get unique chords used in the song
-        const uniqueChords = [...new Set(song.chordProgression || [])];
+        // Extract unique chords from inline notation in lyrics
+        const uniqueChords = this.extractChordsFromLyrics(song.lyrics);
         const chordDiagrams = uniqueChords.map(chordName => {
             const chordData = ChordLibrary.chords[chordName]?.ukulele;
             return { name: chordName, data: chordData };
@@ -676,8 +692,8 @@ export default class SongSheet extends BaseComponent {
             ${chordDiagrams.length > 0 ? `
             <div class="chords-section">
                 <h3>🎼 Chord Diagrams</h3>
-                <div class="chord-diagrams">
-                    ${chordDiagrams.map(chord => this.renderChordDiagram(chord)).join('')}
+                <div class="chord-diagrams" id="chord-diagrams-container">
+                    <!-- Chord diagrams will be inserted here -->
                 </div>
             </div>
             ` : ''}
@@ -699,6 +715,43 @@ export default class SongSheet extends BaseComponent {
                 </div>
             </div>
         `;
+        
+        // After setting innerHTML, render chord diagrams using the chord diagram component
+        if (chordDiagrams.length > 0) {
+            this.renderChordDiagrams(chordDiagrams);
+        }
+    }
+    
+    extractChordsFromLyrics(lyrics) {
+        if (!lyrics) return [];
+        
+        // Extract all chord markers like {C}, {Am}, {F}, etc.
+        const chordMatches = lyrics.match(/\{([^}]+)\}/g);
+        if (!chordMatches) return [];
+        
+        // Remove brackets and get unique chords
+        const chords = chordMatches.map(match => match.replace(/[{}]/g, ''));
+        return [...new Set(chords)];
+    }
+    
+    renderChordDiagrams(chordDiagrams) {
+        const container = this.shadowRoot.getElementById('chord-diagrams-container');
+        if (!container) return;
+        
+        // Clear existing content
+        container.innerHTML = '';
+        
+        // Create and append chord diagram components
+        chordDiagrams.forEach(chordInfo => {
+            const chordWrapper = document.createElement('div');
+            chordWrapper.className = 'chord-diagram-wrapper';
+            chordWrapper.innerHTML = `
+                <div class="chord-name">${chordInfo.name}</div>
+                <chord-diagram chord="${chordInfo.name}" instrument="ukulele"></chord-diagram>
+                <div class="chord-difficulty">${chordInfo.data.difficulty}</div>
+            `;
+            container.appendChild(chordWrapper);
+        });
     }
     
     renderChordDiagram(chord) {

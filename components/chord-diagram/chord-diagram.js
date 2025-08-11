@@ -68,6 +68,87 @@ export default class ChordDiagram extends BaseComponent {
                 position: relative;
                 z-index: 1;
             }
+            
+            /* Print Styles for Chord Diagrams */
+            @media print {
+                .chord-diagram {
+                    background: white !important;
+                    border: none !important;
+                    max-width: 60pt;
+                    grid-template-rows: repeat(5, 16pt);
+                    gap: 1pt;
+                }
+                
+                .chord-diagram--guitar {
+                    max-width: 72pt;
+                    grid-template-columns: repeat(6, 16.66%);
+                }
+                
+                .chord-diagram--ukulele {
+                    grid-template-columns: repeat(4, 25%);
+                }
+                
+                .fret {
+                    width: 14pt;
+                    height: 16pt;
+                    background: 
+                        linear-gradient(
+                            90deg,
+                            rgba(0,0,0,0) 0%,
+                            rgba(0,0,0,0) 40%,
+                            rgba(100,100,100,1) 45%,
+                            rgba(0,0,0,1) 55%,
+                            rgba(0,0,0,0) 60%,
+                            rgba(0,0,0,0) 100%
+                        );
+                    border-bottom: 1px solid black !important;
+                    position: relative;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                }
+                
+                .fret.active::after {
+                    content: '';
+                    display: block;
+                    width: 12pt;
+                    height: 12pt;
+                    border-radius: 50%;
+                    background: black !important;
+                    line-height: 12pt;
+                    text-align: center;
+                    z-index: 2;
+                    border: none;
+                }
+                
+                .fret.active::before {
+                    z-index: 1;
+                }
+                
+                /* First row - string markers */
+                .fret:nth-child(-n+4),
+                .chord-diagram--guitar .fret:nth-child(-n+6) {
+                    border-top: 2px solid black;
+                }
+                
+                /* Last column borders */
+                .fret:nth-child(4n),
+                .chord-diagram--guitar .fret:nth-child(6n) {
+                    border-right: 1px solid black;
+                }
+                
+                /* First column borders */
+                .fret:nth-child(4n-3),
+                .chord-diagram--guitar .fret:nth-child(6n-5) {
+                    border-left: 1px solid black;
+                }
+                
+                /* Bottom border for last row */
+                .fret:nth-last-child(-n+4),
+                .chord-diagram--guitar .fret:nth-last-child(-n+6) {
+                    border-bottom: 1px solid black;
+                }
+            }
         `;
 
         super(template, styles)
