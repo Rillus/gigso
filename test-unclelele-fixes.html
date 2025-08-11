@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Unclelele Fixes - Full Screen & Print</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background: #f0f0f0;
+        }
+        
+        .test-section {
+            background: white;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        .test-button {
+            background: #2E8B57;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 10px;
+            font-size: 16px;
+        }
+        
+        .test-button:hover {
+            background: #1e6b47;
+        }
+        
+        .instructions {
+            background: #e8f5e8;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 15px 0;
+            border-left: 4px solid #2E8B57;
+        }
+        
+        .status {
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 5px;
+            font-weight: bold;
+        }
+        
+        .status.success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        
+        .status.error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+    </style>
+</head>
+<body>
+    <h1>🧪 Test Unclelele Fixes</h1>
+    
+    <div class="test-section">
+        <h2>Full Screen Scrolling Test</h2>
+        <div class="instructions">
+            <strong>Test Steps:</strong>
+            <ol>
+                <li>Click "Load Song Sheet" to load a test song</li>
+                <li>Click the "⛶ Fullscreen" button</li>
+                <li>Try scrolling up and down - you should be able to scroll through the entire song</li>
+                <li>Click "⛶ Exit Fullscreen" to return to normal view</li>
+            </ol>
+        </div>
+        
+        <button class="test-button" id="load-song-btn">Load Song Sheet</button>
+        <button class="test-button" id="test-fullscreen-btn">Test Fullscreen</button>
+        
+        <div id="fullscreen-status" class="status"></div>
+    </div>
+    
+    <div class="test-section">
+        <h2>Print Mode Test</h2>
+        <div class="instructions">
+            <strong>Test Steps:</strong>
+            <ol>
+                <li>Load a song sheet first</li>
+                <li>Click "🖨️ Print" button or press Ctrl+P</li>
+                <li>In print preview, verify that the entire song is visible (not cut off)</li>
+                <li>Check that content flows across multiple pages if needed</li>
+            </ol>
+        </div>
+        
+        <button class="test-button" id="test-print-btn">Test Print Mode</button>
+        <div id="print-status" class="status"></div>
+    </div>
+    
+    <div id="song-sheet-container" style="display: none;">
+        <!-- Song sheet will be loaded here -->
+    </div>
+    
+    <script type="module">
+        import SongSheet from './components/song-sheet/song-sheet.js';
+        import UkuleleSongLibrary from './ukulele-song-library.js';
+        
+        // Test data
+        const testSong = {
+            id: 'test-song',
+            title: 'Test Song for Scrolling & Print',
+            artist: 'Test Artist',
+            key: 'C',
+            difficulty: 'beginner',
+            genre: 'test',
+            strummingPattern: 'D D U U D U',
+            lyrics: `
+[verse 1]
+{C}This is a test song to {G}verify that scrolling works
+{Am}In full screen mode and {F}print mode displays correctly
+
+[chorus]
+{C}Scrolling should work {G}properly in full screen
+{Am}And print mode should {F}show the whole song
+
+[verse 2]
+{C}This verse continues on {G}to make the song longer
+{Am}So we can test if {F}scrolling actually works
+
+[bridge]
+{C}This bridge section {G}adds more content
+{Am}To ensure there's {F}enough to scroll through
+
+[verse 3]
+{C}Another verse to {G}make it even longer
+{Am}Testing full screen {F}scrolling thoroughly
+
+[outro]
+{C}Final section to {G}complete the test
+{Am}Now try scrolling {F}and printing this
+            `
+        };
+        
+        // Add test song to library
+        if (!UkuleleSongLibrary.songs.find(s => s.id === 'test-song')) {
+            UkuleleSongLibrary.songs.unshift(testSong);
+        }
+        
+        let songSheet = null;
+        
+        document.getElementById('load-song-btn').addEventListener('click', () => {
+            const container = document.getElementById('song-sheet-container');
+            container.style.display = 'block';
+            
+            if (!songSheet) {
+                songSheet = document.createElement('song-sheet');
+                songSheet.setAttribute('song-id', 'test-song');
+                container.appendChild(songSheet);
+            }
+            
+            document.getElementById('fullscreen-status').innerHTML = 
+                '<span class="success">✅ Song sheet loaded successfully!</span>';
+        });
+        
+        document.getElementById('test-fullscreen-btn').addEventListener('click', () => {
+            if (!songSheet) {
+                document.getElementById('fullscreen-status').innerHTML = 
+                    '<span class="error">❌ Please load a song sheet first!</span>';
+                return;
+            }
+            
+            // Test fullscreen functionality
+            const container = songSheet.shadowRoot.querySelector('.song-sheet-container');
+            if (container) {
+                document.getElementById('fullscreen-status').innerHTML = 
+                    '<span class="success">✅ Song sheet ready for fullscreen testing!</span><br>' +
+                    '<span>Click the ⛶ Fullscreen button in the song sheet to test scrolling.</span>';
+            } else {
+                document.getElementById('fullscreen-status').innerHTML = 
+                    '<span class="error">❌ Could not find song sheet container!</span>';
+            }
+        });
+        
+        document.getElementById('test-print-btn').addEventListener('click', () => {
+            if (!songSheet) {
+                document.getElementById('print-status').innerHTML = 
+                    '<span class="error">❌ Please load a song sheet first!</span>';
+                return;
+            }
+            
+            document.getElementById('print-status').innerHTML = 
+                '<span class="success">✅ Ready for print testing!</span><br>' +
+                '<span>Click the 🖨️ Print button in the song sheet or press Ctrl+P to test print mode.</span>';
+        });
+        
+        // Listen for fullscreen changes
+        document.addEventListener('fullscreenchange', () => {
+            if (document.fullscreenElement) {
+                document.getElementById('fullscreen-status').innerHTML = 
+                    '<span class="success">✅ Fullscreen mode active! Try scrolling now.</span>';
+            } else {
+                document.getElementById('fullscreen-status').innerHTML = 
+                    '<span class="success">✅ Exited fullscreen mode.</span>';
+            }
+        });
+        
+        // Listen for webkit fullscreen changes
+        document.addEventListener('webkitfullscreenchange', () => {
+            if (document.webkitFullscreenElement) {
+                document.getElementById('fullscreen-status').innerHTML = 
+                    '<span class="success">✅ Fullscreen mode active! Try scrolling now.</span>';
+            } else {
+                document.getElementById('fullscreen-status').innerHTML = 
+                    '<span class="success">✅ Exited fullscreen mode.</span>';
+            }
+        });
+        
+        // Listen for moz fullscreen changes
+        document.addEventListener('mozfullscreenchange', () => {
+            if (document.mozFullScreenElement) {
+                document.getElementById('fullscreen-status').innerHTML = 
+                    '<span class="success">✅ Fullscreen mode active! Try scrolling now.</span>';
+            } else {
+                document.getElementById('fullscreen-status').innerHTML = 
+                    '<span class="success">✅ Exited fullscreen mode.</span>';
+            }
+        });
+    </script>
+</body>
+</html>
