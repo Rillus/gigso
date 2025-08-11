@@ -43,6 +43,82 @@ export default class SongSheet extends BaseComponent {
                 overflow: hidden;
             }
             
+            /* Full screen styles */
+            .song-sheet-container:fullscreen {
+                margin: 0;
+                border-radius: 0;
+                box-shadow: none;
+                overflow-y: auto;
+                overflow-x: hidden;
+                height: 100vh;
+                width: 100vw;
+            }
+            
+            .song-sheet-container:fullscreen .song-sheet {
+                max-width: none;
+                min-height: auto;
+                padding: 40px;
+                margin: 0 auto;
+            }
+            
+            /* Webkit fullscreen support */
+            .song-sheet-container:-webkit-full-screen {
+                margin: 0;
+                border-radius: 0;
+                box-shadow: none;
+                overflow-y: auto;
+                overflow-x: hidden;
+                height: 100vh;
+                width: 100vw;
+            }
+            
+            .song-sheet-container:-webkit-full-screen .song-sheet {
+                max-width: none;
+                min-height: auto;
+                padding: 40px;
+                margin: 0 auto;
+            }
+            
+            /* Mozilla fullscreen support */
+            .song-sheet-container:-moz-full-screen {
+                margin: 0;
+                border-radius: 0;
+                box-shadow: none;
+                overflow-y: auto;
+                overflow-x: hidden;
+                height: 100vh;
+                width: 100vw;
+            }
+            
+            .song-sheet-container:-moz-full-screen .song-sheet {
+                max-width: none;
+                min-height: auto;
+                padding: 40px;
+                margin: 0 auto;
+            }
+            
+            /* Fullscreen active class for JavaScript fallback */
+            .song-sheet-container.fullscreen-active {
+                margin: 0;
+                border-radius: 0;
+                box-shadow: none;
+                overflow-y: auto;
+                overflow-x: hidden;
+                height: 100vh;
+                width: 100vw;
+                position: fixed;
+                top: 0;
+                left: 0;
+                z-index: 9999;
+            }
+            
+            .song-sheet-container.fullscreen-active .song-sheet {
+                max-width: none;
+                min-height: auto;
+                padding: 40px;
+                margin: 0 auto;
+            }
+            
             .sheet-header {
                 background: var(--unclelele-secondary, #98D8C8);
                 padding: 20px 30px;
@@ -431,22 +507,24 @@ export default class SongSheet extends BaseComponent {
                     margin: 0;
                     background: white;
                     width: 100%;
-                    height: 100vh;
-                    display: flex;
-                    flex-direction: column;
+                    height: auto;
+                    display: block;
+                    overflow: visible;
                 }
                 
                 /* Main content area */
                 .song-sheet {
-                    flex: 1;
+                    flex: none;
                     padding: 0;
                     margin: 0;
                     max-width: none;
                     min-height: auto;
+                    height: auto;
                     font-size: 11pt;
                     line-height: 1.3;
                     color: black;
                     background: white;
+                    overflow: visible;
                 }
                 
                 /* Typography improvements for print */
@@ -736,6 +814,27 @@ export default class SongSheet extends BaseComponent {
                     widows: 2;
                 }
                 
+                /* Better page break handling for long content */
+                .lyrics-content {
+                    page-break-inside: auto;
+                }
+                
+                .lyrics-line {
+                    page-break-inside: avoid;
+                }
+                
+                /* Ensure sections don't break awkwardly */
+                .song-header {
+                    page-break-after: avoid;
+                }
+                
+                /* Allow natural page breaks between major sections */
+                .chords-section,
+                .strumming-section {
+                    page-break-before: auto;
+                    page-break-after: auto;
+                }
+                
                 /* Print quality enhancements */
                 * {
                     -webkit-print-color-adjust: exact !important;
@@ -785,6 +884,26 @@ export default class SongSheet extends BaseComponent {
             e.preventDefault();
             window.open('index.html', '_blank');
         });
+        
+        // Listen for fullscreen changes to update button state
+        document.addEventListener('fullscreenchange', () => this.updateFullscreenState());
+        document.addEventListener('webkitfullscreenchange', () => this.updateFullscreenState());
+        document.addEventListener('mozfullscreenchange', () => this.updateFullscreenState());
+    }
+    
+    updateFullscreenState() {
+        const container = this.shadowRoot.querySelector('.song-sheet-container');
+        const fullscreenBtn = this.shadowRoot.getElementById('fullscreen-btn');
+        
+        if (document.fullscreenElement || 
+            document.webkitFullscreenElement || 
+            document.mozFullScreenElement) {
+            container.classList.add('fullscreen-active');
+            fullscreenBtn.textContent = '⛶ Exit Fullscreen';
+        } else {
+            container.classList.remove('fullscreen-active');
+            fullscreenBtn.textContent = '⛶ Fullscreen';
+        }
     }
     
     loadSong(songId) {
