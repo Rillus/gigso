@@ -140,6 +140,27 @@
             }
         }
         
+        /* Print Styles */
+        @media print {
+            .unclelele-header,
+            .workshop-info,
+            .song-sheets-section,
+            .navigation-section {
+                display: none !important;
+            }
+            
+            .unclelele-container {
+                padding: 0;
+                margin: 0;
+            }
+            
+            body {
+                background: white !important;
+                margin: 0;
+                padding: 0;
+            }
+        }
+        
         .hidden {
             display: none;
         }

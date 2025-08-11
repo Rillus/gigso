@@ -151,6 +151,10 @@ export default class SongSheet extends BaseComponent {
                 padding: 15px;
                 border-radius: 8px;
                 border: 1px solid #e0e0e0;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                justify-content: center;
             }
             
             .chord-diagram {
@@ -164,8 +168,35 @@ export default class SongSheet extends BaseComponent {
             .chord-name {
                 font-weight: bold;
                 font-size: 1.1em;
-                color: var(--unclelele-primary, #2E8B57);
                 margin-bottom: 8px;
+                padding: 4px 8px;
+                border-radius: 4px;
+                color: white;
+                text-shadow: 1px 1px 2px rgba(0,0,0,0.3);
+            }
+            
+            /* Chord color coding */
+            .chord-name.chord-c {
+                background-color: #DC2626; /* Red for C */
+            }
+            
+            .chord-name.chord-g {
+                background-color: #16A34A; /* Green for G */
+            }
+            
+            .chord-name.chord-f {
+                background-color: #EAB308; /* Yellow for F */
+                color: #000; /* Black text on yellow */
+                text-shadow: none;
+            }
+            
+            .chord-name.chord-am {
+                background-color: #2563EB; /* Blue for Am */
+            }
+            
+            /* Default color for other chords */
+            .chord-name:not(.chord-c):not(.chord-g):not(.chord-f):not(.chord-am) {
+                background-color: var(--unclelele-primary, #2E8B57);
             }
             
             .chord-frets {
@@ -219,11 +250,39 @@ export default class SongSheet extends BaseComponent {
             .chord-above {
                 position: absolute;
                 top: -1.2em;
-                color: var(--unclelele-primary, #2E8B57);
                 font-weight: bold;
                 font-size: 0.85em;
                 font-family: 'Courier New', monospace;
                 z-index: 1;
+                line-height: 20px;
+                padding: 2px 4px;
+                border-radius: 3px;
+                color: white;
+                text-shadow: 1px 1px 1px rgba(0,0,0,0.3);
+            }
+            
+            /* Inline chord color coding */
+            .chord-above.chord-c {
+                background-color: #DC2626; /* Red for C */
+            }
+            
+            .chord-above.chord-g {
+                background-color: #16A34A; /* Green for G */
+            }
+            
+            .chord-above.chord-f {
+                background-color: #EAB308; /* Yellow for F */
+                color: #000; /* Black text on yellow */
+                text-shadow: none;
+            }
+            
+            .chord-above.chord-am {
+                background-color: #2563EB; /* Blue for Am */
+            }
+            
+            /* Default color for other chords */
+            .chord-above:not(.chord-c):not(.chord-g):not(.chord-f):not(.chord-am) {
+                background-color: var(--unclelele-primary, #2E8B57);
             }
             
             .verse, .chorus, .bridge, .intro, .outro, .pre-chorus {
@@ -439,6 +498,11 @@ export default class SongSheet extends BaseComponent {
                     border: 1px solid black;
                     padding: 8pt;
                     page-break-inside: avoid;
+                    display: flex;
+                    flex-direction: column;
+                    align-items: center;
+                    justify-content: center;
+                    text-align: center;
                 }
                 
                 .chord-diagram {
@@ -449,9 +513,44 @@ export default class SongSheet extends BaseComponent {
                 }
                 
                 .chord-name {
-                    color: black !important;
                     font-size: 10pt;
                     font-weight: bold;
+                    color: white !important;
+                    text-shadow: none !important;
+                    padding: 2pt 4pt;
+                    border-radius: 2pt;
+                }
+                
+                /* Print chord colors - ensure they show */
+                .chord-name.chord-c {
+                    background-color: #DC2626 !important; /* Red for C */
+                    -webkit-print-color-adjust: exact;
+                    color-adjust: exact;
+                }
+                
+                .chord-name.chord-g {
+                    background-color: #16A34A !important; /* Green for G */
+                    -webkit-print-color-adjust: exact;
+                    color-adjust: exact;
+                }
+                
+                .chord-name.chord-f {
+                    background-color: #EAB308 !important; /* Yellow for F */
+                    color: black !important;
+                    -webkit-print-color-adjust: exact;
+                    color-adjust: exact;
+                }
+                
+                .chord-name.chord-am {
+                    background-color: #2563EB !important; /* Blue for Am */
+                    -webkit-print-color-adjust: exact;
+                    color-adjust: exact;
+                }
+                
+                .chord-name:not(.chord-c):not(.chord-g):not(.chord-f):not(.chord-am) {
+                    background-color: #2E8B57 !important;
+                    -webkit-print-color-adjust: exact;
+                    color-adjust: exact;
                 }
                 
                 .chord-frets {
@@ -535,11 +634,46 @@ export default class SongSheet extends BaseComponent {
                 .chord-above {
                     position: absolute;
                     top: -10pt;
-                    color: black !important;
                     font-weight: bold;
-                    font-size: 8pt;
+                    font-size: 7pt;
                     font-family: 'Courier New', monospace;
                     z-index: 1;
+                    padding: 1pt 2pt;
+                    border-radius: 1pt;
+                    color: white !important;
+                    text-shadow: none !important;
+                }
+                
+                /* Print inline chord colors */
+                .chord-above.chord-c {
+                    background-color: #DC2626 !important; /* Red for C */
+                    -webkit-print-color-adjust: exact;
+                    color-adjust: exact;
+                }
+                
+                .chord-above.chord-g {
+                    background-color: #16A34A !important; /* Green for G */
+                    -webkit-print-color-adjust: exact;
+                    color-adjust: exact;
+                }
+                
+                .chord-above.chord-f {
+                    background-color: #EAB308 !important; /* Yellow for F */
+                    color: black !important;
+                    -webkit-print-color-adjust: exact;
+                    color-adjust: exact;
+                }
+                
+                .chord-above.chord-am {
+                    background-color: #2563EB !important; /* Blue for Am */
+                    -webkit-print-color-adjust: exact;
+                    color-adjust: exact;
+                }
+                
+                .chord-above:not(.chord-c):not(.chord-g):not(.chord-f):not(.chord-am) {
+                    background-color: #2E8B57 !important;
+                    -webkit-print-color-adjust: exact;
+                    color-adjust: exact;
                 }
                 
                 /* Lyrics text */
@@ -745,10 +879,10 @@ export default class SongSheet extends BaseComponent {
         chordDiagrams.forEach(chordInfo => {
             const chordWrapper = document.createElement('div');
             chordWrapper.className = 'chord-diagram-wrapper';
+            const chordClass = this.getChordColorClass(chordInfo.name);
             chordWrapper.innerHTML = `
-                <div class="chord-name">${chordInfo.name}</div>
+                <div class="chord-name ${chordClass}">${chordInfo.name}</div>
                 <chord-diagram chord="${chordInfo.name}" instrument="ukulele"></chord-diagram>
-                <div class="chord-difficulty">${chordInfo.data.difficulty}</div>
             `;
             container.appendChild(chordWrapper);
         });
@@ -842,8 +976,9 @@ export default class SongSheet extends BaseComponent {
                 if (part.match(/^\{[^}]+\}$/)) {
                     // This is a chord marker like {C} or {Am}
                     const chord = part.replace(/[{}]/g, '');
+                    const chordClass = this.getChordColorClass(chord);
                     const leftPosition = currentPosition * 0.6; // Approximate character width in ems
-                    chordsHtml += `<span class="chord-above" style="left: ${leftPosition}em;">${chord}</span>`;
+                    chordsHtml += `<span class="chord-above ${chordClass}" style="left: ${leftPosition}em;">${chord}</span>`;
                 } else if (part) {
                     // This is lyrics text
                     lyricsText += part;
@@ -861,6 +996,25 @@ export default class SongSheet extends BaseComponent {
         }
         
         return formattedLyrics;
+    }
+    
+    getChordColorClass(chordName) {
+        // Normalize chord name to handle variations
+        const normalizedChord = chordName.toLowerCase().trim();
+        
+        switch (normalizedChord) {
+            case 'c':
+                return 'chord-c';
+            case 'g':
+                return 'chord-g';
+            case 'f':
+                return 'chord-f';
+            case 'am':
+            case 'a minor':
+                return 'chord-am';
+            default:
+                return '';
+        }
     }
     
     toggleFullscreen() {
