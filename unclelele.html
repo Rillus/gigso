@@ -245,26 +245,65 @@
         // Navigation handlers
         document.getElementById('browse-songs-btn').addEventListener('click', (e) => {
             e.preventDefault();
+            updateURL('search');
             showSection('song-search');
         });
         
         document.getElementById('search-songs-btn').addEventListener('click', (e) => {
             e.preventDefault();
+            updateURL('search');
             showSection('song-search');
         });
+        
+        // URL Routing System
+        function updateURL(section, songId = null) {
+            let hash = '#' + section;
+            if (songId) {
+                hash += '/' + songId;
+            }
+            history.pushState(null, null, hash);
+        }
+        
+        function parseURL() {
+            const hash = window.location.hash.slice(1); // Remove #
+            const parts = hash.split('/');
+            const section = parts[0] || 'home';
+            const songId = parts[1] || null;
+            return { section, songId };
+        }
+        
+        function navigateToURL() {
+            const { section, songId } = parseURL();
+            
+            if (section === 'song' && songId) {
+                const songSheet = document.querySelector('song-sheet');
+                songSheet.setAttribute('song-id', songId);
+                showSection('song-sheet');
+            } else if (section === 'search') {
+                showSection('song-search');
+            } else {
+                showSection('home');
+            }
+        }
+        
+        // Listen for browser back/forward buttons
+        window.addEventListener('popstate', navigateToURL);
         
         // Listen for song selection
         document.addEventListener('song-selected', (event) => {
             const songSheet = document.querySelector('song-sheet');
             songSheet.setAttribute('song-id', event.detail.id);
+            updateURL('song', event.detail.id);
             showSection('song-sheet');
         });
         
         // Listen for back navigation
         document.addEventListener('navigate-back', (event) => {
             if (event.detail.to === 'search') {
+                updateURL('search');
                 showSection('song-search');
             } else if (event.detail.to === 'home') {
+                updateURL('home');
                 showSection('home');
             }
         });
@@ -281,6 +320,12 @@
             // Scroll to top
             window.scrollTo(0, 0);
         }
+        
+        // Initialize routing on page load
+        window.addEventListener('load', () => {
+            // Ensure components are loaded, then navigate to URL
+            setTimeout(navigateToURL, 200);
+        });
     </script>
 </body>
 </html>

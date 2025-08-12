@@ -1,7 +1,7 @@
 export default class UkuleleSongLibrary {
     static songs = [
         {
-            id: 'don-t-stop-believin',
+            id: 'dont-stop-believin',
             title: 'Don\'t Stop Believin\'',
             artist: 'Journey',
             key: 'C',
@@ -14,112 +14,55 @@ export default class UkuleleSongLibrary {
             tags: ['beginner-friendly', 'practice'],
             lyrics: `
                 [Intro]
-{C}   {G}   {Am}   {F}
-{C}   {G}   {F}
- 
-[Verse 1]
-{C}   Just a {G}small town girl,{Am}  livin' in a {F}lonely world
-{C}   She took the {G}midnight train going {F}anywhere{F}
-{C}   Just a {G}city boy,{Am}    born and raised in {F}South Detroit
-{C}   He took the {G}midnight train going {F}anywhere
- 
-[Instrumental]
-{C}   {G}   {Am}   {F}
-{C}   {G}   {F}   {F}
- 
-[Verse 2]
-{C}A singer in a {G}smoky room, {Am}the smell of wine and {F}cheap perfume
-{C}  For a smile they can {G}share the night, it goes {F}on and on {F}and on and on
- 
-[Chorus]
-{F}Strangers waitin'   {C}up and down the boulevard
-Their {F}shadows searchin' in the {C}night
-{F}Streetlights, people, {C}livin' just to find emotion
-{F}Hidin', somewhere in the {G}ni{C}ght {G} {C} {F}
- 
-[Break]
-C   G   Am   F
- 
-[Verse 3]
-C                  G           Am           F
-   Workin' hard to get my fill,    everybody wants a thrill
-C                     G                   Em       F
-   Payin' anything to roll the dice, just one more time
-C              G               Am                  F
-   Some'll win, some will lose,    some are born to sing the blues
-C                G                   Em            F
-   Oh, the movie never ends; it goes on and on and on and on
- 
-[Chorus]
-F                 C
-Strangers waitin'   up and down the boulevard
-      F                         C
-Their shadows searchin' in the night
-F                     C
-Streetlights, people,   livin' just to find emotion
-F                         G  C    G  C F
-Hidin', somewhere in the night
- 
-[Guitar Solo]
-C   G   Am   F
-C   G   Em   F
- 
-[Outro]
-C            G        Am                 F
-Don't stop believin',     hold on to that feelin'
-C             G             Em   F
-Streetlights, people, oh-oh-o-------h
-C            G        Am        F
-Don't stop believin',    hold o-----n
-C             G             Em   F
-Streetlights, people, oh-oh-o-------h
-C            G        Am                 F
-Don't stop believin',     hold on to that feelin'
-C             G             Em   F
-Streetlights, people, oh-oh-o-------h
-
+                {C}   {G}   {Am}   {F}
+                {C}   {G}   {F}
+                
+                [Verse 1]
+                {C}   Just a {G}small town girl,{Am}  livin' in a {F}lonely world
+                {C}   She took the {G}midnight train going {F}anywhere{F}
+                {C}   Just a {G}city boy,{Am}    born and raised in {F}South Detroit
+                {C}   He took the {G}midnight train going {F}anywhere
+                
+                [Instrumental]
+                {C}   {G}   {Am}   {F}
+                {C}   {G}   {F}   {F}
+                
                 [Verse 2]
-                A singer in a smokey room
-                A smell of wine and cheap perfume
-                For a smile they can share the night
-                It goes on and on and on and on
-
+                {C}A singer in a {G}smoky room, {Am}the smell of wine and {F}cheap perfume
+                {C}  For a smile they can {G}share the night, it goes {F}on and on {F}and on and on
+                
                 [Chorus]
-                Strangers waitin'
-                Up and down the boulevard
-                Their shadows searchin' in the night
-                Streetlights, people
-                Livin' just to find emotion
-                Hidin' somewhere in the night
-
+                {F}Strangers waitin'   {C}up and down the boulevard
+                Their {F}shadows searchin' in the {C}night
+                {F}Streetlights, people, {C}livin' just to find emotion
+                {F}Hidin', somewhere in the {G}ni{C}ght {G}  {C}  {F}
+                
+                [Break]
+                {C}   {G}   {Am}   {F}
+                
                 [Verse 3]
-                Workin' hard to get my fill
-                Everybody wants a thrill
-                Payin' anything to roll the dice
-                Just one more time
-                Some'll win, some will lose
-                Some are born to sing the blues
-                Whoa, the movie never ends
-                It goes on and on and on and on
-
+                {C}   Workin' hard to {G}get my fill,{Am}  everybody {F}wants a thrill
+                {C}   Payin' anything to {G}roll the dice, just {Em}one more {F}time
+                {C}   Some'll win, {G}some will lose,{Am}  some are born to {F}sing the blues
+                {C}   Oh, the movie {G}never ends; it goes {Em}on and on and {F}on and on
+                
                 [Chorus]
-                Strangers waitin'
-                Up and down the boulevard
-                Their shadows searchin' in the night
-                Streetlights, people
-                Livin' just to find emotion
-                Hidin', somewhere in the night
-
+                {F}Strangers waitin' {C} up and down the boulevard
+                Their {F}shadows searchin' in the {C}night
+                {F}Streetlights, people, {C}livin' just to find emotion
+                {F}Hidin', somewhere in the {G}ni{C}ght{G}  {C}  {F}
+                
+                [Guitar Solo]
+                {C}   {G}   {Am}   {F}
+                {C}   {G}   {F}   {F}
+                
                 [Outro]
-                Don't stop believin'
-                Hold on to that feelin'
-                Streetlights, people
-                Don't stop believin'
-                Hold on
-                Streetlights, people
-                Don't stop believin'
-                Hold on to that feelin'
-                Streetlights, people`,
+                {C}Don't stop be{G}lievin', {Am}hold on to that {F}feelin'
+                {C}Streetlights, {G}people, oh-oh-{F}o-{F}------h
+                {C}Don't stop be{G}lievin', {Am} hold o-{F}----n
+                {C}Streetlights, {G}people, oh-oh-{F}o----{F}---h
+                {C}Don't stop be{G}lievin', {Am}hold on to that {F}feelin'
+                {C}Streetlights, {G}people, oh-oh-o{F}----{F}--h`
         },
         {
             id: 'ipsum-ballad',

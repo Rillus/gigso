@@ -10,6 +10,7 @@ export default class SongSheet extends BaseComponent {
                 <div class="sheet-header no-print">
                     <button class="back-btn" id="back-search">← Back to Search</button>
                     <div class="sheet-actions">
+                        <button class="share-btn" id="share-btn">🔗 Share</button>
                         <button class="print-btn" id="print-btn">🖨️ Print</button>
                         <button class="fullscreen-btn" id="fullscreen-btn">⛶ Fullscreen</button>
                     </div>
@@ -53,7 +54,7 @@ export default class SongSheet extends BaseComponent {
                 gap: 15px;
             }
             
-            .back-btn, .print-btn, .fullscreen-btn {
+            .back-btn, .print-btn, .fullscreen-btn, .share-btn {
                 background: white;
                 color: var(--unclelele-primary, #2E8B57);
                 border: none;
@@ -65,7 +66,7 @@ export default class SongSheet extends BaseComponent {
                 margin-right: 10px;
             }
             
-            .back-btn:hover, .print-btn:hover, .fullscreen-btn:hover {
+            .back-btn:hover, .print-btn:hover, .fullscreen-btn:hover, .share-btn:hover {
                 transform: translateY(-2px);
                 box-shadow: 0 4px 12px rgba(46, 139, 87, 0.3);
             }
@@ -77,6 +78,15 @@ export default class SongSheet extends BaseComponent {
             
             .print-btn:hover {
                 box-shadow: 0 4px 12px rgba(247, 147, 30, 0.3);
+            }
+            
+            .share-btn {
+                background: #3B82F6;
+                color: white;
+            }
+            
+            .share-btn:hover {
+                box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
             }
             
             .song-sheet {
@@ -762,6 +772,7 @@ export default class SongSheet extends BaseComponent {
     
     setupEventListeners() {
         const backBtn = this.shadowRoot.getElementById('back-search');
+        const shareBtn = this.shadowRoot.getElementById('share-btn');
         const printBtn = this.shadowRoot.getElementById('print-btn');
         const fullscreenBtn = this.shadowRoot.getElementById('fullscreen-btn');
         const gigsoLink = this.shadowRoot.getElementById('gigso-link');
@@ -771,6 +782,10 @@ export default class SongSheet extends BaseComponent {
                 detail: { to: 'search' },
                 bubbles: true
             }));
+        });
+        
+        shareBtn.addEventListener('click', () => {
+            this.shareSong();
         });
         
         printBtn.addEventListener('click', () => {
@@ -1014,6 +1029,38 @@ export default class SongSheet extends BaseComponent {
                 return 'chord-am';
             default:
                 return '';
+        }
+    }
+    
+    shareSong() {
+        if (!this.currentSong) return;
+        
+        const songUrl = `${window.location.origin}${window.location.pathname}#song/${this.currentSong.id}`;
+        
+        // Try to use the Web Share API if available
+        if (navigator.share) {
+            navigator.share({
+                title: `${this.currentSong.title} - Ukulele Song Sheet`,
+                text: `Check out this ukulele song sheet for "${this.currentSong.title}" by ${this.currentSong.artist}`,
+                url: songUrl
+            }).catch(err => console.log('Share failed:', err));
+        } else {
+            // Fallback: copy to clipboard
+            navigator.clipboard.writeText(songUrl).then(() => {
+                // Show temporary success message
+                const shareBtn = this.shadowRoot.getElementById('share-btn');
+                const originalText = shareBtn.textContent;
+                shareBtn.textContent = '✅ Copied!';
+                shareBtn.style.background = '#10B981';
+                
+                setTimeout(() => {
+                    shareBtn.textContent = originalText;
+                    shareBtn.style.background = '#3B82F6';
+                }, 2000);
+            }).catch(err => {
+                // Fallback: prompt with URL
+                prompt('Copy this URL to share the song:', songUrl);
+            });
         }
     }
     
