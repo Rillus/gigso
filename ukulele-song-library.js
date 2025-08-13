@@ -65,52 +65,81 @@ export default class UkuleleSongLibrary {
                 {C}Streetlights, {G}people, oh-oh-o{F}----{F}--h`
         },
         {
-            id: 'ipsum-ballad',
-            title: 'Ipsum Ballad',
-            artist: 'Demo Musician',
+            id: 'with-or-without-you',
+            title: 'With or Without You',
+            artist: 'U2',
             key: 'C',
-            difficulty: 'intermediate',
-            genre: 'pop',
-            tempo: 90,
+            difficulty: 'beginner',
+            genre: 'rock',
+            tempo: 120,
             chordProgression: ['C', 'G', 'Am', 'F', 'C', 'G', 'F', 'C'],
             strummingPattern: 'D-D-U-D-U-D-U',
             strummingNotes: 'Gentle strumming pattern, emphasize the downbeats',
             tags: ['ballad', 'slow-tempo', 'emotional'],
-            lyrics: `[Verse 1]
-Sed ut perspiciatis unde omnis
-Iste natus error sit voluptatem
-Accusantium doloremque laudantium
-Totam rem aperiam eaque
+            lyrics: `
+[Intro]
+{C}
+{C}   {G}    {Am}   {F}
+{C}   {G}    {Am}   {F}
 
-[Pre-Chorus]
-Ipsa quae ab illo inventore
-Veritatis et quasi architecto
-Beatae vitae dicta sunt
-Explicabo nemo enim
-
-[Chorus]
-Ipsam voluptatem quia voluptas
-Sit aspernatur aut odit aut
-Fugit sed quia consequuntur
-Magni dolores eos qui
+[Verse 1]
+{C}    See the {G}stone set in your {Am}eyes
+See the {F}thorn twist in your {C}side
+I {G}wait for you{Am}    {F}
 
 [Verse 2]
-Ratione voluptatem sequi nesciunt
-Neque porro quisquam est qui
-Dolorem ipsum quia dolor sit
-Amet consectetur adipisci
-
-[Pre-Chorus]
-Ipsa quae ab illo inventore
-Veritatis et quasi architecto
-Beatae vitae dicta sunt
-Explicabo nemo enim
+{C}    Sleight of {G}hand and twist of {Am}fate
+On a bed of {F}nails she makes me {C}wait
+And I {G}wait with{Am}out yo{F}u 
 
 [Chorus]
-Ipsam voluptatem quia voluptas
-Sit aspernatur aut odit aut
-Fugit sed quia consequuntur
-Magni dolores eos qui`,
+With or with{C}out you {G}
+With or {Am}without you {F}
+
+[Verse 3]
+{C}     Through the {G}storm we reach the {Am}shore
+You give it {F}all but I want {C}more
+And I'm {G}waiting for {Am}you {F}
+
+[Chorus]
+With or with{C}out you {G}
+With or {Am}without you {F}
+I can't {C}live
+{G}With or with{Am}out you {F}
+
+[Bridge]
+{C}  {G}  {Am}   {F}
+
+[Verse 4]
+And you {C}give yourself aw{G}ay
+And you {Am}give yourself aw{F}ay
+And you {C}give
+And you {G}give
+And you {Am}give yourself {F}away
+
+[Verse 5]
+{C}   My hands are {G}tied  {Am}
+My body {F}bruised, she's got me with
+{C}  Nothing to {G}win and
+{Am}Nothing left to {F}lose
+
+[Verse 6]
+And you {C}give yourself aw{G}ay
+And you {Am}give yourself aw{F}ay
+And you {C}give
+And you {G}give
+And you {Am}give yourself {F}away
+
+[Chorus]
+
+[Outro]
+{C}  {G}  {Am}   {F}
+{C}  {G}  {Am}   {F}
+With or with{C}out you {G}
+With or {Am}without you {F}
+I can't {C}live
+{G}With or with{Am}out you {F}
+`
         },
         {
             id: 'dolor-rhythm',

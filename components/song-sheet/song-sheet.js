@@ -255,6 +255,10 @@ export default class SongSheet extends BaseComponent {
                 margin: 0.5em 0;
                 min-height: 2em;
                 display: block;
+                font-family: 'Courier New', 'Monaco', 'Lucida Console', monospace;
+                font-size: 1em;
+                line-height: 2.2;
+                white-space: pre-wrap; /* Preserve whitespace and allow wrapping */
             }
             
             .chord-above {
@@ -638,6 +642,10 @@ export default class SongSheet extends BaseComponent {
                     margin: 4pt 0;
                     min-height: 14pt;
                     display: block;
+                    font-family: 'Courier New', 'Monaco', monospace;
+                    font-size: 9pt;
+                    line-height: 2;
+                    white-space: pre-wrap; /* Preserve whitespace in print */
                 }
                 
                 /* Chord markings in lyrics */
@@ -953,9 +961,8 @@ export default class SongSheet extends BaseComponent {
         let currentSection = null;
         
         lines.forEach(line => {
+            // Check for section markers (use trimmed line for this check)
             const trimmedLine = line.trim();
-            
-            // Check for section markers
             if (trimmedLine.match(/^\[(verse|chorus|bridge|intro|outro|pre-chorus)\s*\d*\]$/i)) {
                 const sectionType = trimmedLine.toLowerCase()
                     .replace(/[\[\]]/g, '')
@@ -974,30 +981,48 @@ export default class SongSheet extends BaseComponent {
                 return;
             }
             
-            // Skip empty lines
+            // Skip completely empty lines
             if (!trimmedLine) {
                 return;
             }
             
+            // Process the ORIGINAL line to preserve intended spacing
+            const originalLine = line;
+            
             // Parse inline chords format: {C}word {Am}another word
             let chordsHtml = '';
             let lyricsText = '';
-            let currentPosition = 0;
+            let visualPosition = 0; // Track visual position for chord placement
             
-            // Split by chord markers and process
-            const parts = trimmedLine.split(/(\{[^}]+\})/);
+            // Split by chord markers and process, preserving all whitespace
+            const parts = originalLine.split(/(\{[^}]+\})/);
             
             parts.forEach(part => {
                 if (part.match(/^\{[^}]+\}$/)) {
                     // This is a chord marker like {C} or {Am}
                     const chord = part.replace(/[{}]/g, '');
                     const chordClass = this.getChordColorClass(chord);
-                    const leftPosition = currentPosition * 0.6; // Approximate character width in ems
+                    // Use 0.7em character width for Courier New monospace font
+                    // Adjusted to 0.7em for optimal chord alignment
+                    const leftPosition = visualPosition * 0.7;
+                    
                     chordsHtml += `<span class="chord-above ${chordClass}" style="left: ${leftPosition}em;">${chord}</span>`;
-                } else if (part) {
-                    // This is lyrics text
-                    lyricsText += part;
-                    currentPosition += part.length;
+                } else {
+                    // This is lyrics text (including all original whitespace)
+                    // Preserve multiple spaces and tabs
+                    let processedText = part;
+                    
+                    // Convert multiple spaces to non-breaking spaces for HTML display
+                    processedText = processedText.replace(/ {2,}/g, (match) => {
+                        return '&nbsp;'.repeat(match.length);
+                    });
+                    
+                    // Convert tabs to 4 non-breaking spaces
+                    processedText = processedText.replace(/\t/g, '&nbsp;&nbsp;&nbsp;&nbsp;');
+                    
+                    lyricsText += processedText;
+                    // Update visual position based on original text length (not processed HTML)
+                    visualPosition += part.length;
                 }
             });
             
@@ -1011,6 +1036,44 @@ export default class SongSheet extends BaseComponent {
         }
         
         return formattedLyrics;
+    }
+    
+    getCharacterWidth() {
+        // Cache the character width calculation
+        if (this._characterWidth) {
+            return this._characterWidth;
+        }
+        
+        // Create a temporary element to measure character width
+        const span = document.createElement('span');
+        span.style.fontFamily = "'Courier New', 'Monaco', 'Lucida Console', monospace";
+        span.style.fontSize = '1em';
+        span.style.lineHeight = '2.2'; // Match the lyrics line height
+        span.style.visibility = 'hidden';
+        span.style.position = 'absolute';
+        span.style.whiteSpace = 'pre';
+        span.style.top = '-9999px'; // Move far off screen
+        span.style.left = '-9999px';
+        span.textContent = 'XXXXXXXXXX'; // 10 characters
+        
+        // Always append to document body to ensure proper measurement
+        document.body.appendChild(span);
+        
+        // Measure the width
+        const tenCharWidth = span.offsetWidth;
+        document.body.removeChild(span);
+        
+        // Calculate character width in em relative to the component's font size
+        const componentStyles = getComputedStyle(this);
+        const baseFontSize = parseFloat(componentStyles.fontSize) || 16;
+        const charWidthPx = tenCharWidth / 10;
+        this._characterWidth = charWidthPx / baseFontSize;
+        
+        // Debug logging
+        console.log(`Character width calculated: ${this._characterWidth.toFixed(3)}em (${charWidthPx.toFixed(2)}px per char, base font: ${baseFontSize}px)`);
+        console.log(`Span measured: ${tenCharWidth}px for 10 chars = ${charWidthPx}px per char`);
+        
+        return this._characterWidth;
     }
     
     getChordColorClass(chordName) {
