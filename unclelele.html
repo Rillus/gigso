@@ -37,11 +37,17 @@
         }
         
         .unclelele-logo {
-            font-size: 3.5em;
-            font-weight: bold;
-            color: var(--unclelele-primary);
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
             margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .logo-image {
+            max-height: 120px;
+            width: auto;
+            max-width: 100%;
+            filter: drop-shadow(2px 2px 4px rgba(0,0,0,0.1));
         }
         
         .unclelele-tagline {
@@ -127,8 +133,8 @@
         }
         
         @media (max-width: 768px) {
-            .unclelele-logo {
-                font-size: 2.5em;
+            .logo-image {
+                max-height: 80px;
             }
             
             .features-grid {
@@ -169,7 +175,9 @@
 <body>
     <div class="unclelele-container">
         <header class="unclelele-header">
-            <h1 class="unclelele-logo">🎵 Unclelele 🎶</h1>
+            <div class="unclelele-logo">
+                <img src="unclelele.svg" alt="Unclelele" class="logo-image">
+            </div>
             <p class="unclelele-tagline">Your friendly guide to ukulele mastery</p>
         </header>
         

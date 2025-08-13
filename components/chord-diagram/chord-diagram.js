@@ -76,7 +76,7 @@ export default class ChordDiagram extends BaseComponent {
                     border: none !important;
                     max-width: 60pt;
                     grid-template-rows: repeat(5, 16pt);
-                    gap: 1pt;
+                    gap: 0;
                 }
                 
                 .chord-diagram--guitar {
@@ -132,22 +132,22 @@ export default class ChordDiagram extends BaseComponent {
                 }
                 
                 /* Last column borders */
-                .fret:nth-child(4n),
-                .chord-diagram--guitar .fret:nth-child(6n) {
-                    border-right: 1px solid black;
-                }
+                // .fret:nth-child(4n),
+                // .chord-diagram--guitar .fret:nth-child(6n) {
+                //     border-right: 1px solid black;
+                // }
                 
                 /* First column borders */
-                .fret:nth-child(4n-3),
-                .chord-diagram--guitar .fret:nth-child(6n-5) {
-                    border-left: 1px solid black;
-                }
+                // .fret:nth-child(4n-3),
+                // .chord-diagram--guitar .fret:nth-child(6n-5) {
+                //     border-left: 1px solid black;
+                // }
                 
-                /* Bottom border for last row */
-                .fret:nth-last-child(-n+4),
-                .chord-diagram--guitar .fret:nth-last-child(-n+6) {
-                    border-bottom: 1px solid black;
-                }
+                // /* Bottom border for last row */
+                // .fret:nth-last-child(-n+4),
+                // .chord-diagram--guitar .fret:nth-last-child(-n+6) {
+                //     border-bottom: 1px solid black;
+                // }
             }
         `;
 

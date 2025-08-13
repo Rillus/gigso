@@ -7,7 +7,10 @@ export default class UncleleleSearch extends BaseComponent {
             <div class="search-container">
                 <div class="search-header">
                     <h2>🔍 Find Your Next Favorite Song</h2>
-                    <button class="back-btn" id="back-home">← Back to Home</button>
+                    <div class="header-buttons">
+                        <button class="tool-btn" id="chord-parser-btn">📝 Add New Song</button>
+                        <button class="back-btn" id="back-home">← Back to Home</button>
+                    </div>
                 </div>
                 
                 <div class="search-controls">
@@ -82,20 +85,43 @@ export default class UncleleleSearch extends BaseComponent {
                 font-size: 1.8em;
             }
             
-            .back-btn {
-                background: var(--unclelele-secondary, #98D8C8);
-                color: var(--unclelele-primary, #2E8B57);
+            .header-buttons {
+                display: flex;
+                gap: 10px;
+                align-items: center;
+            }
+            
+            .back-btn, .tool-btn {
                 border: none;
                 padding: 10px 20px;
                 border-radius: 8px;
                 font-weight: bold;
                 cursor: pointer;
                 transition: all 0.2s;
+                text-decoration: none;
+                font-size: 0.9em;
+            }
+            
+            .back-btn {
+                background: var(--unclelele-secondary, #98D8C8);
+                color: var(--unclelele-primary, #2E8B57);
+            }
+            
+            .tool-btn {
+                background: var(--unclelele-accent, #F7931E);
+                color: white;
+            }
+            
+            .back-btn:hover, .tool-btn:hover {
+                transform: translateY(-2px);
             }
             
             .back-btn:hover {
-                transform: translateY(-2px);
                 box-shadow: 0 4px 12px rgba(46, 139, 87, 0.3);
+            }
+            
+            .tool-btn:hover {
+                box-shadow: 0 4px 12px rgba(247, 147, 30, 0.3);
             }
             
             .search-controls {
@@ -258,6 +284,11 @@ export default class UncleleleSearch extends BaseComponent {
                     text-align: center;
                 }
                 
+                .header-buttons {
+                    flex-direction: column;
+                    gap: 15px;
+                }
+                
                 .filter-group {
                     flex-direction: column;
                 }
@@ -290,6 +321,7 @@ export default class UncleleleSearch extends BaseComponent {
     
     setupEventListeners() {
         const backBtn = this.shadowRoot.getElementById('back-home');
+        const chordParserBtn = this.shadowRoot.getElementById('chord-parser-btn');
         const searchBtn = this.shadowRoot.getElementById('search-btn');
         const searchInput = this.shadowRoot.getElementById('search-input');
         const difficultyFilter = this.shadowRoot.getElementById('difficulty-filter');
@@ -302,6 +334,10 @@ export default class UncleleleSearch extends BaseComponent {
                 detail: { to: 'home' },
                 bubbles: true 
             }));
+        });
+        
+        chordParserBtn.addEventListener('click', () => {
+            window.open('chord-chart-parser-demo.html', '_blank');
         });
         
         searchBtn.addEventListener('click', () => this.performSearch());

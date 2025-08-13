@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chord Chart Parser Demo</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        
+        h1 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 30px;
+        }
+        
+        .demo-instructions {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 30px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .demo-instructions h2 {
+            margin-top: 0;
+            color: #007acc;
+        }
+        
+        .demo-instructions ul {
+            line-height: 1.6;
+        }
+    </style>
+</head>
+<body>
+    <h1>Chord Chart Parser</h1>
+    
+    <div class="demo-instructions">
+        <h2>How to use:</h2>
+        <ul>
+            <li>Paste your chord chart in the traditional format (chords above lyrics) into the input area</li>
+            <li>Fill in the song metadata (title, artist, key, etc.)</li>
+            <li>Click "Parse to JSON Format" to convert</li>
+            <li>The parsed lyrics will show chords integrated with lyrics using {chord} syntax</li>
+            <li>The full JSON object will be generated for use in the ukulele song library</li>
+            <li>Use "Copy JSON" to copy the result to your clipboard</li>
+        </ul>
+    </div>
+    
+    <chord-chart-parser></chord-chart-parser>
+    
+    <script type="module" src="components/base-component.js"></script>
+    <script type="module" src="components/chord-chart-parser/chord-chart-parser.js"></script>
+</body>
+</html>
