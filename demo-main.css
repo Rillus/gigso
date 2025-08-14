@@ -1,16 +1,25 @@
 :root {
-  --colour-primary: #c6c6c6;
-  --chord-button-border-color: #a6a6a6;
-  --chord-button-active-color: #b6b6b6;
-  --chord-button-hover-color: #d6d6d6;
+  /* Gigso Brand Colors */
+  --gigso-navy: #08113e;
+  --gigso-turquoise: #0DC9BB;
+  --gigso-cream: #F9E6C3;
+  --gigso-sun: #FFE448;
+  --gigso-orange: #F67E07;
+  --gigso-red: #F14424;
+  --gigso-fuschia: #E15280;
 
-  --colour-red: #E1453E;
-  --colour-orange: #F17947;
-  --colour-yellow: #FAB15C;
+  --colour-primary: #0DC9BB;
+  --chord-button-border-color: #08113e;
+  --chord-button-active-color: #FFE448;
+  --chord-button-hover-color: #F9E6C3;
+
+  --colour-red: #F14424;
+  --colour-orange: #F67E07;
+  --colour-yellow: #FFE448;
   --colour-green: #60B05B;
-  --colour-blue: #5394C7;
-  --colour-indigo: #4b0082;
-  --colour-violet: #8F00FF;
+  --colour-blue: #0DC9BB;
+  --colour-indigo: #08113e;
+  --colour-violet: #E15280;
 
   --colour-C: var(--colour-red);
   --colour-D: var(--colour-orange);

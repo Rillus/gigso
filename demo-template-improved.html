@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ChordDiagram Component - Gigso Demo</title>
-    <meta name="description" content="Interactive demo of ChordDiagram component">
+    <title>{{COMPONENT_TITLE}} - Gigso Demo</title>
+    <meta name="description" content="Interactive demo of {{COMPONENT_TITLE}} component">
     <style>
         * {
             margin: 0;
@@ -163,7 +163,6 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            overflow-x: auto;
         }
 
         /* Controls Section */
@@ -411,10 +410,10 @@
             <div class="demo-breadcrumb">
                 <a href="index.html">← Back to Gigso Home</a> • 
                 <a href="demos.html">All Demos</a> • 
-                <span>ChordDiagram</span>
+                <span>{{COMPONENT_NAME}}</span>
             </div>
-            <h1>📊 ChordDiagram Demo</h1>
-            <p>Visual representation of chord fingerings</p>
+            <h1>{{COMPONENT_TITLE}} Demo</h1>
+            <p>{{COMPONENT_DESCRIPTION}}</p>
             <div class="demo-actions">
                 <a href="all-together-demo.html" class="btn btn-secondary">🎵 Try Full Demo</a>
                 <a href="demos.html" class="btn btn-secondary">📚 More Components</a>
@@ -427,11 +426,12 @@
         <div class="component-showcase">
             <div class="showcase-header">
                 <h2>Component Preview</h2>
-                <p>Interactive demonstration of the ChordDiagram component</p>
+                <p>Interactive demonstration of the {{COMPONENT_NAME}} component</p>
             </div>
             <div class="component-container" id="component-container">
-<chorddiagram id="demo-component"></chorddiagram>
-</div>
+                <!-- Component will be inserted here -->
+                <{{COMPONENT_TAG}} id="demo-component"></{{COMPONENT_TAG}}>
+            </div>
         </div>
         
         <!-- Controls Section -->
@@ -440,34 +440,10 @@
                 <h3>🎛️ Interactive Controls</h3>
             </div>
             <div class="controls-grid" id="controls-grid">
-
-                <div class="control-group">
-                    <label for="chord-select">Chord:</label>
-                    <select id="chord-select">
-                        <option value="C">C Major</option>
-                        <option value="Am">A Minor</option>
-                        <option value="F">F Major</option>
-                        <option value="G">G Major</option>
-                        <option value="Dm">D Minor</option>
-                        <option value="Em">E Minor</option>
-                    </select>
-                </div>
-                <div class="control-group">
-                    <label for="instrument-select">Instrument:</label>
-                    <select id="instrument-select">
-                        <option value="ukulele" selected>Ukulele</option>
-                        <option value="guitar">Guitar</option>
-                    </select>
-                </div>
-                <div class="control-group">
-                    <label>Actions:</label>
-                    <button id="show-diagram">Show Diagram</button>
-                    <button id="clear-diagram" class="secondary">Clear</button>
-                </div>
-            
-</div>
+                <!-- Controls will be inserted here -->
+            </div>
             <div id="status" class="status info">
-                ChordDiagram component loaded! Use the controls above to interact with the component.
+                {{COMPONENT_NAME}} component loaded! Use the controls above to interact with the component.
             </div>
         </div>
         
@@ -484,44 +460,44 @@
             <!-- Overview Tab -->
             <div id="overview" class="tab-content active">
                 <h3>Component Overview</h3>
-                <p>Visual representation of chord fingerings for various string instruments</p>
-                <p>This interactive demo allows you to explore all the features and capabilities of the ChordDiagram component. Use the controls above to modify the component's behavior and see the results in real-time.</p>
+                <p>{{COMPONENT_DESCRIPTION}}</p>
+                <p>This interactive demo allows you to explore all the features and capabilities of the {{COMPONENT_NAME}} component. Use the controls above to modify the component's behavior and see the results in real-time.</p>
             </div>
             
             <!-- API Reference Tab -->
             <div id="api" class="tab-content">
                 <h3>API Reference</h3>
-                <p>The ChordDiagram component provides a comprehensive API for integration into your applications.</p>
+                <p>The {{COMPONENT_NAME}} component provides a comprehensive API for integration into your applications.</p>
                 <p><strong>Properties:</strong> Configure the component with various properties to customize its behavior.</p>
-                <p><strong>Methods:</strong> Programmatically control the component using built-in methods for chord display and instrument switching.</p>
+                <p><strong>Methods:</strong> Programmatically control the component using built-in methods.</p>
                 <p><strong>Events:</strong> Listen to component events to respond to user interactions and state changes.</p>
             </div>
             
             <!-- Events Tab -->
             <div id="events" class="tab-content">
                 <h3>Component Events</h3>
-                <p>The ChordDiagram component emits various events that you can listen to:</p>
+                <p>The {{COMPONENT_NAME}} component emits various events that you can listen to:</p>
                 <p>• <strong>Initialization:</strong> Fired when the component is ready for use</p>
-                <p>• <strong>Chord Display:</strong> Fired when chord diagrams are shown</p>
-                <p>• <strong>Instrument Changes:</strong> Fired when the instrument type is switched</p>
-                <p>• <strong>Diagram Clear:</strong> Fired when diagrams are cleared</p>
+                <p>• <strong>User Interaction:</strong> Fired when users interact with the component</p>
+                <p>• <strong>State Changes:</strong> Fired when the component's internal state changes</p>
                 <p>View the Event Log tab to see real-time events as they occur.</p>
             </div>
             
             <!-- Examples Tab -->
             <div id="examples" class="tab-content">
                 <h3>Usage Examples</h3>
-                <p>Here are some common ways to use the ChordDiagram component in your projects:</p>
-                <p><strong>Basic Usage:</strong><br><code>&lt;chorddiagram&gt;&lt;/chorddiagram&gt;</code></p>
-                <p><strong>With Properties:</strong><br><code>&lt;chorddiagram chord="C" instrument="ukulele"&gt;&lt;/chorddiagram&gt;</code></p>
-                <p><strong>Event Listeners:</strong><br><code>diagram.addEventListener('chord-display', handleChordDisplay);</code></p>
+                <p>Here are some common ways to use the {{COMPONENT_NAME}} component in your projects:</p>
+                <p><strong>Basic Usage:</strong><br><code>&lt;{{COMPONENT_TAG}}&gt;&lt;/{{COMPONENT_TAG}}&gt;</code></p>
+                <p><strong>With Properties:</strong><br><code>&lt;{{COMPONENT_TAG}} property="value"&gt;&lt;/{{COMPONENT_TAG}}&gt;</code></p>
+                <p><strong>Event Listeners:</strong><br><code>component.addEventListener('event', handler);</code></p>
             </div>
             
             <!-- Event Log Tab -->
             <div id="events-log" class="tab-content">
                 <h3>Event Log</h3>
+                <p>Real-time log of component events and interactions:</p>
                 <div class="event-log" id="event-log">
-                    <div class="event info">Component initialized</div>
+                    <div class="event info">[Component initialized]</div>
                 </div>
             </div>
         </div>
@@ -530,7 +506,7 @@
     <div class="demo-footer">
         <p>🎵 Gigso Component Demo - Built with modern web technologies</p>
     </div>
-    
+
     <script>
         // Tab functionality
         function showTab(tabName) {
@@ -566,69 +542,12 @@
             eventLog.scrollTop = eventLog.scrollHeight;
         }
         
-        // Initialize component
+        // Initialize page
         document.addEventListener('DOMContentLoaded', function() {
-            logEvent('ChordDiagram demo page loaded', 'success');
+            logEvent('Demo page loaded', 'success');
         });
     </script>
     
-    <!-- Component-specific script will be inserted here -->
-    
-    <script type="module">
-        import './components/chord-diagram/chord-diagram.js';
-        
-        document.addEventListener('DOMContentLoaded', function() {
-            const component = document.getElementById('demo-component');
-            
-            // Component-specific event listeners
-            
-                // ChordDiagram specific controls
-                const chordSelect = document.getElementById('chord-select');
-                const instrumentSelect = document.getElementById('instrument-select');
-                const showDiagramBtn = document.getElementById('show-diagram');
-                const clearDiagramBtn = document.getElementById('clear-diagram');
-                
-                chordSelect.addEventListener('change', (e) => {
-                    component.setChord(e.target.value);
-                    logEvent('Chord changed to ' + e.target.value, 'info');
-                    updateStatus('Chord updated to ' + e.target.value);
-                });
-                
-                instrumentSelect.addEventListener('change', (e) => {
-                    component.setInstrument(e.target.value);
-                    logEvent('Instrument changed to ' + e.target.value, 'info');
-                    updateStatus('Instrument updated to ' + e.target.value);
-                });
-                
-                showDiagramBtn.addEventListener('click', () => {
-                    const chord = chordSelect.value;
-                    const instrument = instrumentSelect.value;
-                    component.showDiagram(chord, instrument);
-                    logEvent('Showing ' + chord + ' diagram for ' + instrument, 'success');
-                    updateStatus('Displaying ' + chord + ' chord diagram');
-                });
-                
-                clearDiagramBtn.addEventListener('click', () => {
-                    component.clearDiagram();
-                    logEvent('Diagram cleared', 'warning');
-                    updateStatus('Chord diagram cleared');
-                });
-                
-                // Listen for chord diagram events
-                component.addEventListener('chord-display', (e) => {
-                    logEvent('Chord displayed: ' + e.detail.chord, 'success');
-                });
-                
-                component.addEventListener('instrument-change', (e) => {
-                    logEvent('Instrument changed: ' + e.detail.instrument, 'info');
-                });
-            
-            
-            // Log component initialization
-            logEvent('ChordDiagram component initialized', 'success');
-            updateStatus('ChordDiagram component ready for interaction');
-        });
-    </script>
-    
+    <!-- Component imports will be added here -->
 </body>
 </html>

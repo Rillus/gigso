@@ -3,19 +3,425 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>HandPan Component Demo</title>
-    <link rel="stylesheet" href="demo-main.css">
+    <title>HandPan Component - Gigso Demo</title>
+    <meta name="description" content="Interactive demo of HandPan component">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: linear-gradient(180deg, #F9E6C3 0%, #ffffff 100%);
+            min-height: 100vh;
+        }
+
+        /* Header */
+        .demo-header {
+            background: linear-gradient(135deg, #08113e 0%, #0DC9BB 100%);
+            color: white;
+            padding: 60px 20px 40px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .demo-header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 20"><defs><pattern id="music" x="0" y="0" width="20" height="20" patternUnits="userSpaceOnUse"><circle cx="10" cy="10" r="1" fill="rgba(255,255,255,0.1)"/></pattern></defs><rect width="100" height="20" fill="url(%23music)"/></svg>');
+            animation: float 20s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateX(0px) translateY(0px); }
+            50% { transform: translateX(-10px) translateY(-5px); }
+        }
+
+        .demo-header-content {
+            position: relative;
+            z-index: 2;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .demo-header h1 {
+            font-size: clamp(2.5rem, 5vw, 3.5rem);
+            font-weight: 700;
+            margin-bottom: 1rem;
+            background: linear-gradient(45deg, #FFE448, #F9E6C3);
+            background-clip: text;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-shadow: 0 4px 20px rgba(0,0,0,0.3);
+        }
+
+        .demo-breadcrumb {
+            margin-bottom: 20px;
+            opacity: 0.9;
+        }
+
+        .demo-breadcrumb a {
+            color: rgba(255,255,255,0.8);
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+
+        .demo-breadcrumb a:hover {
+            color: #FFE448;
+        }
+
+        .demo-header p {
+            font-size: 1.3rem;
+            opacity: 0.9;
+            margin-bottom: 30px;
+        }
+
+        .demo-actions {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border-radius: 25px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            border: none;
+            cursor: pointer;
+            font-size: 0.95rem;
+        }
+
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(10px);
+            color: white;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.25);
+            transform: translateY(-2px);
+        }
+
+        /* Container */
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        /* Component Showcase */
+        .component-showcase {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            margin: -30px 20px 40px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.1);
+            position: relative;
+            z-index: 3;
+        }
+
+        .showcase-header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .showcase-header h2 {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #08113e;
+            margin-bottom: 10px;
+        }
+
+        .showcase-header p {
+            color: #6c757d;
+            font-size: 1.1rem;
+        }
+
+        .component-container {
+            background: rgba(249, 230, 195, 0.2);
+            border: 2px solid rgba(13, 201, 187, 0.2);
+            border-radius: 15px;
+            padding: 30px;
+            margin-bottom: 30px;
+            min-height: 400px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow-x: auto;
+        }
+
+        /* Controls Section */
+        .controls-section {
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.08);
+        }
+
+        .controls-header h3 {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: #08113e;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .controls-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .control-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .control-group label {
+            font-weight: 600;
+            color: #08113e;
+            font-size: 0.9rem;
+        }
+
+        .control-group input,
+        .control-group select {
+            padding: 10px 15px;
+            border: 2px solid #e9ecef;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: border-color 0.3s ease;
+        }
+
+        .control-group input:focus,
+        .control-group select:focus {
+            outline: none;
+            border-color: #0DC9BB;
+        }
+
+        .control-group button {
+            padding: 10px 20px;
+            background: linear-gradient(45deg, #F67E07, #FFE448);
+            color: #08113e;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .control-group button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(246, 126, 7, 0.3);
+        }
+
+        .control-group button.secondary {
+            background: linear-gradient(45deg, #6c757d, #adb5bd);
+            color: white;
+        }
+
+        .control-group button.secondary:hover {
+            box-shadow: 0 4px 12px rgba(108, 117, 125, 0.3);
+        }
+
+        /* Status */
+        .status {
+            padding: 15px 20px;
+            border-radius: 10px;
+            font-weight: 500;
+            margin-top: 20px;
+        }
+
+        .status.info {
+            background: rgba(13, 201, 187, 0.1);
+            color: #0DC9BB;
+            border-left: 4px solid #0DC9BB;
+        }
+
+        .status.success {
+            background: rgba(96, 176, 91, 0.1);
+            color: #60B05B;
+            border-left: 4px solid #60B05B;
+        }
+
+        .status.warning {
+            background: rgba(250, 177, 92, 0.1);
+            color: #FAB15C;
+            border-left: 4px solid #FAB15C;
+        }
+
+        .status.error {
+            background: rgba(225, 69, 62, 0.1);
+            color: #E1453E;
+            border-left: 4px solid #E1453E;
+        }
+
+        /* Documentation Section */
+        .docs-section {
+            background: white;
+            border-radius: 20px;
+            padding: 0;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.08);
+            overflow: hidden;
+        }
+
+        .tabs {
+            display: flex;
+            border-bottom: 2px solid #f8f9fa;
+            background: #f8f9fa;
+        }
+
+        .tab {
+            padding: 15px 25px;
+            border: none;
+            background: transparent;
+            color: #6c757d;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border-bottom: 3px solid transparent;
+        }
+
+        .tab.active {
+            color: #0DC9BB;
+            border-bottom-color: #0DC9BB;
+            background: white;
+        }
+
+        .tab:hover:not(.active) {
+            color: #08113e;
+            background: rgba(13, 201, 187, 0.05);
+        }
+
+        .tab-content {
+            padding: 30px;
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .tab-content h3 {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: #08113e;
+            margin-bottom: 20px;
+        }
+
+        .tab-content p {
+            color: #6c757d;
+            line-height: 1.8;
+            margin-bottom: 15px;
+        }
+
+        /* Event Log */
+        .event-log {
+            background: #1a1a1a;
+            color: #f8f9fa;
+            border-radius: 10px;
+            padding: 20px;
+            max-height: 300px;
+            overflow-y: auto;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9rem;
+        }
+
+        .event {
+            margin-bottom: 5px;
+            padding: 5px 0;
+        }
+
+        .event.info { color: #0DC9BB; }
+        .event.success { color: #60B05B; }
+        .event.warning { color: #FAB15C; }
+        .event.error { color: #E1453E; }
+
+        /* Footer */
+        .demo-footer {
+            background: #08113e;
+            color: white;
+            padding: 40px 20px;
+            text-align: center;
+            margin-top: 50px;
+        }
+
+        .demo-footer p {
+            opacity: 0.8;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .demo-actions {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .btn {
+                width: 100%;
+                max-width: 300px;
+                justify-content: center;
+            }
+
+            .component-showcase {
+                margin: -30px 10px 30px;
+                padding: 30px 20px;
+            }
+
+            .controls-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .tabs {
+                flex-wrap: wrap;
+            }
+
+            .tab {
+                flex: 1;
+                min-width: 120px;
+                text-align: center;
+            }
+        }
+    </style>
     <!-- Load Tone.js for audio functionality -->
     <script src="https://unpkg.com/tone@14.7.77/build/Tone.js"></script>
-    <!-- Load HandPan component -->
-    <script type="module">
-        import '../components/hand-pan/hand-pan.js';
-    </script>
 </head>
 <body>
     <div class="demo-header">
-        <h1>🥁 HandPan Component Demo</h1>
-        <p>Interactive hand pan (hang drum) instrument for touch-screen play with soothing synthesized tones</p>
+        <div class="demo-header-content">
+            <div class="demo-breadcrumb">
+                <a href="index.html">← Back to Gigso Home</a> • 
+                <a href="demos.html">All Demos</a> • 
+                <span>HandPan</span>
+            </div>
+            <h1>🥁 HandPan Demo</h1>
+            <p>Interactive hand pan (hang drum) instrument for touch-screen play with soothing synthesized tones</p>
+            <div class="demo-actions">
+                <a href="all-together-demo.html" class="btn btn-secondary">🎵 Try Full Demo</a>
+                <a href="demos.html" class="btn btn-secondary">📚 More Components</a>
+            </div>
+        </div>
     </div>
     
     <div class="container">
@@ -33,7 +439,7 @@
         <!-- Controls Section -->
         <div class="controls-section">
             <div class="controls-header">
-                <h3>Interactive Controls</h3>
+                <h3>🎛️ Interactive Controls</h3>
             </div>
             <div class="controls-grid" id="controls-grid">
 
@@ -90,24 +496,36 @@
             <div id="overview" class="tab-content active">
                 <h3>Component Overview</h3>
                 <p>Interactive hand pan (hang drum) instrument for touch-screen play with soothing synthesized tones</p>
+                <p>This interactive demo allows you to explore all the features and capabilities of the HandPan component. Use the controls above to modify the component's behavior and see the results in real-time.</p>
             </div>
             
             <!-- API Reference Tab -->
             <div id="api" class="tab-content">
                 <h3>API Reference</h3>
-                <p>API documentation will be available soon.</p>
+                <p>The HandPan component provides a comprehensive API for integration into your applications.</p>
+                <p><strong>Properties:</strong> Configure the component with various properties to customize its behavior.</p>
+                <p><strong>Methods:</strong> Programmatically control the component using built-in methods for key/scale changes and audio control.</p>
+                <p><strong>Events:</strong> Listen to component events to respond to user interactions and state changes.</p>
             </div>
             
             <!-- Events Tab -->
             <div id="events" class="tab-content">
-                <h3>Events</h3>
-                <p>Events documentation will be available soon.</p>
+                <h3>Component Events</h3>
+                <p>The HandPan component emits various events that you can listen to:</p>
+                <p>• <strong>Initialization:</strong> Fired when the component is ready for use</p>
+                <p>• <strong>Note Played:</strong> Fired when users touch the hand pan keys</p>
+                <p>• <strong>Key Changes:</strong> Fired when the key or scale is modified</p>
+                <p>• <strong>Audio Control:</strong> Fired when mute/unmute actions occur</p>
+                <p>View the Event Log tab to see real-time events as they occur.</p>
             </div>
             
             <!-- Examples Tab -->
             <div id="examples" class="tab-content">
                 <h3>Usage Examples</h3>
-                <p>Usage examples will be available soon.</p>
+                <p>Here are some common ways to use the HandPan component in your projects:</p>
+                <p><strong>Basic Usage:</strong><br><code>&lt;hand-pan&gt;&lt;/hand-pan&gt;</code></p>
+                <p><strong>With Properties:</strong><br><code>&lt;hand-pan key="D" scale="minor" size="large"&gt;&lt;/hand-pan&gt;</code></p>
+                <p><strong>Event Listeners:</strong><br><code>handPan.addEventListener('note-played', handleNotePlay);</code></p>
             </div>
             
             <!-- Event Log Tab -->
@@ -118,6 +536,10 @@
                 </div>
             </div>
         </div>
+    </div>
+
+    <div class="demo-footer">
+        <p>🎵 Gigso Component Demo - Built with modern web technologies</p>
     </div>
     
     <script>
@@ -162,9 +584,9 @@
         });
     </script>
     
-    <!-- Component-specific script will be inserted here -->
-    
     <script type="module">
+        import './components/hand-pan/hand-pan.js';
+        
         document.addEventListener('DOMContentLoaded', function() {
             console.log('HandPan Demo: DOM loaded');
             const component = document.getElementById('demo-component');

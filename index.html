@@ -3,427 +3,545 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gigso Component Demos</title>
-    <link rel="stylesheet" href="demo-main.css">
+    <title>Gigso - Browser-Based Music Creation Tools</title>
+    <meta name="description" content="Create, learn, and play music directly in your browser. Interactive instruments, tutorials, and music-making tools for everyone.">
     <style>
-        /* Index-specific styles */
-        .header {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            overflow-x: hidden;
+        }
+
+        /* Hero Section */
+        .hero {
+            background: linear-gradient(135deg, #08113e 0%, #0DC9BB 100%);
             color: white;
-            padding: 60px 20px;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 20"><defs><pattern id="music" x="0" y="0" width="20" height="20" patternUnits="userSpaceOnUse"><circle cx="10" cy="10" r="1" fill="rgba(255,255,255,0.1)"/></pattern></defs><rect width="100" height="20" fill="url(%23music)"/></svg>');
+            animation: float 20s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateX(0px) translateY(0px); }
+            50% { transform: translateX(-10px) translateY(-5px); }
+        }
+
+        .hero-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
             text-align: center;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+            position: relative;
+            z-index: 2;
+        }
+
+        .hero h1 {
+            font-size: clamp(2.5rem, 6vw, 4.5rem);
+            font-weight: 700;
+            margin-bottom: 1.5rem;
+            background: linear-gradient(45deg, #FFE448, #F9E6C3);
+            background-clip: text;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-shadow: 0 4px 20px rgba(0,0,0,0.3);
         }
         
-        .header h1 {
-            margin: 0 0 20px 0;
-            font-size: 3em;
+        .hero-logo {
+            display: flex;
+            justify-content: center;
+            width: 362px;
+            height: 362px;
+            margin: 2rem auto;
+        }
+        
+        .hero-logo gigso-logo {
+            filter: drop-shadow(0 8px 25px rgba(0,0,0,0.3));
+        }
+
+        .hero .tagline {
+            font-size: clamp(1.2rem, 4vw, 2rem);
+            margin-bottom: 2rem;
+            opacity: 0.95;
             font-weight: 300;
         }
-        
-        .header p {
-            margin: 0;
-            font-size: 1.3em;
-            opacity: 0.9;
+
+        .hero .subtitle {
+            font-size: clamp(1rem, 2vw, 1.3rem);
+            margin-bottom: 3rem;
+            opacity: 0.8;
+            max-width: 700px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .cta-buttons {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-top: 2rem;
+        }
+
+        .btn {
+            padding: 18px 36px;
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 1.1rem;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn-primary {
+            background: linear-gradient(45deg, #F67E07, #FFE448);
+            color: #08113e;
+            box-shadow: 0 8px 25px rgba(246, 126, 7, 0.4);
+            font-weight: 700;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 35px rgba(246, 126, 7, 0.6);
+        }
+
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(10px);
+            color: white;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.25);
+            transform: translateY(-2px);
+        }
+
+        /* Features Section */
+        .features {
+            padding: 100px 20px;
+            background: linear-gradient(180deg, #F9E6C3 0%, #ffffff 100%);
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .section-header {
+            text-align: center;
+            margin-bottom: 80px;
+        }
+
+        .section-header h2 {
+            font-size: clamp(2.5rem, 5vw, 4rem);
+            font-weight: 700;
+            color: #08113e;
+            margin-bottom: 1rem;
+        }
+
+        .section-header p {
+            font-size: 1.3rem;
+            color: #6c757d;
             max-width: 600px;
             margin: 0 auto;
         }
-        
-        .category {
-            background: white;
-            border-radius: 16px;
-            padding: 30px;
-            margin-bottom: 30px;
-            box-shadow: 0 8px 32px rgba(0,0,0,0.1);
-        }
-        
-        .category h2 {
-            color: #2c3e50;
-            margin: 0 0 25px 0;
-            font-size: 1.8em;
-            border-bottom: 2px solid #e9ecef;
-            padding-bottom: 15px;
-        }
-        
-        .components-grid {
+
+        .features-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
-            gap: 20px;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 40px;
+            margin-bottom: 60px;
         }
-        
-        .component-card {
-            background: #f8f9fa;
-            border-radius: 12px;
-            padding: 25px;
-            border: 2px solid #e9ecef;
+
+        .feature-card {
+            background: white;
+            border-radius: 20px;
+            padding: 40px 30px;
+            text-align: center;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.08);
             transition: all 0.3s ease;
-            text-decoration: none;
-            color: inherit;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .feature-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, #0DC9BB, #F67E07);
+        }
+
+        .feature-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 20px 60px rgba(0,0,0,0.15);
+        }
+
+        .feature-icon {
+            font-size: 4rem;
+            margin-bottom: 20px;
             display: block;
         }
-        
-        .component-card:hover {
-            transform: translateY(-4px);
-            box-shadow: 0 12px 40px rgba(0,0,0,0.15);
-            border-color: #667eea;
-        }
-        
-        .component-header {
-            display: flex;
-            align-items: center;
+
+        .feature-card h3 {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: #08113e;
             margin-bottom: 15px;
         }
-        
-        .component-icon {
-            font-size: 2em;
-            margin-right: 15px;
-        }
-        
-        .component-title {
-            font-size: 1.3em;
-            font-weight: 600;
-            color: #2c3e50;
-            margin: 0;
-        }
-        
-        .component-description {
+
+        .feature-card p {
             color: #6c757d;
-            margin: 0 0 20px 0;
-            line-height: 1.5;
+            line-height: 1.6;
         }
-        
-        .component-link {
-            display: inline-block;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+
+        /* Categories Section */
+        .categories {
+            padding: 100px 20px;
+            background: #08113e;
             color: white;
-            padding: 10px 20px;
-            border-radius: 8px;
+        }
+
+        .categories-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+        }
+
+        .category-card {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 30px;
+            text-decoration: none;
+            color: white;
+            transition: all 0.3s ease;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .category-card:hover {
+            background: rgba(255, 255, 255, 0.15);
+            transform: translateY(-5px);
+            box-shadow: 0 15px 40px rgba(0,0,0,0.3);
+        }
+
+        .category-icon {
+            font-size: 3rem;
+            margin-bottom: 20px;
+            display: block;
+        }
+
+        .category-card h3 {
+            font-size: 1.4rem;
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+
+        .category-card p {
+            opacity: 0.9;
+            font-size: 0.95rem;
+            margin-bottom: 15px;
+        }
+
+        .category-count {
+            display: inline-block;
+            background: rgba(255, 255, 255, 0.2);
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 500;
+        }
+
+        /* CTA Section */
+        .cta-section {
+            padding: 100px 20px;
+            background: linear-gradient(135deg, #F14424 0%, #F67E07 100%);
+            color: white;
+            text-align: center;
+        }
+
+        .cta-section h2 {
+            font-size: clamp(2.5rem, 5vw, 4rem);
+            font-weight: 700;
+            margin-bottom: 20px;
+        }
+
+        .cta-section p {
+            font-size: 1.3rem;
+            margin-bottom: 40px;
+            opacity: 0.95;
+        }
+
+        /* Footer */
+        .footer {
+            background: #1a1a1a;
+            color: white;
+            padding: 60px 20px 40px;
+            text-align: center;
+        }
+
+        .footer-content {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .footer-links {
+            display: flex;
+            justify-content: center;
+            gap: 40px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+        }
+
+        .footer-links a {
+            color: #ccc;
             text-decoration: none;
             font-weight: 500;
-            transition: all 0.2s ease;
+            transition: color 0.3s ease;
         }
-        
-        .component-link:hover {
-            transform: translateY(-1px);
-            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+
+        .footer-links a:hover {
+            color: #0DC9BB;
         }
-        
-        .stats {
-            background: white;
-            border-radius: 16px;
-            padding: 30px;
-            margin-bottom: 30px;
-            box-shadow: 0 8px 32px rgba(0,0,0,0.1);
-            text-align: center;
-        }
-        
-        .stats h2 {
-            color: #2c3e50;
-            margin: 0 0 20px 0;
-            font-size: 1.8em;
-        }
-        
-        .stats-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 20px;
-        }
-        
-        .stat-item {
-            padding: 20px;
-            background: #f8f9fa;
-            border-radius: 12px;
-            border: 2px solid #e9ecef;
-        }
-        
-        .stat-number {
-            font-size: 2.5em;
-            font-weight: 700;
-            color: #667eea;
-            margin: 0;
-        }
-        
-        .stat-label {
-            color: #6c757d;
-            margin: 5px 0 0 0;
-            font-weight: 500;
-        }
-        
-        .footer {
-            background: #2c3e50;
-            color: white;
-            text-align: center;
-            padding: 30px 20px;
-            margin-top: 40px;
-        }
-        
+
         .footer p {
-            margin: 0;
-            opacity: 0.8;
+            color: #888;
+            margin-bottom: 10px;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .cta-buttons {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .btn {
+                width: 100%;
+                max-width: 300px;
+                justify-content: center;
+            }
+
+            .features-grid {
+                grid-template-columns: 1fr;
+                gap: 30px;
+            }
+
+            .categories-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .footer-links {
+                flex-direction: column;
+                gap: 20px;
+            }
         }
         
-        @media (max-width: 768px) {
-            .header h1 {
-                font-size: 2.5em;
+        @media (max-width: 480px) {
+            .hero-logo gigso-logo {
+                max-width: 100%;
+                height: 120px;
             }
-            
-            .components-grid {
-                grid-template-columns: 1fr;
+        }
+
+        /* Animation for scroll reveal */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
             }
-            
-            .stats-grid {
-                grid-template-columns: 1fr;
+            to {
+                opacity: 1;
+                transform: translateY(0);
             }
+        }
+
+        .animate-on-scroll {
+            animation: fadeInUp 0.8s ease-out;
         }
     </style>
 </head>
 <body>
-    <div class="header">
-        <h1>🎵 Gigso Component Demos</h1>
-        <p>Interactive demonstrations of all Gigso music application components with documentation, API references, and live examples.</p>
-    </div>
-    
-    <div class="container">
-        <div class="stats">
-            <h2>Component Overview</h2>
-            <div class="stats-grid">
-                <div class="stat-item">
-                    <p class="stat-number">21</p>
-                    <p class="stat-label">Total Components</p>
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="hero-content">
+            <div class="hero-logo">
+                <gigso-logo></gigso-logo>
+            </div>
+            <p class="tagline">Music Creation in Your Browser</p>
+            <p class="subtitle">
+                Interactive instruments, music theory tools, and educational resources. 
+                No downloads, no installation - just open and play.
+            </p>
+            <div class="cta-buttons">
+                <a href="all-together-demo.html" class="btn btn-primary">
+                    🎹 Try It Now
+                </a>
+                <a href="demos.html" class="btn btn-secondary">
+                    📚 Explore Components
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section class="features">
+        <div class="container">
+            <div class="section-header">
+                <h2>Everything You Need to Create Music</h2>
+                <p>Powerful tools designed for musicians, educators, and music enthusiasts of all skill levels</p>
+            </div>
+            
+            <div class="features-grid">
+                <div class="feature-card">
+                    <span class="feature-icon">🎹</span>
+                    <h3>Interactive Instruments</h3>
+                    <p>Play piano keyboards, guitar fretboards, and unique instruments like handpans directly in your browser with realistic sound and touch response.</p>
                 </div>
-                <div class="stat-item">
-                    <p class="stat-number">5</p>
-                    <p class="stat-label">Categories</p>
+                
+                <div class="feature-card">
+                    <span class="feature-icon">🎼</span>
+                    <h3>Music Theory Tools</h3>
+                    <p>Visualize chords, scales, and progressions. Perfect for learning music theory or composing your next masterpiece.</p>
                 </div>
-                <div class="stat-item">
-                    <p class="stat-number">100%</p>
-                    <p class="stat-label">Interactive Demos</p>
+                
+                <div class="feature-card">
+                    <span class="feature-icon">🎧</span>
+                    <h3>Audio Production</h3>
+                    <p>Record, sequence, and arrange your musical ideas with professional-grade tools that run entirely in your web browser.</p>
                 </div>
-                <div class="stat-item">
-                    <p class="stat-number">📚</p>
-                    <p class="stat-label">Full Documentation</p>
+                
+                <div class="feature-card">
+                    <span class="feature-icon">📱</span>
+                    <h3>Mobile Friendly</h3>
+                    <p>Create music anywhere with full touch support. All tools work seamlessly on phones, tablets, and desktop computers.</p>
+                </div>
+                
+                <div class="feature-card">
+                    <span class="feature-icon">🎓</span>
+                    <h3>Educational Resources</h3>
+                    <p>Learn with interactive tutorials, chord charts, and guided lessons. Includes specialized tools for ukulele workshops.</p>
+                </div>
+                
+                <div class="feature-card">
+                    <span class="feature-icon">🔧</span>
+                    <h3>Open Source</h3>
+                    <p>Built with modern web technologies. All components are modular and can be integrated into your own projects.</p>
                 </div>
             </div>
         </div>
-        
-        <div class="category">
-            <h2>🎹 Music Creation Components</h2>
-            <div class="components-grid">
-                <a href="piano-roll-demo.html" class="component-card">
-                    <div class="component-header">
-                        <div class="component-icon">🎹</div>
-                        <h3 class="component-title">PianoRoll</h3>
-                    </div>
-                    <p class="component-description">Visual timeline interface for arranging and playing chord progressions</p>
-                    <span class="component-link">View Demo →</span>
+    </section>
+
+    <!-- Categories Section -->
+    <section class="categories">
+        <div class="container">
+            <div class="section-header">
+                <h2>Explore Our Tools</h2>
+                <p>Discover the different categories of music-making components</p>
+            </div>
+            
+            <div class="categories-grid">
+                <a href="demos.html#music-creation" class="category-card">
+                    <span class="category-icon">🎹</span>
+                    <h3>Music Creation</h3>
+                    <p>Piano rolls, chord palettes, keyboards, and composition tools for creating original music.</p>
+                    <span class="category-count">6 Components</span>
                 </a>
                 
-                <a href="chord-palette-demo.html" class="component-card">
-                    <div class="component-header">
-                        <div class="component-icon">🎼</div>
-                        <h3 class="component-title">ChordPalette</h3>
-                    </div>
-                    <p class="component-description">Pre-defined chord library for quick chord selection</p>
-                    <span class="component-link">View Demo →</span>
+                <a href="demos.html#instruments" class="category-card">
+                    <span class="category-icon">🎸</span>
+                    <h3>Virtual Instruments</h3>
+                    <p>Interactive fretboards, chord diagrams, tuners, and instrument simulators.</p>
+                    <span class="category-count">4 Components</span>
                 </a>
                 
-                <a href="add-chord-demo.html" class="component-card">
-                    <div class="component-header">
-                        <div class="component-icon">➕</div>
-                        <h3 class="component-title">AddChord</h3>
-                    </div>
-                    <p class="component-description">Form interface for creating custom chords</p>
-                    <span class="component-link">View Demo →</span>
+                <a href="demos.html#playback" class="category-card">
+                    <span class="category-icon">⏯️</span>
+                    <h3>Playback Controls</h3>
+                    <p>Transport controls, play/stop buttons, and loop functionality for your compositions.</p>
+                    <span class="category-count">4 Components</span>
                 </a>
                 
-                <a href="gigso-keyboard-demo.html" class="component-card">
-                    <div class="component-header">
-                        <div class="component-icon">🎹</div>
-                        <h3 class="component-title">GigsoKeyboard</h3>
-                    </div>
-                    <p class="component-description">Interactive piano keyboard for note playback and visual feedback</p>
-                    <span class="component-link">View Demo →</span>
+                <a href="demos.html#visualization" class="category-card">
+                    <span class="category-icon">📊</span>
+                    <h3>Audio Visualization</h3>
+                    <p>VU meters, frequency monitors, EQ displays, and real-time audio analysis tools.</p>
+                    <span class="category-count">4 Components</span>
                 </a>
                 
-                <a href="hand-pan-demo.html" class="component-card">
-                    <div class="component-header">
-                        <div class="component-icon">🥁</div>
-                        <h3 class="component-title">HandPan</h3>
-                    </div>
-                    <p class="component-description">Interactive hand pan (hang drum) instrument for touch-screen play</p>
-                    <span class="component-link">View Demo →</span>
+                <a href="demos.html#management" class="category-card">
+                    <span class="category-icon">🔧</span>
+                    <h3>Interface & Tools</h3>
+                    <p>Menus, song libraries, branding, and utility components for building music apps.</p>
+                    <span class="category-count">3 Components</span>
                 </a>
                 
-                <a href="hand-pan-wrapper-demo.html" class="component-card">
-                    <div class="component-header">
-                        <div class="component-icon">🥁</div>
-                        <h3 class="component-title">HandPanWrapper</h3>
-                    </div>
-                    <p class="component-description">Complete drop-in wrapper component with audio management and controls</p>
-                    <span class="component-link">View Demo →</span>
+                <a href="unclelele.html" class="category-card">
+                    <span class="category-icon">🎵</span>
+                    <h3>Ukulele Workshop</h3>
+                    <p>Specialized tools for ukulele education, song sheets, and workshop materials.</p>
+                    <span class="category-count">Special Feature</span>
                 </a>
             </div>
         </div>
-        
-        <div class="category">
-            <h2>🎸 Instrument Components</h2>
-            <div class="components-grid">
-                <a href="fretboard-demo.html" class="component-card">
-                    <div class="component-header">
-                        <div class="component-icon">🎸</div>
-                        <h3 class="component-title">Fretboard</h3>
-                    </div>
-                    <p class="component-description">Interactive guitar fretboard component for chord and scale visualization</p>
-                    <span class="component-link">View Demo →</span>
-                </a>
-                
-                <a href="chord-diagram-demo.html" class="component-card">
-                    <div class="component-header">
-                        <div class="component-icon">📊</div>
-                        <h3 class="component-title">ChordDiagram</h3>
-                    </div>
-                    <p class="component-description">Visual representation of chord fingerings</p>
-                    <span class="component-link">View Demo →</span>
-                </a>
-                
-                <a href="chromatic-tuner-demo.html" class="component-card">
-                    <div class="component-header">
-                        <div class="component-icon">🎵</div>
-                        <h3 class="component-title">ChromaticTuner</h3>
-                    </div>
-                    <p class="component-description">Chromatic tuner for instrument tuning</p>
-                    <span class="component-link">View Demo →</span>
-                </a>
-                
-                <a href="scale-key-demo.html" class="component-card">
-                    <div class="component-header">
-                        <div class="component-icon">🎼</div>
-                        <h3 class="component-title">ScaleKey</h3>
-                    </div>
-                    <p class="component-description">Scale and key selection component</p>
-                    <span class="component-link">View Demo →</span>
+    </section>
+
+    <!-- CTA Section -->
+    <section class="cta-section">
+        <div class="container">
+            <h2>Ready to Make Music?</h2>
+            <p>Join thousands of musicians creating amazing music with Gigso</p>
+            <div class="cta-buttons">
+                <a href="all-together-demo.html" class="btn btn-secondary" style="background: rgba(255,255,255,0.2); border-color: rgba(255,255,255,0.4);">
+                    🎵 Start Creating Now
                 </a>
             </div>
         </div>
-        
-        <div class="category">
-            <h2>⏯️ Playback Controls</h2>
-            <div class="components-grid">
-                <a href="transport-controls-demo.html" class="component-card">
-                    <div class="component-header">
-                        <div class="component-icon">⏯️</div>
-                        <h3 class="component-title">TransportControls</h3>
-                    </div>
-                    <p class="component-description">Container component for playback control buttons</p>
-                    <span class="component-link">View Demo →</span>
-                </a>
-                
-                <a href="play-button-demo.html" class="component-card">
-                    <div class="component-header">
-                        <div class="component-icon">▶️</div>
-                        <h3 class="component-title">PlayButton</h3>
-                    </div>
-                    <p class="component-description">Initiates playback of the current song</p>
-                    <span class="component-link">View Demo →</span>
-                </a>
-                
-                <a href="stop-button-demo.html" class="component-card">
-                    <div class="component-header">
-                        <div class="component-icon">⏹️</div>
-                        <h3 class="component-title">StopButton</h3>
-                    </div>
-                    <p class="component-description">Stops playback and resets to beginning</p>
-                    <span class="component-link">View Demo →</span>
-                </a>
-                
-                <a href="loop-button-demo.html" class="component-card">
-                    <div class="component-header">
-                        <div class="component-icon">🔁</div>
-                        <h3 class="component-title">LoopButton</h3>
-                    </div>
-                    <p class="component-description">Toggles loop playback mode</p>
-                    <span class="component-link">View Demo →</span>
-                </a>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-content">
+            <div class="footer-links">
+                <a href="demos.html">All Components</a>
+                <a href="all-together-demo.html">Try Demo</a>
+                <a href="unclelele.html">Ukulele Workshop</a>
+                <a href="chord-chart-parser-demo.html">Chord Parser</a>
             </div>
+            <p>🎵 Gigso - Browser-Based Music Creation Tools</p>
+            <p>Built with modern web technologies for musicians everywhere</p>
         </div>
-        
-        <div class="category">
-            <h2>📊 Visual Feedback</h2>
-            <div class="components-grid">
-                <a href="current-chord-demo.html" class="component-card">
-                    <div class="component-header">
-                        <div class="component-icon">🎵</div>
-                        <h3 class="component-title">CurrentChord</h3>
-                    </div>
-                    <p class="component-description">Displays the currently selected or playing chord</p>
-                    <span class="component-link">View Demo →</span>
-                </a>
-                
-                <a href="eq-display-demo.html" class="component-card">
-                    <div class="component-header">
-                        <div class="component-icon">📊</div>
-                        <h3 class="component-title">EQDisplay</h3>
-                    </div>
-                    <p class="component-description">Equalizer display component</p>
-                    <span class="component-link">View Demo →</span>
-                </a>
-                
-                <a href="frequency-monitor-demo.html" class="component-card">
-                    <div class="component-header">
-                        <div class="component-icon">📈</div>
-                        <h3 class="component-title">FrequencyMonitor</h3>
-                    </div>
-                    <p class="component-description">Frequency monitoring and analysis component</p>
-                    <span class="component-link">View Demo →</span>
-                </a>
-                
-                <a href="vu-meter-demo.html" class="component-card">
-                    <div class="component-header">
-                        <div class="component-icon">📊</div>
-                        <h3 class="component-title">VUMeter</h3>
-                    </div>
-                    <p class="component-description">Volume unit meter for audio visualization</p>
-                    <span class="component-link">View Demo →</span>
-                </a>
-            </div>
-        </div>
-        
-        <div class="category">
-            <h2>🔧 Interface & Management</h2>
-            <div class="components-grid">
-                <a href="gigso-menu-demo.html" class="component-card">
-                    <div class="component-header">
-                        <div class="component-icon">☰</div>
-                        <h3 class="component-title">GigsoMenu</h3>
-                    </div>
-                    <p class="component-description">Toggle interface for showing/hiding components</p>
-                    <span class="component-link">View Demo →</span>
-                </a>
-                
-                <a href="record-collection-demo.html" class="component-card">
-                    <div class="component-header">
-                        <div class="component-icon">📚</div>
-                        <h3 class="component-title">RecordCollection</h3>
-                    </div>
-                    <p class="component-description">Displays and loads songs from the song library</p>
-                    <span class="component-link">View Demo →</span>
-                </a>
-                
-                <a href="gigso-logo-demo.html" class="component-card">
-                    <div class="component-header">
-                        <div class="component-icon">🎵</div>
-                        <h3 class="component-title">GigsoLogo</h3>
-                    </div>
-                    <p class="component-description">Gigso application logo component</p>
-                    <span class="component-link">View Demo →</span>
-                </a>
-            </div>
-        </div>
-    </div>
-    
-    <div class="footer">
-        <p>🎵 Gigso Music Application - Component Demo Suite</p>
-        <p>Each demo includes interactive controls, API documentation, event logging, and usage examples</p>
-    </div>
+    </footer>
+
+    <!-- Import Gigso Logo Component -->
+    <script type="module" src="components/base-component.js"></script>
+    <script type="module" src="helpers/eventHandlers.js"></script>
+    <script type="module" src="components/gigso-logo/gigso-logo.js"></script>
 </body>
 </html>

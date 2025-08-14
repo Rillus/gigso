@@ -49,6 +49,8 @@ Gigso is a web-based music creation application built with vanilla JavaScript, W
 - Test all component interactions
 - Maintain high test coverage
 - Follow naming convention: `component-name.test.js`
+- **CRITICAL**: Never use the watch mode of the test command (`npm test` without specific file) - this blocks progression
+- Always run specific test files: `npm test -- path/to/test-file.test.js`
 
 ## Audio Implementation
 - Use Tone.js for all audio functionality
@@ -105,6 +107,7 @@ Gigso is a web-based music creation application built with vanilla JavaScript, W
 - Maintain the established architecture patterns
 - Reference the PRD for any architectural decisions
 - **CRITICAL**: When working with deployment files (`_headers`, `_redirects`), ensure proper MIME types and avoid overly broad redirects
+- **CRITICAL**: Never run `npm test` without specifying a test file - this starts watch mode and blocks progression
 
 ## Key Files to Reference
 - `documents/PRD.md` - Complete project specification

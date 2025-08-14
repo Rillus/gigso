@@ -7,6 +7,34 @@
     border: 20px solid #f2770b;
     border-width: 30px 10px 15px;
     box-sizing: border-box;
+    transition: all 0.3s ease;
+}
+
+/* Size-based styling */
+.size-small .keyboard {
+    height: 80px;
+    border-width: 24px 8px 12px;
+}
+
+.size-medium .keyboard {
+    height: 100px;
+    border-width: 30px 10px 15px;
+}
+
+.size-large .keyboard {
+    height: 120px;
+    border-width: 36px 12px 18px;
+}
+
+/* Apply size multiplier to all dimensions */
+.size-small {
+    transform: scale(0.8);
+    transform-origin: center;
+}
+
+.size-large {
+    transform: scale(1.2);
+    transform-origin: center;
 }
 
 ol {

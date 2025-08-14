@@ -12,6 +12,7 @@ The GigsoKeyboard component provides a visual piano keyboard interface that user
 | Attribute | Type | Default | Description |
 |-----------|------|---------|-------------|
 | `octaves` | number | 4 | Number of octaves to display |
+| `size` | string | 'medium' | Keyboard size ('small', 'medium', 'large') |
 
 ### Events Received
 | Event | Data | Description |
@@ -47,6 +48,12 @@ The GigsoKeyboard component provides a visual piano keyboard interface that user
 - **Note duration**: Highlight duration matches note playback
 - **Octave display**: Visual representation of current octave
 
+### Events Emitted
+| Event | Data | Description |
+|-------|------|-------------|
+| `octave-change` | `{octave}` | Emitted when octave changes |
+| `key-press` | `{note}` | Emitted when a note is played |
+
 ## Properties
 
 | Property | Type | Default | Description |
@@ -55,6 +62,7 @@ The GigsoKeyboard component provides a visual piano keyboard interface that user
 | `keyMap` | Object | {...} | Keyboard key to note mapping |
 | `keysPerOctave` | Array | ['C', 'C#', ...] | Note names per octave |
 | `currentOctave` | number | 3 | Current octave for keyboard input |
+| `playingNotes` | Set | new Set() | Set of currently playing notes |
 
 ## Expected Behaviour
 
@@ -107,6 +115,21 @@ Handles keyboard release for visual feedback.
 ### `highlightNotes(played)`
 Highlights specific notes for a given duration.
 
+### `setOctave(octave)`
+Sets the current octave for keyboard input and emits an `octave-change` event.
+
+### `setSize(size)`
+Sets the keyboard size attribute ('small', 'medium', 'large').
+
+### `updateSize()`
+Updates the keyboard size styling based on the size attribute.
+
+### `playScale()`
+Plays a C major scale with a 0.5-second delay between notes.
+
+### `stopAll()`
+Stops all currently playing notes and clears visual highlights.
+
 ## Integration Patterns
 
 ### With Actions
@@ -131,6 +154,33 @@ this.synth.triggerAttackRelease(note, '8n');
 3. Actions dispatches highlight-notes event
 4. GigsoKeyboard highlights corresponding keys
 5. Highlights clear after note duration
+
+### Demo Integration
+```javascript
+// Demo controls integration
+const keyboard = document.getElementById('demo-component');
+
+// Octave control
+keyboard.setOctave(5);
+
+// Size control
+keyboard.setSize('large');
+
+// Scale playback
+keyboard.playScale();
+
+// Stop all notes
+keyboard.stopAll();
+
+// Event listening
+keyboard.addEventListener('octave-change', (e) => {
+    console.log('Octave changed to:', e.detail.octave);
+});
+
+keyboard.addEventListener('key-press', (e) => {
+    console.log('Note played:', e.detail.note);
+});
+```
 
 ## Styling
 
@@ -200,6 +250,45 @@ test('should highlight notes when event received', () => {
 - Octave changes work with +/- keys
 - Visual feedback matches key press/release
 - Multiple simultaneous key presses
+
+### New Methods
+```javascript
+test('should set octave using setOctave method', () => {
+  const keyboard = document.createElement('gigso-keyboard');
+  document.body.appendChild(keyboard);
+  
+  keyboard.setOctave(5);
+  expect(keyboard.currentOctave).toBe(5);
+});
+
+test('should set size using setSize method', () => {
+  const keyboard = document.createElement('gigso-keyboard');
+  document.body.appendChild(keyboard);
+  
+  keyboard.setSize('large');
+  expect(keyboard.getAttribute('size')).toBe('large');
+});
+
+test('should play scale using playScale method', async () => {
+  const keyboard = document.createElement('gigso-keyboard');
+  document.body.appendChild(keyboard);
+  const playNoteSpy = jest.spyOn(keyboard, 'playNote');
+  
+  keyboard.playScale();
+  await new Promise(resolve => setTimeout(resolve, 100));
+  
+  expect(playNoteSpy).toHaveBeenCalled();
+});
+
+test('should stop all notes using stopAll method', () => {
+  const keyboard = document.createElement('gigso-keyboard');
+  document.body.appendChild(keyboard);
+  const stopAllSpy = jest.spyOn(keyboard.synth, 'triggerRelease');
+  
+  keyboard.stopAll();
+  expect(stopAllSpy).toHaveBeenCalled();
+});
+```
 
 ## Performance Considerations
 

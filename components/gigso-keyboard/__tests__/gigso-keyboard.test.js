@@ -6,12 +6,14 @@ describe('GigsoKeyboard Component', () => {
     beforeEach(() => {
         document.body.innerHTML = '';
 
-        // Create a mock synth
+        // Create a mock synth with all required methods
         window.Tone = {
             Synth: jest.fn().mockImplementation(() => ({
                 triggerAttackRelease: jest.fn(),
+                triggerRelease: jest.fn(),
                 toDestination: jest.fn(() => ({
-                    triggerAttackRelease: jest.fn()
+                    triggerAttackRelease: jest.fn(),
+                    triggerRelease: jest.fn()
                 }))
             }))
         };
@@ -83,5 +85,107 @@ describe('GigsoKeyboard Component', () => {
 
         // Assert
         expect(keyboard.currentOctave).toBe(2);
+    });
+
+    // Test setOctave method
+    test('should set octave using setOctave method', () => {
+        // Arrange
+        const keyboard = new GigsoKeyboard();
+        document.body.appendChild(keyboard);
+
+        // Act
+        keyboard.setOctave(5);
+
+        // Assert
+        expect(keyboard.currentOctave).toBe(5);
+    });
+
+    // Test setSize method
+    test('should set size using setSize method', () => {
+        // Arrange
+        const keyboard = new GigsoKeyboard();
+        document.body.appendChild(keyboard);
+
+        // Act
+        keyboard.setSize('large');
+
+        // Assert
+        expect(keyboard.getAttribute('size')).toBe('large');
+    });
+
+    // Test playScale method
+    test('should play scale using playScale method', async () => {
+        // Arrange
+        const keyboard = new GigsoKeyboard();
+        document.body.appendChild(keyboard);
+        const playNoteSpy = jest.spyOn(keyboard, 'playNote');
+
+        // Act
+        keyboard.playScale();
+
+        // Wait for the first note to be scheduled
+        await new Promise(resolve => setTimeout(resolve, 100));
+
+        // Assert
+        expect(playNoteSpy).toHaveBeenCalled();
+    });
+
+    // Test stopAll method
+    test('should stop all notes using stopAll method', () => {
+        // Arrange
+        const keyboard = new GigsoKeyboard();
+        document.body.appendChild(keyboard);
+        
+        // Mock the synth and its methods
+        const mockSynth = {
+            triggerRelease: jest.fn()
+        };
+        keyboard.synth = mockSynth;
+        
+        const stopAllSpy = jest.spyOn(mockSynth, 'triggerRelease');
+
+        // Act
+        keyboard.stopAll();
+
+        // Assert
+        expect(stopAllSpy).toHaveBeenCalled();
+    });
+
+    // Test octave-change event emission
+    test('should emit octave-change event when octave is set', () => {
+        // Arrange
+        const keyboard = new GigsoKeyboard();
+        document.body.appendChild(keyboard);
+        const eventSpy = jest.fn();
+        keyboard.addEventListener('octave-change', eventSpy);
+
+        // Act
+        keyboard.setOctave(6);
+
+        // Assert
+        expect(eventSpy).toHaveBeenCalledWith(
+            expect.objectContaining({
+                detail: { octave: 6 }
+            })
+        );
+    });
+
+    // Test key-press event emission
+    test('should emit key-press event when note is played', () => {
+        // Arrange
+        const keyboard = new GigsoKeyboard();
+        document.body.appendChild(keyboard);
+        const eventSpy = jest.fn();
+        keyboard.addEventListener('key-press', eventSpy);
+
+        // Act
+        keyboard.playNote(0, true); // Play C note
+
+        // Assert
+        expect(eventSpy).toHaveBeenCalledWith(
+            expect.objectContaining({
+                detail: { note: 'C3' }
+            })
+        );
     });
 });
