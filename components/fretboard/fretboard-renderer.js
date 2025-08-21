@@ -87,7 +87,9 @@ export default class FretboardRenderer {
 
     // Render strings
     for (let string = 0; string < this.instrumentConfig.strings; string++) {
-      const y = startY + (string * this.dimensions.stringSpacing);
+      // Invert string index to match chord library order (highest string = index 0)
+      const invertedStringIndex = this.instrumentConfig.strings - 1 - string;
+      const y = startY + (invertedStringIndex * this.dimensions.stringSpacing);
       this.renderString(startX, y, fretCount);
     }
 
@@ -157,7 +159,9 @@ export default class FretboardRenderer {
     const startY = 30;
     
     this.instrumentConfig.tuning.forEach((note, index) => {
-      const y = startY + (index * this.dimensions.stringSpacing);
+      // Invert string index to match chord library order (highest string = index 0)
+      const invertedStringIndex = this.instrumentConfig.strings - 1 - index;
+      const y = startY + (invertedStringIndex * this.dimensions.stringSpacing);
       
       const label = document.createElementNS('http://www.w3.org/2000/svg', 'text');
       label.setAttribute('x', startX);
@@ -176,7 +180,15 @@ export default class FretboardRenderer {
   renderFretMarkers() {
     const { fretRange } = this.options;
     const startX = this.dimensions.nutWidth + 20;
-    const centerY = 30 + ((this.instrumentConfig.strings - 1) * this.dimensions.stringSpacing) / 2;
+    
+    // Position for traditional inlay dots on the fretboard (between strings)
+    // For 6-string guitar: position between G and D strings (between strings 2 and 3)
+    const stringCount = this.instrumentConfig.strings;
+    const middleStringIndex = Math.floor(stringCount / 2) - 0.5; // Position between middle strings
+    const fretboardY = 30 + (middleStringIndex * this.dimensions.stringSpacing);
+    
+    // Position for additional inlay dots below the fretboard
+    const bottomY = 30 + (stringCount * this.dimensions.stringSpacing) + 20;
     
     this.instrumentConfig.markers.forEach(fretNumber => {
       if (fretNumber >= fretRange.start && fretNumber <= fretRange.end) {
@@ -184,25 +196,33 @@ export default class FretboardRenderer {
         const x = startX + (fretIndex * this.dimensions.fretWidth) - (this.dimensions.fretWidth / 2);
         
         if (this.instrumentConfig.doubleMarkers.includes(fretNumber)) {
-          // Double marker (e.g., 12th fret)
-          this.renderMarkerDot(x, centerY - 8, 4);
-          this.renderMarkerDot(x, centerY + 8, 4);
+          // Double marker (e.g., 12th fret) - vertically stacked on fretboard, side-by-side below
+          // Traditional dots on fretboard (vertically stacked)
+          this.renderMarkerDot(x, fretboardY - 25, 6, 'fretboard-marker');
+          this.renderMarkerDot(x, fretboardY + 25, 6, 'fretboard-marker');
+          // Additional dots below (side by side)
+          this.renderMarkerDot(x - 6, bottomY, 4, 'bottom-marker');
+          this.renderMarkerDot(x + 6, bottomY, 4, 'bottom-marker');
         } else {
           // Single marker
-          this.renderMarkerDot(x, centerY, 4);
+          // Traditional dot on fretboard
+          this.renderMarkerDot(x, fretboardY, 6, 'fretboard-marker');
+          // Additional dot below
+          this.renderMarkerDot(x, bottomY, 4, 'bottom-marker');
         }
       }
     });
   }
 
-  renderMarkerDot(x, y, radius) {
+  renderMarkerDot(x, y, radius, markerClass = 'fret-marker') {
     const dot = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
     dot.setAttribute('cx', x);
     dot.setAttribute('cy', y);
     dot.setAttribute('r', radius);
-    dot.setAttribute('fill', '#DDD');
-    dot.setAttribute('stroke', '#BBB');
+    dot.setAttribute('fill', '#F0F0F0');
+    dot.setAttribute('stroke', '#D0D0D0');
     dot.setAttribute('stroke-width', '1');
+    dot.setAttribute('class', markerClass);
     
     this.svg.appendChild(dot);
   }
@@ -211,7 +231,9 @@ export default class FretboardRenderer {
     for (let fret = 0; fret < fretCount; fret++) {
       for (let string = 0; string < this.instrumentConfig.strings; string++) {
         const x = startX + (fret * this.dimensions.fretWidth) + (this.dimensions.fretWidth / 2);
-        const y = startY + (string * this.dimensions.stringSpacing);
+        // Invert string index to match chord library order (highest string = index 0)
+        const invertedStringIndex = this.instrumentConfig.strings - 1 - string;
+        const y = startY + (invertedStringIndex * this.dimensions.stringSpacing);
         
         const position = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
         position.setAttribute('cx', x);
@@ -249,15 +271,18 @@ export default class FretboardRenderer {
     positions.forEach((fretNumber, stringIndex) => {
       if (fretNumber === null || fretNumber === undefined) return;
       
+      // Invert string index to match chord library order (highest string = index 0)
+      const invertedStringIndex = this.instrumentConfig.strings - 1 - stringIndex;
+      
       if (fretNumber === 0) {
         // Open string indicator
-        this.renderOpenString(startX - 15, startY + (stringIndex * this.dimensions.stringSpacing));
+        this.renderOpenString(startX - 5, startY + (invertedStringIndex * this.dimensions.stringSpacing));
       } else if (fretNumber > 0) {
         // Finger position
-        const fretIndex = fretNumber - this.options.fretRange.start;
+        const fretIndex = fretNumber - this.options.fretRange.start - 1;
         if (fretIndex >= 0 && fretIndex < (this.options.fretRange.end - this.options.fretRange.start)) {
           const x = startX + (fretIndex * this.dimensions.fretWidth) + (this.dimensions.fretWidth / 2);
-          const y = startY + (stringIndex * this.dimensions.stringSpacing);
+          const y = startY + (invertedStringIndex * this.dimensions.stringSpacing);
           this.renderFingerPosition(x, y, fretNumber);
         }
       }
@@ -299,7 +324,7 @@ export default class FretboardRenderer {
     text.setAttribute('font-weight', 'bold');
     text.setAttribute('fill', 'white');
     text.setAttribute('class', 'chord-marker finger-number');
-    text.textContent = fretNumber - 1;
+    text.textContent = fretNumber;
     
     this.svg.appendChild(text);
   }
@@ -324,14 +349,28 @@ export default class FretboardRenderer {
     
     positionsToRender.forEach(position => {
       const { string, fret, note, degree, interval, isRoot, isThird, isFifth, isSeventh } = position;
-      const fretIndex = fret - this.options.fretRange.start;
       
-      if (fretIndex >= 0 && fretIndex < (this.options.fretRange.end - this.options.fretRange.start)) {
-        const x = startX + (fretIndex * this.dimensions.fretWidth) + (this.dimensions.fretWidth / 2);
-        const y = startY + (string * this.dimensions.stringSpacing);
-        
-        this.renderScalePosition(x, y, note, degree, interval, isRoot, isThird, isFifth, isSeventh);
+      // Invert string index to match chord library order (highest string = index 0)
+      const invertedStringIndex = this.instrumentConfig.strings - 1 - string;
+      
+      let x, y;
+      
+      if (fret === 0) {
+        // Open string - position at the nut
+        x = (this.dimensions.fretWidth / 2) - this.dimensions.nutWidth;
+        y = startY + (invertedStringIndex * this.dimensions.stringSpacing);
+      } else {
+        // Freted note - position between fret lines
+        const fretIndex = fret - this.options.fretRange.start - 1; // Adjust for fret position between lines
+        if (fretIndex >= 0 && fretIndex < (this.options.fretRange.end - this.options.fretRange.start)) {
+          x = startX + (fretIndex * this.dimensions.fretWidth) + (this.dimensions.fretWidth / 2);
+          y = startY + (invertedStringIndex * this.dimensions.stringSpacing);
+        } else {
+          return; // Skip if fret is out of range
+        }
       }
+      
+      this.renderScalePosition(x, y, note, degree, interval, isRoot, isThird, isFifth, isSeventh);
     });
   }
 
@@ -506,10 +545,9 @@ export default class FretboardRenderer {
     
     const keySignatureGroup = document.createElementNS('http://www.w3.org/2000/svg', 'g');
     keySignatureGroup.setAttribute('class', 'key-signature');
-    
-    // Position for key signature display
-    const x = this.dimensions.width - 150;
-    const y = 30;
+     
+    const x = 0;
+    const y = this.dimensions.height - 50;
     
     // Key name
     const keyText = document.createElementNS('http://www.w3.org/2000/svg', 'text');

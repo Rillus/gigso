@@ -9,60 +9,66 @@ const { instrument: instrumentState, currentChord } = State;
 
 export default class Fretboard extends BaseComponent {
   constructor(options = {}) {
-    const template = `<div class="fretboard-container"></div>`;
-    
-    const styles = `
-      .fretboard-container {
-        width: 100%;
-        height: 100%;
-        position: relative;
-        overflow-x: auto;
-        overflow-y: hidden;
-        background: #f8f8f8;
-        border: 1px solid #ddd;
-        border-radius: 8px;
-        padding: 20px;
-        box-sizing: border-box;
-      }
+    try {
+      const template = `<div class="fretboard-container"></div>`;
       
-      .fretboard-svg {
-        display: block;
-        margin: 0 auto;
-      }
-      
-      @media (max-width: 768px) {
+      const styles = `
         .fretboard-container {
-          padding: 10px;
+          width: 100%;
+          height: 100%;
+          position: relative;
+          overflow-x: auto;
+          overflow-y: hidden;
+          background: #f8f8f8;
+          border: 1px solid #ddd;
+          border-radius: 8px;
+          padding: 20px;
+          box-sizing: border-box;
         }
-      }
-    `;
+        
+        .fretboard-svg {
+          display: block;
+          margin: 0 auto;
+        }
+        
+        @media (max-width: 768px) {
+          .fretboard-container {
+            padding: 10px;
+          }
+        }
+      `;
 
-    super(template, styles);
+      super(template, styles);
 
-    // Initialize properties
-    this.instrument = options.instrument || instrumentState() || 'guitar';
-    this.fretRange = options.fretRange || { start: 0, end: 12 };
-    this.theme = options.theme || 'default';
-    this.currentChord = null;
-    this.currentScale = null;
-    this.scaleKey = null;
-    
-    // Initialize calculator and renderer
-    this.calculator = new FretboardCalculator();
-    this.renderer = new FretboardRenderer(
-      this.shadowRoot.querySelector('.fretboard-container'),
-      this.instrument,
-      options
-    );
-    
-    // Initialize scale key component for enhanced scale operations
-    this.initializeScaleKey(options);
+      // Initialize properties
+      this.instrument = options.instrument || instrumentState() || 'guitar';
+      this.fretRange = options.fretRange || { start: 0, end: 12 };
+      this.theme = options.theme || 'default';
+      this.currentChord = null;
+      this.currentScale = null;
+      this.scaleKey = null;
+      
+      // Initialize calculator and renderer
+      this.calculator = new FretboardCalculator();
+      this.renderer = new FretboardRenderer(
+        this.shadowRoot.querySelector('.fretboard-container'),
+        this.instrument,
+        options
+      );
+      
+      // Initialize scale key component for enhanced scale operations
+      this.initializeScaleKey(options);
 
-    // Set up event listeners
-    this.setupEventListeners();
-    
-    // Initial render
-    this.render();
+      // Set up event listeners
+      this.setupEventListeners();
+      
+      // Initial render
+      this.render();
+    } catch (error) {
+      console.error('Fretboard: Constructor error:', error);
+      // Re-throw to prevent silent failures
+      throw error;
+    }
   }
 
   static get observedAttributes() {
@@ -596,4 +602,11 @@ export default class Fretboard extends BaseComponent {
   }
 }
 
-customElements.define('fretboard-component', Fretboard);
+try {
+    console.log('Fretboard: About to register custom element');
+    customElements.define('fretboard-component', Fretboard);
+    console.log('Fretboard: Custom element registered successfully');
+} catch (error) {
+    console.error('Fretboard: Failed to register custom element:', error);
+    throw error;
+}

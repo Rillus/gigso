@@ -21,15 +21,15 @@ export const INSTRUMENT_CONFIG = {
     stringGauges: [0.032, 0.024, 0.028, 0.021]
   },
   mandolin: {
-    strings: 8,
-    courses: 4, // Double strings
-    tuning: ['G', 'D', 'A', 'E'], // Course tuning (each doubled)
+    strings: 4, // Treat as 4-string instrument (courses)
+    courses: 4, // Double strings per course
+    tuning: ['G', 'D', 'A', 'E'], // Course tuning (each course has 2 strings)
     fretCount: 20,
-    stringSpacing: 12,
+    stringSpacing: 25, // Increased spacing for visual clarity
     fretSpacing: 25,
     markers: [3, 5, 7, 9, 12, 15, 17, 19],
     doubleMarkers: [12],
-    stringGauges: [0.011, 0.011, 0.016, 0.016, 0.026, 0.026, 0.040, 0.040]
+    stringGauges: [0.011, 0.016, 0.026, 0.040] // One gauge per course
   }
 };
 
@@ -188,9 +188,8 @@ export default class FretboardCalculator {
       throw new Error(`Invalid note: ${note}`);
     }
 
-    // Handle mandolin course tuning (double strings)
-    const tuning = instrument === 'mandolin' ? 
-      [...config.tuning, ...config.tuning] : config.tuning;
+    // Use standard tuning (mandolin now treated as 4-string)
+    const tuning = config.tuning;
 
     tuning.forEach((openNote, stringIndex) => {
       const openNoteIndex = this.chromatic.indexOf(openNote);
@@ -244,9 +243,8 @@ export default class FretboardCalculator {
 
     const positions = [];
 
-    // Handle mandolin course tuning
-    const tuning = instrument === 'mandolin' ? 
-      [...config.tuning, ...config.tuning] : config.tuning;
+    // Use standard tuning (mandolin now treated as 4-string)
+    const tuning = config.tuning;
 
     tuning.forEach((openNote, stringIndex) => {
       const openNoteIndex = this.chromatic.indexOf(openNote);
@@ -285,9 +283,8 @@ export default class FretboardCalculator {
       throw new Error(`Unknown instrument: ${instrument}`);
     }
 
-    // Handle mandolin course tuning
-    const tuning = instrument === 'mandolin' ? 
-      [...config.tuning, ...config.tuning] : config.tuning;
+    // Use standard tuning (mandolin now treated as 4-string)
+    const tuning = config.tuning;
 
     if (stringIndex >= tuning.length) {
       throw new Error(`Invalid string index: ${stringIndex}`);

@@ -23,7 +23,7 @@ export const INSTRUMENT_CONFIGS = {
         stringCount: { 
             guitar: 6, 
             ukulele: 4, 
-            mandolin: 8,
+            mandolin: 4, // 4 courses (each with 2 strings)
             bass: 4 
         },
         noteFormatting: (note, octave) => `${note}${octave}`,

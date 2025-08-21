@@ -336,6 +336,83 @@
             margin-bottom: 15px;
         }
 
+        .tab-content h4 {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: #08113e;
+            margin: 25px 0 15px 0;
+            border-left: 4px solid #0DC9BB;
+            padding-left: 15px;
+        }
+
+        .tab-content h5 {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #2c3e50;
+            margin: 20px 0 10px 0;
+        }
+
+        .tab-content ul, .tab-content ol {
+            margin: 15px 0;
+            padding-left: 25px;
+        }
+
+        .tab-content li {
+            color: #6c757d;
+            line-height: 1.6;
+            margin-bottom: 8px;
+        }
+
+        .tab-content strong {
+            color: #08113e;
+            font-weight: 600;
+        }
+
+        .tab-content code {
+            background: #f8f9fa;
+            color: #e83e8c;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9rem;
+        }
+
+        /* Fretboard Inlay Dots */
+        .fret-marker {
+            filter: drop-shadow(0 1px 2px rgba(0,0,0,0.1));
+        }
+
+        /* Traditional inlay dots on the fretboard */
+        .fretboard-marker {
+            filter: drop-shadow(0 1px 2px rgba(0,0,0,0.1));
+            opacity: 0.8;
+        }
+
+        /* Additional inlay dots below the fretboard */
+        .bottom-marker {
+            filter: drop-shadow(0 1px 2px rgba(0,0,0,0.1));
+            opacity: 0.6;
+        }
+
+        /* Key Signature Styling */
+        .key-signature {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 15px;
+            border-radius: 10px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            border: 2px solid #e9ecef;
+        }
+
+        .key-signature text {
+            pointer-events: none;
+        }
+
+        /* Component-specific styling */
+        .fretboard-svg {
+            max-width: 100%;
+            height: auto;
+        }
+
         /* Event Log */
         .event-log {
             background: #1a1a1a;
@@ -430,7 +507,7 @@
                 <p>Interactive demonstration of the Fretboard component</p>
             </div>
             <div class="component-container" id="component-container">
-<fretboard id="demo-component"></fretboard>
+          <fretboard-component id="demo-component"></fretboard-component>
 </div>
         </div>
         
@@ -498,6 +575,7 @@
         <div class="docs-section">
             <div class="tabs">
                 <button class="tab active" onclick="showTab('overview')">Overview</button>
+                <button class="tab" onclick="showTab('scales')">Scales & Numbers</button>
                 <button class="tab" onclick="showTab('api')">API Reference</button>
                 <button class="tab" onclick="showTab('events')">Events</button>
                 <button class="tab" onclick="showTab('examples')">Examples</button>
@@ -509,6 +587,89 @@
                 <h3>Component Overview</h3>
                 <p>Interactive guitar fretboard component for chord and scale visualization</p>
                 <p>This interactive demo allows you to explore all the features and capabilities of the Fretboard component. Use the controls above to modify the component's behavior and see the results in real-time.</p>
+            </div>
+            
+            <!-- Scales & Numbers Tab -->
+            <div id="scales" class="tab-content">
+                <h3>Scales & Numbers</h3>
+                <p>Understanding musical scales and their fretboard representations is crucial for musicians. The Fretboard component supports various scale types and provides a clear visual representation of notes.</p>
+                
+                <h4>🎵 Scale Types</h4>
+                <p>Understanding the different types of musical scales helps you choose the right sound for your music. Each scale has its own unique character and emotional quality:</p>
+                <ul>
+                    <li><strong>Major Scale:</strong> The foundation of Western music, featuring a bright, happy sound. Pattern: Root, Major 2nd, Major 3rd, Perfect 4th, Perfect 5th, Major 6th, Major 7th</li>
+                    <li><strong>Natural Minor Scale:</strong> A more relaxed, melancholic scale. Pattern: Root, Major 2nd, Minor 3rd, Perfect 4th, Perfect 5th, Minor 6th, Minor 7th</li>
+                    <li><strong>Harmonic Minor Scale:</strong> Similar to natural minor but with a raised 7th, creating tension. Common in classical and flamenco music.</li>
+                    <li><strong>Melodic Minor Scale:</strong> A jazz favorite that raises both 6th and 7th when ascending, natural minor when descending.</li>
+                    <li><strong>Pentatonic Scales:</strong> Five-note scales that are easy to play and sound great. Major pentatonic removes the 4th and 7th from major scale.</li>
+                    <li><strong>Blues Scale:</strong> A six-note scale that adds a "blue note" (flattened 5th) to the minor pentatonic.</li>
+                    <li><strong>Dorian Mode:</strong> A minor scale with a major 6th, giving it a jazzy, sophisticated feel.</li>
+                    <li><strong>Phrygian Mode:</strong> A minor scale with a flattened 2nd, creating an exotic, Spanish sound.</li>
+                </ul>
+                
+                <h4>🔢 Understanding the Numbers</h4>
+                <p>When you display a scale on the fretboard, you'll see numbers that represent different aspects of the scale:</p>
+                
+                <h5>Scale Degrees (1, 2, 3, 4, 5, 6, 7)</h5>
+                <ul>
+                    <li><strong>1 (Root):</strong> The starting note of the scale - this is your "home base"</li>
+                    <li><strong>2 (Second):</strong> The second note, usually a whole step above the root</li>
+                    <li><strong>3 (Third):</strong> Determines if the scale is major (major 3rd) or minor (minor 3rd)</li>
+                    <li><strong>4 (Fourth):</strong> The fourth note, often used in chord progressions</li>
+                    <li><strong>5 (Fifth):</strong> The fifth note, very stable and commonly used in power chords</li>
+                    <li><strong>6 (Sixth):</strong> The sixth note, adds color to the scale</li>
+                    <li><strong>7 (Seventh):</strong> The seventh note, creates tension that resolves to the root</li>
+                </ul>
+                
+                <h5>Intervals (0, 2, 4, 5, 7, 9, 11)</h5>
+                <p>These numbers represent the distance in semitones from the root note:</p>
+                <ul>
+                    <li><strong>0:</strong> Root note (0 semitones from root)</li>
+                    <li><strong>2:</strong> Major 2nd (2 semitones from root)</li>
+                    <li><strong>4:</strong> Major 3rd (4 semitones from root)</li>
+                    <li><strong>5:</strong> Perfect 4th (5 semitones from root)</li>
+                    <li><strong>7:</strong> Perfect 5th (7 semitones from root)</li>
+                    <li><strong>9:</strong> Major 6th (9 semitones from root)</li>
+                    <li><strong>11:</strong> Major 7th (11 semitones from root)</li>
+                </ul>
+                
+                <h4>🎯 How to Use the Scale Display</h4>
+                <ol>
+                    <li><strong>Select a Scale Root:</strong> Choose the starting note (C, D, E, F, G, A, B)</li>
+                    <li><strong>Choose Scale Type:</strong> Pick the scale pattern (Major, Minor, Pentatonic, etc.)</li>
+                    <li><strong>View the Pattern:</strong> The fretboard will highlight all notes of that scale</li>
+                    <li><strong>Practice Patterns:</strong> Use the highlighted notes to practice scales and improvisation</li>
+                </ol>
+                
+                <h4>💡 Practical Tips</h4>
+                <ul>
+                    <li><strong>Start with Major Scales:</strong> They're the foundation for understanding other scales</li>
+                    <li><strong>Learn the Root Note:</strong> Always know where your root note is - it's your anchor</li>
+                    <li><strong>Practice in Different Positions:</strong> Try playing the same scale starting from different frets</li>
+                    <li><strong>Use for Improvisation:</strong> The highlighted notes are safe to use when soloing in that key</li>
+                    <li><strong>Combine with Chords:</strong> Scales and chords work together - learn which scales fit with which chord progressions</li>
+                </ul>
+                
+                <h4>🎸 Example: C Major Scale</h4>
+                <p>When you select C Major scale, you'll see:</p>
+                <ul>
+                    <li><strong>Root (1):</strong> C notes highlighted in a special color</li>
+                    <li><strong>Scale Notes:</strong> C, D, E, F, G, A, B all highlighted across the fretboard</li>
+                    <li><strong>Pattern:</strong> The same pattern repeats every 12 frets (one octave)</li>
+                </ul>
+                <p>This scale works perfectly with C major chords and can be used for soloing in the key of C.</p>
+                
+                <h4>🧪 Try This Exercise</h4>
+                <p>Practice this common scale pattern to improve your fretboard knowledge:</p>
+                <ol>
+                    <li><strong>Select C Major Scale:</strong> Use the controls above to set root to "C" and type to "Major"</li>
+                    <li><strong>Find the Root Notes:</strong> Look for the specially colored C notes (these are your "home base")</li>
+                    <li><strong>Play the Scale:</strong> Start from any C note and play up the scale: C → D → E → F → G → A → B → C</li>
+                    <li><strong>Try Different Positions:</strong> Move to a different C note and play the same pattern</li>
+                    <li><strong>Experiment with Other Keys:</strong> Try G Major (G, A, B, C, D, E, F#) or F Major (F, G, A, Bb, C, D, E)</li>
+                </ol>
+                
+                <p><strong>💡 Pro Tip:</strong> Notice how the same scale pattern appears in different positions across the fretboard. This is called "position playing" and is essential for advanced guitar techniques.</p>
             </div>
             
             <!-- API Reference Tab -->
@@ -601,10 +762,111 @@
         import './components/fretboard/fretboard.js';
         
         document.addEventListener('DOMContentLoaded', function() {
-            const component = document.getElementById('demo-component');
+            console.log('Fretboard Demo: DOM loaded');
             
-            // Component-specific event listeners
+            let retryCount = 0;
+            const maxRetries = 50; // 5 seconds max
             
+            // Wait for the custom element to be defined AND the component element to exist
+            const waitForComponent = () => {
+                retryCount++;
+                if (retryCount > maxRetries) {
+                    console.error('Fretboard Demo: Max retries exceeded, component failed to initialize');
+                    logEvent('Component failed to initialize after maximum retries', 'error');
+                    updateStatus('Error: Component failed to initialize', 'error');
+                    return;
+                }
+                
+                console.log(`Fretboard Demo: waitForComponent called (attempt ${retryCount}/${maxRetries})`);
+                
+                // First check if custom element is defined
+                const customElement = customElements.get('fretboard-component');
+                if (!customElement) {
+                    console.log('Fretboard Demo: Custom element not defined yet, retrying...');
+                    setTimeout(waitForComponent, 100);
+                    return;
+                }
+                
+                console.log('Fretboard Demo: Custom element is defined:', customElement);
+                console.log('Fretboard Demo: Custom element name:', customElement.name);
+                
+                // Check if component element exists and needs to be upgraded
+                let component = document.getElementById('demo-component');
+                if (!component) {
+                    console.log('Fretboard Demo: Component element not found, retrying...');
+                    logEvent('Component element not found, retrying...', 'warning');
+                    setTimeout(waitForComponent, 100);
+                    return;
+                }
+                
+                console.log('Fretboard Demo: Component element found:', component);
+                console.log('Fretboard Demo: Component tagName:', component.tagName);
+                console.log('Fretboard Demo: Component constructor:', component.constructor.name);
+                
+                // If the element is still HTMLUnknownElement, we need to recreate it
+                if (component.constructor.name === 'HTMLUnknownElement') {
+                    console.log('Fretboard Demo: Component needs to be recreated, doing so now...');
+                    
+                    // Store the current attributes
+                    const instrument = component.getAttribute('instrument');
+                    const chord = component.getAttribute('chord');
+                    const scaleRoot = component.getAttribute('scale-root');
+                    const scaleType = component.getAttribute('scale-type');
+                    
+                    // Remove the old element
+                    component.remove();
+                    
+                    // Create a new element
+                    const newComponent = document.createElement('fretboard-component');
+                    newComponent.id = 'demo-component';
+                    if (instrument) newComponent.setAttribute('instrument', instrument);
+                    if (chord) newComponent.setAttribute('chord', chord);
+                    if (scaleRoot) newComponent.setAttribute('scale-root', scaleRoot);
+                    if (scaleType) newComponent.setAttribute('scale-type', scaleType);
+                    
+                    // Insert it back into the DOM
+                    document.getElementById('component-container').appendChild(newComponent);
+                    
+                    // Update our reference
+                    component = newComponent;
+                    
+                    console.log('Fretboard Demo: Component recreated:', component);
+                    console.log('Fretboard Demo: New component constructor:', component.constructor.name);
+                    
+                    // Wait a bit for the new component to be fully initialized
+                    setTimeout(() => {
+                        // Continue with the normal flow
+                        if (!component.shadowRoot) {
+                            console.log('Fretboard Demo: New component shadow DOM not ready, retrying...');
+                            setTimeout(waitForComponent, 100);
+                            return;
+                        }
+                        
+                        console.log('Fretboard Demo: New component shadow DOM ready');
+                        
+                        // Component is ready, set up event listeners
+                        setupComponent(component);
+                    }, 100);
+                    
+                    return; // Exit early since we're handling the new component separately
+                }
+                
+                // Wait for the component to be fully connected and have its shadow DOM
+                if (!component.shadowRoot) {
+                    console.log('Fretboard Demo: Component shadow DOM not ready, retrying...');
+                    setTimeout(waitForComponent, 100);
+                    return;
+                }
+                
+                console.log('Fretboard Demo: Component shadow DOM ready');
+                
+                // Component is ready, set up event listeners
+                setupComponent(component);
+            };
+            
+            const setupComponent = (component) => {
+                console.log('Fretboard Demo: setupComponent called with:', component);
+                
                 // Fretboard specific controls
                 const instrumentSelect = document.getElementById('instrument-select');
                 const chordSelect = document.getElementById('chord-select');
@@ -613,61 +875,111 @@
                 const clearDisplayBtn = document.getElementById('clear-display');
                 const updateRangeBtn = document.getElementById('update-range');
                 
-                instrumentSelect.addEventListener('change', (e) => {
-                    component.setInstrument(e.target.value);
-                    logEvent('Instrument changed to ' + e.target.value, 'info');
-                    updateStatus('Instrument updated to ' + e.target.value);
+                console.log('Fretboard Demo: Found controls:', {
+                    instrumentSelect: !!instrumentSelect,
+                    chordSelect: !!chordSelect,
+                    scaleRoot: !!scaleRoot,
+                    scaleType: !!scaleType,
+                    clearDisplayBtn: !!clearDisplayBtn,
+                    updateRangeBtn: !!updateRangeBtn
                 });
                 
-                chordSelect.addEventListener('change', (e) => {
-                    if (e.target.value) {
-                        component.displayChord(e.target.value);
-                        logEvent('Chord displayed: ' + e.target.value, 'success');
-                        updateStatus('Displaying ' + e.target.value + ' chord');
-                        scaleRoot.value = '';
-                        scaleType.value = '';
-                    }
-                });
+                if (instrumentSelect) {
+                    instrumentSelect.addEventListener('change', (e) => {
+                        try {
+                            component.setInstrument(e.target.value);
+                            logEvent('Instrument changed to ' + e.target.value, 'info');
+                            updateStatus('Instrument updated to ' + e.target.value);
+                        } catch (error) {
+                            console.error('Fretboard Demo: Error setting instrument:', error);
+                            logEvent('Error setting instrument: ' + error.message, 'error');
+                        }
+                    });
+                }
+                
+                if (chordSelect) {
+                    chordSelect.addEventListener('change', (e) => {
+                        try {
+                            if (e.target.value) {
+                                component.displayChord(e.target.value);
+                                logEvent('Chord displayed: ' + e.target.value, 'success');
+                                updateStatus('Displaying ' + e.target.value + ' chord');
+                                scaleRoot.value = '';
+                                scaleType.value = '';
+                            }
+                        } catch (error) {
+                            console.error('Fretboard Demo: Error displaying chord:', error);
+                            logEvent('Error displaying chord: ' + error.message, 'error');
+                        }
+                    });
+                }
                 
                 function updateScale() {
                     const root = scaleRoot.value;
                     const type = scaleType.value;
                     
                     if (root && type) {
-                        component.displayScale(root, type);
-                        logEvent('Scale displayed: ' + root + ' ' + type, 'success');
-                        updateStatus('Displaying ' + root + ' ' + type + ' scale');
-                        chordSelect.value = '';
+                        try {
+                            component.displayScale(root, type);
+                            logEvent('Scale displayed: ' + root + ' ' + type, 'success');
+                            updateStatus('Displaying ' + root + ' ' + type + ' scale');
+                            chordSelect.value = '';
+                        } catch (error) {
+                            console.error('Fretboard Demo: Error displaying scale:', error);
+                            logEvent('Error displaying scale: ' + error.message, 'error');
+                        }
                     }
                 }
                 
-                scaleRoot.addEventListener('change', updateScale);
-                scaleType.addEventListener('change', updateScale);
+                if (scaleRoot) {
+                    scaleRoot.addEventListener('change', updateScale);
+                }
                 
-                clearDisplayBtn.addEventListener('click', () => {
-                    component.clearDisplay();
-                    chordSelect.value = '';
-                    scaleRoot.value = '';
-                    scaleType.value = '';
-                    logEvent('Display cleared', 'info');
-                    updateStatus('Display cleared');
-                });
+                if (scaleType) {
+                    scaleType.addEventListener('change', updateScale);
+                }
                 
-                updateRangeBtn.addEventListener('click', () => {
-                    component.setFretRange(0, 12);
-                    logEvent('Fret range updated', 'info');
-                    updateStatus('Fret range updated to 0-12');
-                });
+                if (clearDisplayBtn) {
+                    clearDisplayBtn.addEventListener('click', () => {
+                        try {
+                            component.clearDisplay();
+                            chordSelect.value = '';
+                            scaleRoot.value = '';
+                            scaleType.value = '';
+                            logEvent('Display cleared', 'info');
+                            updateStatus('Display cleared');
+                        } catch (error) {
+                            console.error('Fretboard Demo: Error clearing display:', error);
+                            logEvent('Error clearing display: ' + error.message, 'error');
+                        }
+                    });
+                }
+                
+                if (updateRangeBtn) {
+                    updateRangeBtn.addEventListener('click', () => {
+                        try {
+                            component.setFretRange(0, 12);
+                            logEvent('Fret range updated', 'info');
+                            updateStatus('Fret range updated to 0-12');
+                        } catch (error) {
+                            console.error('Fretboard Demo: Error updating fret range:', error);
+                            logEvent('Error updating fret range: ' + error.message, 'error');
+                        }
+                    });
+                }
                 
                 // Listen for fretboard events
                 component.addEventListener('note-click', (e) => {
                     logEvent('Note clicked: ' + e.detail.note, 'success');
                 });
+                
+                // Log component initialization
+                logEvent('Fretboard component initialized successfully', 'success');
+                updateStatus('Fretboard component ready for interaction');
+            };
             
-            
-            // Log component initialization
-            logEvent('Fretboard component initialized', 'success');
-            updateStatus('Fretboard component ready for interaction');
+            // Start waiting for custom element definition
+            waitForComponent();
         });
     </script>
     

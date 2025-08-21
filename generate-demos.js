@@ -279,7 +279,7 @@ function generateControls(component) {
                     <select id="instrument-select">
                         <option value="guitar" selected>Guitar (6-string)</option>
                         <option value="ukulele">Ukulele (4-string)</option>
-                        <option value="mandolin">Mandolin (8-string)</option>
+                        <option value="mandolin">Mandolin (4 courses)</option>
                     </select>
                 </div>
                 <div class="control-group">
