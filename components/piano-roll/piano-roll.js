@@ -9,6 +9,8 @@ export default class PianoRoll extends HTMLElement {
         this.attachShadow({ mode: 'open' });
         
         this.chordWidth = 100;
+        this.tempo = 120; // Default tempo in BPM
+        this.timeSignature = '4/4'; // Default time signature
         this.shadowRoot.innerHTML = `
             <style>
                 .piano-roll {
@@ -105,7 +107,12 @@ export default class PianoRoll extends HTMLElement {
     }
 
     connectedCallback() {
-        this.renderChords();
+        // Add a placeholder message when no chords are present
+        if (this.chords.length === 0) {
+            this.showPlaceholder();
+        } else {
+            this.renderChords();
+        }
 
         this.addEventListener('add-chord', (event) => {
             const chord = event.detail;
@@ -147,6 +154,26 @@ export default class PianoRoll extends HTMLElement {
         this.dispatchEvent(readyEvent);
     }
 
+    showPlaceholder() {
+        this.reel.innerHTML = `
+            <div style="
+                display: flex; 
+                align-items: center; 
+                justify-content: center; 
+                height: 100%; 
+                color: #666; 
+                font-style: italic;
+                text-align: center;
+                padding: 20px;
+            ">
+                <div>
+                    <div style="font-size: 18px; margin-bottom: 10px;">🎹 PianoRoll</div>
+                    <div style="font-size: 14px;">Add chords to get started</div>
+                </div>
+            </div>
+        `;
+    }
+
     addChord(chord) {
         this.chords.push(chord);
         this.renderChords();
@@ -168,10 +195,21 @@ export default class PianoRoll extends HTMLElement {
             chordText.setAttribute('class', 'chordName')
             chordText.textContent = chord.name;
             chordBox.appendChild(chordText);
-            const chordDiagram = document.createElement('chord-diagram');
-            chordDiagram.setAttribute('chord', chord.name);
-            chordDiagram.setAttribute('instrument', this.instrument);
-            chordBox.appendChild(chordDiagram);
+            
+            try {
+                const chordDiagram = document.createElement('chord-diagram');
+                chordDiagram.setAttribute('chord', chord.name);
+                chordDiagram.setAttribute('instrument', this.instrument);
+                chordBox.appendChild(chordDiagram);
+                console.log('PianoRoll: Created chord-diagram for', chord.name);
+            } catch (error) {
+                console.error('PianoRoll: Error creating chord-diagram:', error);
+                // Fallback: just show the chord name
+                const fallbackText = document.createElement('div');
+                fallbackText.textContent = `[${chord.name}]`;
+                fallbackText.style.cssText = 'font-size: 12px; color: #666; text-align: center;';
+                chordBox.appendChild(fallbackText);
+            }
 
             chordBox.setAttribute(
               'style', 
@@ -317,6 +355,24 @@ export default class PianoRoll extends HTMLElement {
     setInstrument(instrument) {
         this.instrument = instrument;
         this.renderChords();
+    }
+
+    setTempo(tempo) {
+        this.tempo = tempo;
+        console.log('PianoRoll: Tempo set to', tempo, 'BPM');
+    }
+
+    setTimeSignature(timeSignature) {
+        this.timeSignature = timeSignature;
+        console.log('PianoRoll: Time signature set to', timeSignature);
+    }
+
+    getTempo() {
+        return this.tempo;
+    }
+
+    getTimeSignature() {
+        return this.timeSignature;
     }
 }
 

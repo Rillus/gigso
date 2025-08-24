@@ -403,6 +403,39 @@
                 text-align: center;
             }
         }
+        
+        /* Page Layout with Navigation */
+        .page-layout {
+            display: flex;
+            min-height: calc(100vh - 200px); /* Account for header */
+        }
+        
+        .nav-sidebar {
+            flex-shrink: 0;
+            background: #f8f9fa;
+            border-right: 1px solid #e9ecef;
+        }
+        
+        .main-content {
+            flex: 1;
+            min-width: 0; /* Allow flex item to shrink below content size */
+        }
+        
+        .main-content .container {
+            max-width: none;
+            padding: 0 20px;
+        }
+        
+        @media (max-width: 768px) {
+            .page-layout {
+                flex-direction: column;
+            }
+            
+            .nav-sidebar {
+                border-right: none;
+                border-bottom: 1px solid #e9ecef;
+            }
+        }
     </style>
 </head>
 <body>
@@ -422,109 +455,115 @@
         </div>
     </div>
     
-    <div class="container">
-        <!-- Component Showcase -->
-        <div class="component-showcase">
-            <div class="showcase-header">
-                <h2>Component Preview</h2>
-                <p>Interactive demonstration of the ChordPalette component</p>
-            </div>
-            <div class="component-container" id="component-container">
-<chordpalette id="demo-component"></chordpalette>
-</div>
+    <div class="page-layout">
+        <div class="nav-sidebar">
+            <demo-navigation></demo-navigation>
         </div>
         
-        <!-- Controls Section -->
-        <div class="controls-section">
-            <div class="controls-header">
-                <h3>🎛️ Interactive Controls</h3>
-            </div>
-            <div class="controls-grid" id="controls-grid">
-
-                <div class="control-group">
-                    <label for="category-select">Category:</label>
-                    <select id="category-select">
-                        <option value="major">Major</option>
-                        <option value="minor">Minor</option>
-                        <option value="diminished">Diminished</option>
-                        <option value="augmented">Augmented</option>
-                    </select>
+        <div class="main-content">
+            <div class="container">
+                <!-- Component Showcase -->
+                <div class="component-showcase">
+                    <div class="showcase-header">
+                        <h2>Component Preview</h2>
+                        <p>Interactive demonstration of the ChordPalette component</p>
+                    </div>
+                    <div class="component-container" id="component-container">
+                        <chord-palette id="demo-component"></chord-palette>
+                    </div>
                 </div>
-                <div class="control-group">
-                    <label for="root-select">Root Note:</label>
-                    <select id="root-select">
-                        <option value="C">C</option>
-                        <option value="D">D</option>
-                        <option value="E">E</option>
-                        <option value="F">F</option>
-                        <option value="G">G</option>
-                        <option value="A">A</option>
-                        <option value="B">B</option>
-                    </select>
+                
+                <!-- Controls Section -->
+                <div class="controls-section">
+                    <div class="controls-header">
+                        <h3>🎛️ Interactive Controls</h3>
+                    </div>
+                    <div class="controls-grid" id="controls-grid">
+                        <div class="control-group">
+                            <label for="chord-select">Select Chord:</label>
+                            <select id="chord-select">
+                                <option value="C">C Major</option>
+                                <option value="Cm">C Minor</option>
+                                <option value="C7">C Dominant 7</option>
+                                <option value="Cmaj7">C Major 7</option>
+                                <option value="G">G Major</option>
+                                <option value="Am">A Minor</option>
+                                <option value="F">F Major</option>
+                                <option value="Dm">D Minor</option>
+                            </select>
+                        </div>
+                        <div class="control-group">
+                            <label for="instrument-select">Instrument:</label>
+                            <select id="instrument-select">
+                                <option value="guitar">Guitar</option>
+                                <option value="ukulele">Ukulele</option>
+                                <option value="mandolin">Mandolin</option>
+                            </select>
+                        </div>
+                        <div class="control-group">
+                            <label>Actions:</label>
+                            <button id="play-chord">Play Chord</button>
+                            <button id="stop-chord" class="secondary">Stop</button>
+                            <button id="add-to-progression">Add to Progression</button>
+                        </div>
+                    </div>
+                    <div id="status" class="status info">
+                        ChordPalette component loaded! Use the controls above to interact with the component.
+                    </div>
                 </div>
-                <div class="control-group">
-                    <label>Actions:</label>
-                    <button id="add-chord">Add to Progression</button>
-                    <button id="clear-progression" class="secondary">Clear Progression</button>
-                </div>
-            
-</div>
-            <div id="status" class="status info">
-                ChordPalette component loaded! Use the controls above to interact with the component.
-            </div>
-        </div>
-        
-        <!-- Documentation Section -->
-        <div class="docs-section">
-            <div class="tabs">
-                <button class="tab active" onclick="showTab('overview')">Overview</button>
-                <button class="tab" onclick="showTab('api')">API Reference</button>
-                <button class="tab" onclick="showTab('events')">Events</button>
-                <button class="tab" onclick="showTab('examples')">Examples</button>
-                <button class="tab" onclick="showTab('events-log')">Event Log</button>
-            </div>
-            
-            <!-- Overview Tab -->
-            <div id="overview" class="tab-content active">
-                <h3>Component Overview</h3>
-                <p>Pre-defined chord library for quick chord selection</p>
-                <p>This interactive demo allows you to explore all the features and capabilities of the ChordPalette component. Use the controls above to modify the component's behavior and see the results in real-time.</p>
-            </div>
-            
-            <!-- API Reference Tab -->
-            <div id="api" class="tab-content">
-                <h3>API Reference</h3>
-                <p>The ChordPalette component provides a comprehensive API for integration into your applications.</p>
-                <p><strong>Properties:</strong> Configure the component with various properties to customize its behavior.</p>
-                <p><strong>Methods:</strong> Programmatically control the component using built-in methods for chord selection and progression building.</p>
-                <p><strong>Events:</strong> Listen to component events to respond to user interactions and state changes.</p>
-            </div>
-            
-            <!-- Events Tab -->
-            <div id="events" class="tab-content">
-                <h3>Component Events</h3>
-                <p>The ChordPalette component emits various events that you can listen to:</p>
-                <p>• <strong>Initialization:</strong> Fired when the component is ready for use</p>
-                <p>• <strong>Chord Selection:</strong> Fired when users select chords from the palette</p>
-                <p>• <strong>Category Changes:</strong> Fired when chord categories are switched</p>
-                <p>• <strong>Progression Updates:</strong> Fired when chord progressions are modified</p>
-                <p>View the Event Log tab to see real-time events as they occur.</p>
-            </div>
-            
-            <!-- Examples Tab -->
-            <div id="examples" class="tab-content">
-                <h3>Usage Examples</h3>
-                <p>Here are some common ways to use the ChordPalette component in your projects:</p>
-                <p><strong>Basic Usage:</strong><br><code>&lt;chordpalette&gt;&lt;/chordpalette&gt;</code></p>
-                <p><strong>With Properties:</strong><br><code>&lt;chordpalette category="major" root="C"&gt;&lt;/chordpalette&gt;</code></p>
-                <p><strong>Event Listeners:</strong><br><code>palette.addEventListener('chord-select', handleChordSelect);</code></p>
-            </div>
-            
-            <!-- Event Log Tab -->
-            <div id="events-log" class="tab-content">
-                <h3>Event Log</h3>
-                <div class="event-log" id="event-log">
-                    <div class="event info">Component initialized</div>
+                
+                <!-- Documentation Section -->
+                <div class="docs-section">
+                    <div class="tabs">
+                        <button class="tab active" onclick="showTab('overview')">Overview</button>
+                        <button class="tab" onclick="showTab('api')">API Reference</button>
+                        <button class="tab" onclick="showTab('events')">Events</button>
+                        <button class="tab" onclick="showTab('examples')">Examples</button>
+                        <button class="tab" onclick="showTab('events-log')">Event Log</button>
+                    </div>
+                    
+                    <!-- Overview Tab -->
+                    <div id="overview" class="tab-content active">
+                        <h3>Component Overview</h3>
+                        <p>Pre-defined chord library for quick chord selection</p>
+                        <p>This interactive demo allows you to explore all the features and capabilities of the ChordPalette component. Use the controls above to modify the component's behavior and see the results in real-time.</p>
+                    </div>
+                    
+                    <!-- API Reference Tab -->
+                    <div id="api" class="tab-content">
+                        <h3>API Reference</h3>
+                        <p>The ChordPalette component provides a comprehensive API for integration into your applications.</p>
+                        <p><strong>Properties:</strong> Configure the component with various properties to customize its behavior.</p>
+                        <p><strong>Methods:</strong> Programmatically control the component using built-in methods.</p>
+                        <p><strong>Events:</strong> Listen to component events to respond to user interactions and state changes.</p>
+                    </div>
+                    
+                    <!-- Events Tab -->
+                    <div id="events" class="tab-content">
+                        <h3>Component Events</h3>
+                        <p>The ChordPalette component emits various events that you can listen to:</p>
+                        <p>• <strong>Initialization:</strong> Fired when the component is ready for use</p>
+                        <p>• <strong>Chord Selection:</strong> Fired when a chord is selected</p>
+                        <p>• <strong>Playback Events:</strong> Fired when chords are played or stopped</p>
+                        <p>View the Event Log tab to see real-time events as they occur.</p>
+                    </div>
+                    
+                    <!-- Examples Tab -->
+                    <div id="examples" class="tab-content">
+                        <h3>Usage Examples</h3>
+                        <p>Here are some common ways to use the ChordPalette component in your projects:</p>
+                        <p><strong>Basic Usage:</strong><br><code>&lt;chord-palette&gt;&lt;/chord-palette&gt;</code></p>
+                        <p><strong>With Properties:</strong><br><code>&lt;chord-palette instrument="guitar"&gt;&lt;/chord-palette&gt;</code></p>
+                        <p><strong>Event Listeners:</strong><br><code>chordPalette.addEventListener('chord-selected', handleChordSelection);</code></p>
+                    </div>
+                    
+                    <!-- Event Log Tab -->
+                    <div id="events-log" class="tab-content">
+                        <h3>Event Log</h3>
+                        <div class="event-log" id="event-log">
+                            <div class="event info">Component initialized</div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -579,6 +618,7 @@
     
     <script type="module">
         import './components/chord-palette/chord-palette.js';
+        import './components/demo-navigation/demo-navigation.js';
         
         document.addEventListener('DOMContentLoaded', function() {
             const component = document.getElementById('demo-component');
@@ -586,44 +626,54 @@
             // Component-specific event listeners
             
                 // ChordPalette specific controls
-                const categorySelect = document.getElementById('category-select');
-                const rootSelect = document.getElementById('root-select');
-                const addChordBtn = document.getElementById('add-chord');
-                const clearProgressionBtn = document.getElementById('clear-progression');
+                const chordSelect = document.getElementById('chord-select');
+                const instrumentSelect = document.getElementById('instrument-select');
+                const playChordBtn = document.getElementById('play-chord');
+                const stopChordBtn = document.getElementById('stop-chord');
+                const addToProgressionBtn = document.getElementById('add-to-progression');
                 
-                categorySelect.addEventListener('change', (e) => {
-                    component.setCategory(e.target.value);
-                    logEvent('Category changed to ' + e.target.value, 'info');
-                    updateStatus('Chord category updated to ' + e.target.value);
+                chordSelect.addEventListener('change', (e) => {
+                    component.setChord(e.target.value);
+                    logEvent('Chord selected: ' + e.target.value, 'success');
+                    updateStatus('Chord selected: ' + e.target.value);
                 });
                 
-                rootSelect.addEventListener('change', (e) => {
-                    component.setRoot(e.target.value);
-                    logEvent('Root note changed to ' + e.target.value, 'info');
-                    updateStatus('Root note updated to ' + e.target.value);
+                instrumentSelect.addEventListener('change', (e) => {
+                    component.setInstrument(e.target.value);
+                    logEvent('Instrument changed to ' + e.target.value, 'info');
+                    updateStatus('Instrument updated to ' + e.target.value);
                 });
                 
-                addChordBtn.addEventListener('click', () => {
-                    const root = rootSelect.value;
-                    const category = categorySelect.value;
-                    component.addToProgression(root + category);
-                    logEvent('Chord added: ' + root + category, 'success');
-                    updateStatus('Added ' + root + category + ' to progression');
+                playChordBtn.addEventListener('click', () => {
+                    component.playChord();
+                    logEvent('Chord played', 'info');
+                    updateStatus('Playing chord...');
                 });
                 
-                clearProgressionBtn.addEventListener('click', () => {
-                    component.clearProgression();
-                    logEvent('Chord progression cleared', 'warning');
-                    updateStatus('Chord progression cleared');
+                stopChordBtn.addEventListener('click', () => {
+                    component.stopChord();
+                    logEvent('Chord stopped', 'warning');
+                    updateStatus('Chord stopped');
+                });
+                
+                addToProgressionBtn.addEventListener('click', () => {
+                    const chord = chordSelect.value;
+                    component.addToProgression(chord);
+                    logEvent('Chord added to progression: ' + chord, 'success');
+                    updateStatus('Added ' + chord + ' to progression');
                 });
                 
                 // Listen for chord palette events
-                component.addEventListener('chord-select', (e) => {
+                component.addEventListener('chord-selected', (e) => {
                     logEvent('Chord selected: ' + e.detail.chord, 'success');
                 });
                 
-                component.addEventListener('progression-change', (e) => {
-                    logEvent('Progression updated: ' + e.detail.progression.join(' - '), 'info');
+                component.addEventListener('playback-start', (e) => {
+                    logEvent('Chord playback started', 'info');
+                });
+                
+                component.addEventListener('playback-stop', (e) => {
+                    logEvent('Chord playback stopped', 'warning');
                 });
             
             

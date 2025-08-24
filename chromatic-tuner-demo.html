@@ -403,6 +403,36 @@
                 text-align: center;
             }
         }
+
+        /* Page Layout with Navigation */
+        .page-layout {
+            display: flex;
+            min-height: calc(100vh - 200px);
+        }
+
+        .nav-sidebar {
+            width: 280px;
+            background: #f8f9fa;
+            border-right: 1px solid #dee2e6;
+            flex-shrink: 0;
+        }
+
+        .main-content {
+            flex: 1;
+            min-width: 0;
+        }
+
+        @media (max-width: 1024px) {
+            .page-layout {
+                flex-direction: column;
+            }
+            
+            .nav-sidebar {
+                width: 100%;
+                border-right: none;
+                border-bottom: 1px solid #dee2e6;
+            }
+        }
     </style>
 </head>
 <body>
@@ -422,113 +452,121 @@
         </div>
     </div>
     
-    <div class="container">
-        <!-- Component Showcase -->
-        <div class="component-showcase">
-            <div class="showcase-header">
-                <h2>Component Preview</h2>
-                <p>Interactive demonstration of the Chromatic Tuner component</p>
-            </div>
-            <div class="component-container" id="component-container">
-<chromatictuner id="demo-component"></chromatictuner>
-</div>
-        </div>
+    <div class="page-layout">
+        <nav class="nav-sidebar">
+            <demo-navigation></demo-navigation>
+        </nav>
         
-        <!-- Controls Section -->
-        <div class="controls-section">
-            <div class="controls-header">
-                <h3>🎛️ Interactive Controls</h3>
-            </div>
-            <div class="controls-grid" id="controls-grid">
+        <main class="main-content">
+            <div class="container">
+                <!-- Component Showcase -->
+                <div class="component-showcase">
+                    <div class="showcase-header">
+                        <h2>Component Preview</h2>
+                        <p>Interactive demonstration of the Chromatic Tuner component</p>
+                    </div>
+                    <div class="component-container" id="component-container">
+        <chromatictuner id="demo-component"></chromatictuner>
+        </div>
+                </div>
+                
+                <!-- Controls Section -->
+                <div class="controls-section">
+                    <div class="controls-header">
+                        <h3>🎛️ Interactive Controls</h3>
+                    </div>
+                    <div class="controls-grid" id="controls-grid">
 
-                <div class="control-group">
-                    <label for="instrument-select">Instrument:</label>
-                    <select id="instrument-select">
-                        <option value="guitar" selected>Guitar</option>
-                        <option value="bass">Bass Guitar</option>
-                        <option value="violin">Violin</option>
-                        <option value="ukulele">Ukulele</option>
-                        <option value="mandolin">Mandolin</option>
-                    </select>
-                </div>
-                <div class="control-group">
-                    <label for="reference-frequency">Reference Frequency (Hz):</label>
-                    <input type="number" id="reference-frequency" value="440" min="400" max="480" step="1">
-                </div>
-                <div class="control-group">
-                    <label for="sensitivity">Sensitivity:</label>
-                    <select id="sensitivity">
-                        <option value="low">Low</option>
-                        <option value="medium" selected>Medium</option>
-                        <option value="high">High</option>
-                    </select>
-                </div>
-                <div class="control-group">
-                    <label>Actions:</label>
-                    <button id="start-tuning">Start Tuning</button>
-                    <button id="stop-tuning" class="secondary">Stop Tuning</button>
-                </div>
-            
-</div>
-            <div id="status" class="status info">
-                Chromatic Tuner component loaded! Use the controls above to interact with the component.
-            </div>
+                        <div class="control-group">
+                            <label for="instrument-select">Instrument:</label>
+                            <select id="instrument-select">
+                                <option value="guitar" selected>Guitar</option>
+                                <option value="bass">Bass Guitar</option>
+                                <option value="violin">Violin</option>
+                                <option value="ukulele">Ukulele</option>
+                                <option value="mandolin">Mandolin</option>
+                            </select>
+                        </div>
+                        <div class="control-group">
+                            <label for="reference-frequency">Reference Frequency (Hz):</label>
+                            <input type="number" id="reference-frequency" value="440" min="400" max="480" step="1">
+                        </div>
+                        <div class="control-group">
+                            <label for="sensitivity">Sensitivity:</label>
+                            <select id="sensitivity">
+                                <option value="low">Low</option>
+                                <option value="medium" selected>Medium</option>
+                                <option value="high">High</option>
+                            </select>
+                        </div>
+                        <div class="control-group">
+                            <label>Actions:</label>
+                            <button id="start-tuning">Start Tuning</button>
+                            <button id="stop-tuning" class="secondary">Stop Tuning</button>
+                        </div>
+                    
         </div>
-        
-        <!-- Documentation Section -->
-        <div class="docs-section">
-            <div class="tabs">
-                <button class="tab active" onclick="showTab('overview')">Overview</button>
-                <button class="tab" onclick="showTab('api')">API Reference</button>
-                <button class="tab" onclick="showTab('events')">Events</button>
-                <button class="tab" onclick="showTab('examples')">Examples</button>
-                <button class="tab" onclick="showTab('events-log')">Event Log</button>
-            </div>
-            
-            <!-- Overview Tab -->
-            <div id="overview" class="tab-content active">
-                <h3>Component Overview</h3>
-                <p>The Chromatic Tuner component provides precise instrument tuning functionality with real-time frequency detection and visual feedback.</p>
-                <p>This interactive demo allows you to explore all the features and capabilities of the Chromatic Tuner component. Use the controls above to configure the tuner for different instruments and adjust sensitivity settings for optimal tuning accuracy.</p>
-            </div>
-            
-            <!-- API Reference Tab -->
-            <div id="api" class="tab-content">
-                <h3>API Reference</h3>
-                <p>The Chromatic Tuner component provides a comprehensive API for integration into your applications.</p>
-                <p><strong>Properties:</strong> Configure the component with various properties to customize tuning behavior and sensitivity.</p>
-                <p><strong>Methods:</strong> Programmatically control the tuner using built-in methods for starting/stopping detection and setting reference frequencies.</p>
-                <p><strong>Events:</strong> Listen to component events to respond to pitch detection and tuning status changes.</p>
-            </div>
-            
-            <!-- Events Tab -->
-            <div id="events" class="tab-content">
-                <h3>Component Events</h3>
-                <p>The Chromatic Tuner component emits various events that you can listen to:</p>
-                <p>• <strong>Pitch Detection:</strong> Fired when the tuner detects a pitch from audio input</p>
-                <p>• <strong>Tuning Status:</strong> Fired when notes are in tune or need adjustment</p>
-                <p>• <strong>Reference Change:</strong> Fired when the reference frequency is updated</p>
-                <p>• <strong>Calibration:</strong> Fired when the tuner calibrates to a new instrument</p>
-                <p>View the Event Log tab to see real-time events as they occur.</p>
-            </div>
-            
-            <!-- Examples Tab -->
-            <div id="examples" class="tab-content">
-                <h3>Usage Examples</h3>
-                <p>Here are some common ways to use the Chromatic Tuner component in your projects:</p>
-                <p><strong>Basic Usage:</strong><br><code>&lt;chromatictuner&gt;&lt;/chromatictuner&gt;</code></p>
-                <p><strong>With Properties:</strong><br><code>&lt;chromatictuner reference="440" sensitivity="high"&gt;&lt;/chromatictuner&gt;</code></p>
-                <p><strong>Event Listeners:</strong><br><code>tuner.addEventListener('pitchdetected', handlePitchDetection);</code></p>
-            </div>
-            
-            <!-- Event Log Tab -->
-            <div id="events-log" class="tab-content">
-                <h3>Event Log</h3>
-                <div class="event-log" id="event-log">
-                    <div class="event info">Component initialized</div>
+                    <div id="status" class="status info">
+                        Chromatic Tuner component loaded! Use the controls above to interact with the component.
+                    </div>
+                </div>
+                
+                <!-- Documentation Section -->
+                <div class="docs-section">
+                    <div class="tabs">
+                        <button class="tab active" onclick="showTab('overview')">Overview</button>
+                        <button class="tab" onclick="showTab('api')">API Reference</button>
+                        <button class="tab" onclick="showTab('events')">Events</button>
+                        <button class="tab" onclick="showTab('examples')">Examples</button>
+                        <button class="tab" onclick="showTab('events-log')">Event Log</button>
+                    </div>
+                    
+                    <!-- Overview Tab -->
+                    <div id="overview" class="tab-content active">
+                        <h3>Component Overview</h3>
+                        <p>The Chromatic Tuner component provides precise instrument tuning functionality with real-time frequency detection and visual feedback.</p>
+                        <p>This interactive demo allows you to explore all the features and capabilities of the Chromatic Tuner component. Use the controls above to configure the tuner for different instruments and adjust sensitivity settings for optimal tuning accuracy.</p>
+                    </div>
+                    
+                    <!-- API Reference Tab -->
+                    <div id="api" class="tab-content">
+                        <h3>API Reference</h3>
+                        <p>The Chromatic Tuner component provides a comprehensive API for integration into your applications.</p>
+                        <p><strong>Properties:</strong> Configure the component with various properties to customize tuning behavior and sensitivity.</p>
+                        <p><strong>Methods:</strong> Programmatically control the tuner using built-in methods for starting/stopping detection and setting reference frequencies.</p>
+                        <p><strong>Events:</strong> Listen to component events to respond to pitch detection and tuning status changes.</p>
+                    </div>
+                    
+                    <!-- Events Tab -->
+                    <div id="events" class="tab-content">
+                        <h3>Component Events</h3>
+                        <p>The Chromatic Tuner component emits various events that you can listen to:</p>
+                        <p>• <strong>Pitch Detection:</strong> Fired when the tuner detects a pitch from audio input</p>
+                        <p>• <strong>Tuning Status:</strong> Fired when notes are in tune or need adjustment</p>
+                        <p>• <strong>Reference Change:</strong> Fired when the reference frequency is updated</p>
+                        <p>• <strong>Calibration:</strong> Fired when the tuner calibrates to a new instrument</p>
+                        <p>View the Event Log tab to see real-time events as they occur.</p>
+                    </div>
+                    
+                    <!-- Examples Tab -->
+                    <div id="examples" class="tab-content">
+                        <h3>Usage Examples</h3>
+                        <p>Here are some common ways to use the Chromatic Tuner component in your projects:</p>
+                        <p><strong>Basic Usage:</strong><br><code>&lt;chromatictuner&gt;&lt;/chromatictuner&gt;</code></p>
+                        <p><strong>With Properties:</strong><br><code>&lt;chromatictuner reference="440" sensitivity="high"&gt;&lt;/chromatictuner&gt;</code></p>
+                        <p><strong>Event Listeners:</strong><br><code>tuner.addEventListener('pitchdetected', handlePitchDetection);</code></p>
+                    </div>
+                    
+                    <!-- Event Log Tab -->
+                    <div id="events-log" class="tab-content">
+                        <h3>Event Log</h3>
+                        <div class="event-log" id="event-log">
+                            <div class="event info">Component initialized</div>
+                        </div>
+                    </div>
                 </div>
             </div>
-        </div>
+        </main>
     </div>
 
     <div class="demo-footer">
@@ -580,6 +618,7 @@
     
     <script type="module">
         import './components/chromatic-tuner/chromatic-tuner.js';
+        import './components/demo-navigation/demo-navigation.js';
         
         document.addEventListener('DOMContentLoaded', function() {
             const component = document.getElementById('demo-component');

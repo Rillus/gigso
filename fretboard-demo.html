@@ -480,6 +480,36 @@
                 text-align: center;
             }
         }
+
+        /* Page Layout with Navigation */
+        .page-layout {
+            display: flex;
+            min-height: calc(100vh - 200px);
+        }
+
+        .nav-sidebar {
+            width: 280px;
+            background: #f8f9fa;
+            border-right: 1px solid #dee2e6;
+            flex-shrink: 0;
+        }
+
+        .main-content {
+            flex: 1;
+            min-width: 0;
+        }
+
+        @media (max-width: 1024px) {
+            .page-layout {
+                flex-direction: column;
+            }
+            
+            .nav-sidebar {
+                width: 100%;
+                border-right: none;
+                border-bottom: 1px solid #dee2e6;
+            }
+        }
     </style>
 </head>
 <body>
@@ -499,216 +529,224 @@
         </div>
     </div>
     
-    <div class="container">
-        <!-- Component Showcase -->
-        <div class="component-showcase">
-            <div class="showcase-header">
-                <h2>Component Preview</h2>
-                <p>Interactive demonstration of the Fretboard component</p>
-            </div>
-            <div class="component-container" id="component-container">
-          <fretboard-component id="demo-component"></fretboard-component>
-</div>
-        </div>
+    <div class="page-layout">
+        <nav class="nav-sidebar">
+            <demo-navigation></demo-navigation>
+        </nav>
         
-        <!-- Controls Section -->
-        <div class="controls-section">
-            <div class="controls-header">
-                <h3>🎛️ Interactive Controls</h3>
-            </div>
-            <div class="controls-grid" id="controls-grid">
+        <main class="main-content">
+            <div class="container">
+                <!-- Component Showcase -->
+                <div class="component-showcase">
+                    <div class="showcase-header">
+                        <h2>Component Preview</h2>
+                        <p>Interactive demonstration of the Fretboard component</p>
+                    </div>
+                    <div class="component-container" id="component-container">
+                  <fretboard-component id="demo-component"></fretboard-component>
+        </div>
+                </div>
+                
+                <!-- Controls Section -->
+                <div class="controls-section">
+                    <div class="controls-header">
+                        <h3>🎛️ Interactive Controls</h3>
+                    </div>
+                    <div class="controls-grid" id="controls-grid">
 
-                <div class="control-group">
-                    <label for="instrument-select">Instrument:</label>
-                    <select id="instrument-select">
-                        <option value="guitar" selected>Guitar (6-string)</option>
-                        <option value="ukulele">Ukulele (4-string)</option>
-                        <option value="mandolin">Mandolin (8-string)</option>
-                    </select>
-                </div>
-                <div class="control-group">
-                    <label for="chord-select">Chord:</label>
-                    <select id="chord-select">
-                        <option value="">-- Select Chord --</option>
-                        <option value="C">C Major</option>
-                        <option value="Am">A Minor</option>
-                        <option value="F">F Major</option>
-                        <option value="G">G Major</option>
-                    </select>
-                </div>
-                <div class="control-group">
-                    <label for="scale-root">Scale Root:</label>
-                    <select id="scale-root">
-                        <option value="">-- Select Root --</option>
-                        <option value="C">C</option>
-                        <option value="D">D</option>
-                        <option value="E">E</option>
-                        <option value="F">F</option>
-                        <option value="G">G</option>
-                        <option value="A">A</option>
-                        <option value="B">B</option>
-                    </select>
-                </div>
-                <div class="control-group">
-                    <label for="scale-type">Scale Type:</label>
-                    <select id="scale-type">
-                        <option value="">-- Select Scale --</option>
-                        <option value="major">Major</option>
-                        <option value="naturalMinor">Natural Minor</option>
-                        <option value="pentatonicMajor">Pentatonic Major</option>
-                        <option value="pentatonicMinor">Pentatonic Minor</option>
-                    </select>
-                </div>
-                <div class="control-group">
-                    <label>Actions:</label>
-                    <button id="clear-display">Clear Display</button>
-                    <button id="update-range" class="secondary">Update Range</button>
-                </div>
-            
-</div>
-            <div id="status" class="status info">
-                Fretboard component loaded! Use the controls above to interact with the component.
-            </div>
+                        <div class="control-group">
+                            <label for="instrument-select">Instrument:</label>
+                            <select id="instrument-select">
+                                <option value="guitar" selected>Guitar (6-string)</option>
+                                <option value="ukulele">Ukulele (4-string)</option>
+                                <option value="mandolin">Mandolin (8-string)</option>
+                            </select>
+                        </div>
+                        <div class="control-group">
+                            <label for="chord-select">Chord:</label>
+                            <select id="chord-select">
+                                <option value="">-- Select Chord --</option>
+                                <option value="C">C Major</option>
+                                <option value="Am">A Minor</option>
+                                <option value="F">F Major</option>
+                                <option value="G">G Major</option>
+                            </select>
+                        </div>
+                        <div class="control-group">
+                            <label for="scale-root">Scale Root:</label>
+                            <select id="scale-root">
+                                <option value="">-- Select Root --</option>
+                                <option value="C">C</option>
+                                <option value="D">D</option>
+                                <option value="E">E</option>
+                                <option value="F">F</option>
+                                <option value="G">G</option>
+                                <option value="A">A</option>
+                                <option value="B">B</option>
+                            </select>
+                        </div>
+                        <div class="control-group">
+                            <label for="scale-type">Scale Type:</label>
+                            <select id="scale-type">
+                                <option value="">-- Select Scale --</option>
+                                <option value="major">Major</option>
+                                <option value="naturalMinor">Natural Minor</option>
+                                <option value="pentatonicMajor">Pentatonic Major</option>
+                                <option value="pentatonicMinor">Pentatonic Minor</option>
+                            </select>
+                        </div>
+                        <div class="control-group">
+                            <label>Actions:</label>
+                            <button id="clear-display">Clear Display</button>
+                            <button id="update-range" class="secondary">Update Range</button>
+                        </div>
+                    
         </div>
-        
-        <!-- Documentation Section -->
-        <div class="docs-section">
-            <div class="tabs">
-                <button class="tab active" onclick="showTab('overview')">Overview</button>
-                <button class="tab" onclick="showTab('scales')">Scales & Numbers</button>
-                <button class="tab" onclick="showTab('api')">API Reference</button>
-                <button class="tab" onclick="showTab('events')">Events</button>
-                <button class="tab" onclick="showTab('examples')">Examples</button>
-                <button class="tab" onclick="showTab('events-log')">Event Log</button>
-            </div>
-            
-            <!-- Overview Tab -->
-            <div id="overview" class="tab-content active">
-                <h3>Component Overview</h3>
-                <p>Interactive guitar fretboard component for chord and scale visualization</p>
-                <p>This interactive demo allows you to explore all the features and capabilities of the Fretboard component. Use the controls above to modify the component's behavior and see the results in real-time.</p>
-            </div>
-            
-            <!-- Scales & Numbers Tab -->
-            <div id="scales" class="tab-content">
-                <h3>Scales & Numbers</h3>
-                <p>Understanding musical scales and their fretboard representations is crucial for musicians. The Fretboard component supports various scale types and provides a clear visual representation of notes.</p>
+                    <div id="status" class="status info">
+                        Fretboard component loaded! Use the controls above to interact with the component.
+                    </div>
+                </div>
                 
-                <h4>🎵 Scale Types</h4>
-                <p>Understanding the different types of musical scales helps you choose the right sound for your music. Each scale has its own unique character and emotional quality:</p>
-                <ul>
-                    <li><strong>Major Scale:</strong> The foundation of Western music, featuring a bright, happy sound. Pattern: Root, Major 2nd, Major 3rd, Perfect 4th, Perfect 5th, Major 6th, Major 7th</li>
-                    <li><strong>Natural Minor Scale:</strong> A more relaxed, melancholic scale. Pattern: Root, Major 2nd, Minor 3rd, Perfect 4th, Perfect 5th, Minor 6th, Minor 7th</li>
-                    <li><strong>Harmonic Minor Scale:</strong> Similar to natural minor but with a raised 7th, creating tension. Common in classical and flamenco music.</li>
-                    <li><strong>Melodic Minor Scale:</strong> A jazz favorite that raises both 6th and 7th when ascending, natural minor when descending.</li>
-                    <li><strong>Pentatonic Scales:</strong> Five-note scales that are easy to play and sound great. Major pentatonic removes the 4th and 7th from major scale.</li>
-                    <li><strong>Blues Scale:</strong> A six-note scale that adds a "blue note" (flattened 5th) to the minor pentatonic.</li>
-                    <li><strong>Dorian Mode:</strong> A minor scale with a major 6th, giving it a jazzy, sophisticated feel.</li>
-                    <li><strong>Phrygian Mode:</strong> A minor scale with a flattened 2nd, creating an exotic, Spanish sound.</li>
-                </ul>
-                
-                <h4>🔢 Understanding the Numbers</h4>
-                <p>When you display a scale on the fretboard, you'll see numbers that represent different aspects of the scale:</p>
-                
-                <h5>Scale Degrees (1, 2, 3, 4, 5, 6, 7)</h5>
-                <ul>
-                    <li><strong>1 (Root):</strong> The starting note of the scale - this is your "home base"</li>
-                    <li><strong>2 (Second):</strong> The second note, usually a whole step above the root</li>
-                    <li><strong>3 (Third):</strong> Determines if the scale is major (major 3rd) or minor (minor 3rd)</li>
-                    <li><strong>4 (Fourth):</strong> The fourth note, often used in chord progressions</li>
-                    <li><strong>5 (Fifth):</strong> The fifth note, very stable and commonly used in power chords</li>
-                    <li><strong>6 (Sixth):</strong> The sixth note, adds color to the scale</li>
-                    <li><strong>7 (Seventh):</strong> The seventh note, creates tension that resolves to the root</li>
-                </ul>
-                
-                <h5>Intervals (0, 2, 4, 5, 7, 9, 11)</h5>
-                <p>These numbers represent the distance in semitones from the root note:</p>
-                <ul>
-                    <li><strong>0:</strong> Root note (0 semitones from root)</li>
-                    <li><strong>2:</strong> Major 2nd (2 semitones from root)</li>
-                    <li><strong>4:</strong> Major 3rd (4 semitones from root)</li>
-                    <li><strong>5:</strong> Perfect 4th (5 semitones from root)</li>
-                    <li><strong>7:</strong> Perfect 5th (7 semitones from root)</li>
-                    <li><strong>9:</strong> Major 6th (9 semitones from root)</li>
-                    <li><strong>11:</strong> Major 7th (11 semitones from root)</li>
-                </ul>
-                
-                <h4>🎯 How to Use the Scale Display</h4>
-                <ol>
-                    <li><strong>Select a Scale Root:</strong> Choose the starting note (C, D, E, F, G, A, B)</li>
-                    <li><strong>Choose Scale Type:</strong> Pick the scale pattern (Major, Minor, Pentatonic, etc.)</li>
-                    <li><strong>View the Pattern:</strong> The fretboard will highlight all notes of that scale</li>
-                    <li><strong>Practice Patterns:</strong> Use the highlighted notes to practice scales and improvisation</li>
-                </ol>
-                
-                <h4>💡 Practical Tips</h4>
-                <ul>
-                    <li><strong>Start with Major Scales:</strong> They're the foundation for understanding other scales</li>
-                    <li><strong>Learn the Root Note:</strong> Always know where your root note is - it's your anchor</li>
-                    <li><strong>Practice in Different Positions:</strong> Try playing the same scale starting from different frets</li>
-                    <li><strong>Use for Improvisation:</strong> The highlighted notes are safe to use when soloing in that key</li>
-                    <li><strong>Combine with Chords:</strong> Scales and chords work together - learn which scales fit with which chord progressions</li>
-                </ul>
-                
-                <h4>🎸 Example: C Major Scale</h4>
-                <p>When you select C Major scale, you'll see:</p>
-                <ul>
-                    <li><strong>Root (1):</strong> C notes highlighted in a special color</li>
-                    <li><strong>Scale Notes:</strong> C, D, E, F, G, A, B all highlighted across the fretboard</li>
-                    <li><strong>Pattern:</strong> The same pattern repeats every 12 frets (one octave)</li>
-                </ul>
-                <p>This scale works perfectly with C major chords and can be used for soloing in the key of C.</p>
-                
-                <h4>🧪 Try This Exercise</h4>
-                <p>Practice this common scale pattern to improve your fretboard knowledge:</p>
-                <ol>
-                    <li><strong>Select C Major Scale:</strong> Use the controls above to set root to "C" and type to "Major"</li>
-                    <li><strong>Find the Root Notes:</strong> Look for the specially colored C notes (these are your "home base")</li>
-                    <li><strong>Play the Scale:</strong> Start from any C note and play up the scale: C → D → E → F → G → A → B → C</li>
-                    <li><strong>Try Different Positions:</strong> Move to a different C note and play the same pattern</li>
-                    <li><strong>Experiment with Other Keys:</strong> Try G Major (G, A, B, C, D, E, F#) or F Major (F, G, A, Bb, C, D, E)</li>
-                </ol>
-                
-                <p><strong>💡 Pro Tip:</strong> Notice how the same scale pattern appears in different positions across the fretboard. This is called "position playing" and is essential for advanced guitar techniques.</p>
-            </div>
-            
-            <!-- API Reference Tab -->
-            <div id="api" class="tab-content">
-                <h3>API Reference</h3>
-                <p>The Fretboard component provides a comprehensive API for integration into your applications.</p>
-                <p><strong>Properties:</strong> Configure the component with various properties to customize its behavior.</p>
-                <p><strong>Methods:</strong> Programmatically control the component using built-in methods for chord display and scale patterns.</p>
-                <p><strong>Events:</strong> Listen to component events to respond to user interactions and state changes.</p>
-            </div>
-            
-            <!-- Events Tab -->
-            <div id="events" class="tab-content">
-                <h3>Component Events</h3>
-                <p>The Fretboard component emits various events that you can listen to:</p>
-                <p>• <strong>Initialization:</strong> Fired when the component is ready for use</p>
-                <p>• <strong>Note Selection:</strong> Fired when users click on fret positions</p>
-                <p>• <strong>Chord Changes:</strong> Fired when chord patterns are displayed</p>
-                <p>• <strong>Scale Changes:</strong> Fired when scale patterns are updated</p>
-                <p>View the Event Log tab to see real-time events as they occur.</p>
-            </div>
-            
-            <!-- Examples Tab -->
-            <div id="examples" class="tab-content">
-                <h3>Usage Examples</h3>
-                <p>Here are some common ways to use the Fretboard component in your projects:</p>
-                <p><strong>Basic Usage:</strong><br><code>&lt;fretboard&gt;&lt;/fretboard&gt;</code></p>
-                <p><strong>With Properties:</strong><br><code>&lt;fretboard instrument="guitar" tuning="standard"&gt;&lt;/fretboard&gt;</code></p>
-                <p><strong>Event Listeners:</strong><br><code>fretboard.addEventListener('noteselect', handleNoteSelect);</code></p>
-            </div>
-            
-            <!-- Event Log Tab -->
-            <div id="events-log" class="tab-content">
-                <h3>Event Log</h3>
-                <div class="event-log" id="event-log">
-                    <div class="event info">Component initialized</div>
+                <!-- Documentation Section -->
+                <div class="docs-section">
+                    <div class="tabs">
+                        <button class="tab active" onclick="showTab('overview')">Overview</button>
+                        <button class="tab" onclick="showTab('scales')">Scales & Numbers</button>
+                        <button class="tab" onclick="showTab('api')">API Reference</button>
+                        <button class="tab" onclick="showTab('events')">Events</button>
+                        <button class="tab" onclick="showTab('examples')">Examples</button>
+                        <button class="tab" onclick="showTab('events-log')">Event Log</button>
+                    </div>
+                    
+                    <!-- Overview Tab -->
+                    <div id="overview" class="tab-content active">
+                        <h3>Component Overview</h3>
+                        <p>Interactive guitar fretboard component for chord and scale visualization</p>
+                        <p>This interactive demo allows you to explore all the features and capabilities of the Fretboard component. Use the controls above to modify the component's behavior and see the results in real-time.</p>
+                    </div>
+                    
+                    <!-- Scales & Numbers Tab -->
+                    <div id="scales" class="tab-content">
+                        <h3>Scales & Numbers</h3>
+                        <p>Understanding musical scales and their fretboard representations is crucial for musicians. The Fretboard component supports various scale types and provides a clear visual representation of notes.</p>
+                        
+                        <h4>🎵 Scale Types</h4>
+                        <p>Understanding the different types of musical scales helps you choose the right sound for your music. Each scale has its own unique character and emotional quality:</p>
+                        <ul>
+                            <li><strong>Major Scale:</strong> The foundation of Western music, featuring a bright, happy sound. Pattern: Root, Major 2nd, Major 3rd, Perfect 4th, Perfect 5th, Major 6th, Major 7th</li>
+                            <li><strong>Natural Minor Scale:</strong> A more relaxed, melancholic scale. Pattern: Root, Major 2nd, Minor 3rd, Perfect 4th, Perfect 5th, Minor 6th, Minor 7th</li>
+                            <li><strong>Harmonic Minor Scale:</strong> Similar to natural minor but with a raised 7th, creating tension. Common in classical and flamenco music.</li>
+                            <li><strong>Melodic Minor Scale:</strong> A jazz favorite that raises both 6th and 7th when ascending, natural minor when descending.</li>
+                            <li><strong>Pentatonic Scales:</strong> Five-note scales that are easy to play and sound great. Major pentatonic removes the 4th and 7th from major scale.</li>
+                            <li><strong>Blues Scale:</strong> A six-note scale that adds a "blue note" (flattened 5th) to the minor pentatonic.</li>
+                            <li><strong>Dorian Mode:</strong> A minor scale with a major 6th, giving it a jazzy, sophisticated feel.</li>
+                            <li><strong>Phrygian Mode:</strong> A minor scale with a flattened 2nd, creating an exotic, Spanish sound.</li>
+                        </ul>
+                        
+                        <h4>🔢 Understanding the Numbers</h4>
+                        <p>When you display a scale on the fretboard, you'll see numbers that represent different aspects of the scale:</p>
+                        
+                        <h5>Scale Degrees (1, 2, 3, 4, 5, 6, 7)</h5>
+                        <ul>
+                            <li><strong>1 (Root):</strong> The starting note of the scale - this is your "home base"</li>
+                            <li><strong>2 (Second):</strong> The second note, usually a whole step above the root</li>
+                            <li><strong>3 (Third):</strong> Determines if the scale is major (major 3rd) or minor (minor 3rd)</li>
+                            <li><strong>4 (Fourth):</strong> The fourth note, often used in chord progressions</li>
+                            <li><strong>5 (Fifth):</strong> The fifth note, very stable and commonly used in power chords</li>
+                            <li><strong>6 (Sixth):</strong> The sixth note, adds color to the scale</li>
+                            <li><strong>7 (Seventh):</strong> The seventh note, creates tension that resolves to the root</li>
+                        </ul>
+                        
+                        <h5>Intervals (0, 2, 4, 5, 7, 9, 11)</h5>
+                        <p>These numbers represent the distance in semitones from the root note:</p>
+                        <ul>
+                            <li><strong>0:</strong> Root note (0 semitones from root)</li>
+                            <li><strong>2:</strong> Major 2nd (2 semitones from root)</li>
+                            <li><strong>4:</strong> Major 3rd (4 semitones from root)</li>
+                            <li><strong>5:</strong> Perfect 4th (5 semitones from root)</li>
+                            <li><strong>7:</strong> Perfect 5th (7 semitones from root)</li>
+                            <li><strong>9:</strong> Major 6th (9 semitones from root)</li>
+                            <li><strong>11:</strong> Major 7th (11 semitones from root)</li>
+                        </ul>
+                        
+                        <h4>🎯 How to Use the Scale Display</h4>
+                        <ol>
+                            <li><strong>Select a Scale Root:</strong> Choose the starting note (C, D, E, F, G, A, B)</li>
+                            <li><strong>Choose Scale Type:</strong> Pick the scale pattern (Major, Minor, Pentatonic, etc.)</li>
+                            <li><strong>View the Pattern:</strong> The fretboard will highlight all notes of that scale</li>
+                            <li><strong>Practice Patterns:</strong> Use the highlighted notes to practice scales and improvisation</li>
+                        </ol>
+                        
+                        <h4>💡 Practical Tips</h4>
+                        <ul>
+                            <li><strong>Start with Major Scales:</strong> They're the foundation for understanding other scales</li>
+                            <li><strong>Learn the Root Note:</strong> Always know where your root note is - it's your anchor</li>
+                            <li><strong>Practice in Different Positions:</strong> Try playing the same scale starting from different frets</li>
+                            <li><strong>Use for Improvisation:</strong> The highlighted notes are safe to use when soloing in that key</li>
+                            <li><strong>Combine with Chords:</strong> Scales and chords work together - learn which scales fit with which chord progressions</li>
+                        </ul>
+                        
+                        <h4>🎸 Example: C Major Scale</h4>
+                        <p>When you select C Major scale, you'll see:</p>
+                        <ul>
+                            <li><strong>Root (1):</strong> C notes highlighted in a special color</li>
+                            <li><strong>Scale Notes:</strong> C, D, E, F, G, A, B all highlighted across the fretboard</li>
+                            <li><strong>Pattern:</strong> The same pattern repeats every 12 frets (one octave)</li>
+                        </ul>
+                        <p>This scale works perfectly with C major chords and can be used for soloing in the key of C.</p>
+                        
+                        <h4>🧪 Try This Exercise</h4>
+                        <p>Practice this common scale pattern to improve your fretboard knowledge:</p>
+                        <ol>
+                            <li><strong>Select C Major Scale:</strong> Use the controls above to set root to "C" and type to "Major"</li>
+                            <li><strong>Find the Root Notes:</strong> Look for the specially colored C notes (these are your "home base")</li>
+                            <li><strong>Play the Scale:</strong> Start from any C note and play up the scale: C → D → E → F → G → A → B → C</li>
+                            <li><strong>Try Different Positions:</strong> Move to a different C note and play the same pattern</li>
+                            <li><strong>Experiment with Other Keys:</strong> Try G Major (G, A, B, C, D, E, F#) or F Major (F, G, A, Bb, C, D, E)</li>
+                        </ol>
+                        
+                        <p><strong>💡 Pro Tip:</strong> Notice how the same scale pattern appears in different positions across the fretboard. This is called "position playing" and is essential for advanced guitar techniques.</p>
+                    </div>
+                    
+                    <!-- API Reference Tab -->
+                    <div id="api" class="tab-content">
+                        <h3>API Reference</h3>
+                        <p>The Fretboard component provides a comprehensive API for integration into your applications.</p>
+                        <p><strong>Properties:</strong> Configure the component with various properties to customize its behavior.</p>
+                        <p><strong>Methods:</strong> Programmatically control the component using built-in methods for chord display and scale patterns.</p>
+                        <p><strong>Events:</strong> Listen to component events to respond to user interactions and state changes.</p>
+                    </div>
+                    
+                    <!-- Events Tab -->
+                    <div id="events" class="tab-content">
+                        <h3>Component Events</h3>
+                        <p>The Fretboard component emits various events that you can listen to:</p>
+                        <p>• <strong>Initialization:</strong> Fired when the component is ready for use</p>
+                        <p>• <strong>Note Selection:</strong> Fired when users click on fret positions</p>
+                        <p>• <strong>Chord Changes:</strong> Fired when chord patterns are displayed</p>
+                        <p>• <strong>Scale Changes:</strong> Fired when scale patterns are updated</p>
+                        <p>View the Event Log tab to see real-time events as they occur.</p>
+                    </div>
+                    
+                    <!-- Examples Tab -->
+                    <div id="examples" class="tab-content">
+                        <h3>Usage Examples</h3>
+                        <p>Here are some common ways to use the Fretboard component in your projects:</p>
+                        <p><strong>Basic Usage:</strong><br><code>&lt;fretboard&gt;&lt;/fretboard&gt;</code></p>
+                        <p><strong>With Properties:</strong><br><code>&lt;fretboard instrument="guitar" tuning="standard"&gt;&lt;/fretboard&gt;</code></p>
+                        <p><strong>Event Listeners:</strong><br><code>fretboard.addEventListener('noteselect', handleNoteSelect);</code></p>
+                    </div>
+                    
+                    <!-- Event Log Tab -->
+                    <div id="events-log" class="tab-content">
+                        <h3>Event Log</h3>
+                        <div class="event-log" id="event-log">
+                            <div class="event info">Component initialized</div>
+                        </div>
+                    </div>
                 </div>
             </div>
-        </div>
+        </main>
     </div>
 
     <div class="demo-footer">
@@ -760,6 +798,7 @@
     
     <script type="module">
         import './components/fretboard/fretboard.js';
+        import './components/demo-navigation/demo-navigation.js';
         
         document.addEventListener('DOMContentLoaded', function() {
             console.log('Fretboard Demo: DOM loaded');

@@ -1,5 +1,6 @@
 import { generateScaleNotes, getNoteFrequency } from '../../helpers/scaleUtils.js';
 import { applyNoteColor, getBaseNote } from '../../helpers/noteColorUtils.js';
+import { checkToneJsStatus, getAudioErrorMessage, logAudioStatus } from '../../helpers/audioUtils.js';
 
 export default class HandPan extends HTMLElement {
     constructor() {
@@ -37,6 +38,9 @@ export default class HandPan extends HTMLElement {
 
     connectedCallback() {
         console.log('HandPan: Component connected to DOM');
+        
+        // Log audio status for debugging
+        logAudioStatus('HandPan');
         
         // Set default attributes if not provided
         if (!this.hasAttribute('key')) {
@@ -82,9 +86,11 @@ export default class HandPan extends HTMLElement {
 
     createHandPanSynth() {
         try {
-            // Check if Tone.js is available
-            if (typeof Tone === 'undefined') {
-                console.warn('HandPan: Tone.js not available, creating fallback synthesiser');
+            // Check if Tone.js is available using the utility
+            const status = checkToneJsStatus();
+            
+            if (!status.available) {
+                console.warn('HandPan:', getAudioErrorMessage('HandPan', status.error));
                 this.createFallbackSynth();
                 return;
             }
@@ -899,15 +905,15 @@ export default class HandPan extends HTMLElement {
     }
 
     async ensureAudioContextRunning() {
-        // Check if Tone.js is available
-        if (typeof Tone === 'undefined') {
-            console.warn('HandPan: Tone.js not loaded yet');
-            return false;
-        }
+        // Check if Tone.js is available using the utility
+        const status = checkToneJsStatus();
         
-        // Check if Tone.context exists
-        if (!Tone.context) {
-            console.warn('HandPan: Tone.context not available');
+        if (!status.available) {
+            const errorMessage = getAudioErrorMessage('HandPan', status.error);
+            console.warn('HandPan:', errorMessage);
+            
+            // Update the audio status indicator with helpful information
+            this.updateAudioStatusIndicator(status.error);
             return false;
         }
         
@@ -921,6 +927,7 @@ export default class HandPan extends HTMLElement {
                 return true;
             } catch (error) {
                 console.warn('HandPan: Error resuming audio context:', error);
+                this.updateAudioStatusIndicator('AUDIO_CONTEXT_FAILED');
                 return false;
             }
         } else if (Tone.context.state !== 'running') {
@@ -932,13 +939,14 @@ export default class HandPan extends HTMLElement {
                 return true;
             } catch (error) {
                 console.warn('HandPan: Error starting audio context:', error);
+                this.updateAudioStatusIndicator('AUDIO_CONTEXT_FAILED');
                 return false;
             }
         }
         return true;
     }
     
-    updateAudioStatusIndicator() {
+    updateAudioStatusIndicator(errorType = null) {
         const indicator = this.shadowRoot.getElementById('audioStatusIndicator');
         if (indicator) {
             if (typeof Tone !== 'undefined' && Tone.context && Tone.context.state === 'running') {
@@ -947,7 +955,14 @@ export default class HandPan extends HTMLElement {
                 indicator.style.display = 'block';
                 const textElement = indicator.querySelector('.audio-status-text');
                 if (textElement) {
-                    textElement.textContent = '🔇 Click to enable audio';
+                    if (errorType) {
+                        const errorMessage = getAudioErrorMessage('HandPan', errorType);
+                        textElement.textContent = '🔇 Audio Error - Click for details';
+                        textElement.title = errorMessage; // Show full message on hover
+                    } else {
+                        textElement.textContent = '🔇 Click to enable audio';
+                        textElement.title = 'Click to enable audio functionality';
+                    }
                 }
             }
         }

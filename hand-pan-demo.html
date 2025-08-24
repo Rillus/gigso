@@ -403,6 +403,39 @@
                 text-align: center;
             }
         }
+        
+        /* Page Layout with Navigation */
+        .page-layout {
+            display: flex;
+            min-height: calc(100vh - 200px); /* Account for header */
+        }
+        
+        .nav-sidebar {
+            flex-shrink: 0;
+            background: #f8f9fa;
+            border-right: 1px solid #e9ecef;
+        }
+        
+        .main-content {
+            flex: 1;
+            min-width: 0; /* Allow flex item to shrink below content size */
+        }
+        
+        .main-content .container {
+            max-width: none;
+            padding: 0 20px;
+        }
+        
+        @media (max-width: 768px) {
+            .page-layout {
+                flex-direction: column;
+            }
+            
+            .nav-sidebar {
+                border-right: none;
+                border-bottom: 1px solid #e9ecef;
+            }
+        }
     </style>
     <!-- Load Tone.js for audio functionality -->
     <script src="https://unpkg.com/tone@14.7.77/build/Tone.js"></script>
@@ -424,115 +457,121 @@
         </div>
     </div>
     
-    <div class="container">
-        <!-- Component Showcase -->
-        <div class="component-showcase">
-            <div class="showcase-header">
-                <h2>Component Preview</h2>
-                <p>Interactive demonstration of the HandPan component</p>
-            </div>
-            <div class="component-container" id="component-container">
-<hand-pan id="demo-component"></hand-pan>
-</div>
+    <div class="page-layout">
+        <div class="nav-sidebar">
+            <demo-navigation></demo-navigation>
         </div>
         
-        <!-- Controls Section -->
-        <div class="controls-section">
-            <div class="controls-header">
-                <h3>🎛️ Interactive Controls</h3>
-            </div>
-            <div class="controls-grid" id="controls-grid">
-
-                <div class="control-group">
-                    <label for="key-select">Key:</label>
-                    <select id="key-select">
-                        <option value="C">C</option>
-                        <option value="D" selected>D</option>
-                        <option value="E">E</option>
-                        <option value="F">F</option>
-                        <option value="G">G</option>
-                        <option value="A">A</option>
-                        <option value="B">B</option>
-                    </select>
+        <div class="main-content">
+            <div class="container">
+                <!-- Component Showcase -->
+                <div class="component-showcase">
+                    <div class="showcase-header">
+                        <h2>Component Preview</h2>
+                        <p>Interactive demonstration of the HandPan component</p>
+                    </div>
+                    <div class="component-container" id="component-container">
+                        <hand-pan id="demo-component"></hand-pan>
+                    </div>
                 </div>
-                <div class="control-group">
-                    <label for="scale-select">Scale:</label>
-                    <select id="scale-select">
-                        <option value="major">Major</option>
-                        <option value="minor" selected>Minor</option>
-                    </select>
+                
+                <!-- Controls Section -->
+                <div class="controls-section">
+                    <div class="controls-header">
+                        <h3>🎛️ Interactive Controls</h3>
+                    </div>
+                    <div class="controls-grid" id="controls-grid">
+                        <div class="control-group">
+                            <label for="key-select">Key:</label>
+                            <select id="key-select">
+                                <option value="C">C</option>
+                                <option value="D" selected>D</option>
+                                <option value="E">E</option>
+                                <option value="F">F</option>
+                                <option value="G">G</option>
+                                <option value="A">A</option>
+                                <option value="B">B</option>
+                            </select>
+                        </div>
+                        <div class="control-group">
+                            <label for="scale-select">Scale:</label>
+                            <select id="scale-select">
+                                <option value="major">Major</option>
+                                <option value="minor" selected>Minor</option>
+                            </select>
+                        </div>
+                        <div class="control-group">
+                            <label for="size-select">Size:</label>
+                            <select id="size-select">
+                                <option value="small">Small</option>
+                                <option value="medium" selected>Medium</option>
+                                <option value="large">Large</option>
+                            </select>
+                        </div>
+                        <div class="control-group">
+                            <label>Actions:</label>
+                            <button id="mute-btn">Mute</button>
+                            <button id="unmute-btn" class="secondary">Unmute</button>
+                        </div>
+                    </div>
+                    <div id="status" class="status info">
+                        HandPan component loaded! Use the controls above to interact with the component.
+                    </div>
                 </div>
-                <div class="control-group">
-                    <label for="size-select">Size:</label>
-                    <select id="size-select">
-                        <option value="small">Small</option>
-                        <option value="medium" selected>Medium</option>
-                        <option value="large">Large</option>
-                    </select>
-                </div>
-                <div class="control-group">
-                    <label>Actions:</label>
-                    <button id="mute-btn">Mute</button>
-                    <button id="unmute-btn" class="secondary">Unmute</button>
-                </div>
-            
-</div>
-            <div id="status" class="status info">
-                HandPan component loaded! Use the controls above to interact with the component.
-            </div>
-        </div>
-        
-        <!-- Documentation Section -->
-        <div class="docs-section">
-            <div class="tabs">
-                <button class="tab active" onclick="showTab('overview')">Overview</button>
-                <button class="tab" onclick="showTab('api')">API Reference</button>
-                <button class="tab" onclick="showTab('events')">Events</button>
-                <button class="tab" onclick="showTab('examples')">Examples</button>
-                <button class="tab" onclick="showTab('events-log')">Event Log</button>
-            </div>
-            
-            <!-- Overview Tab -->
-            <div id="overview" class="tab-content active">
-                <h3>Component Overview</h3>
-                <p>Interactive hand pan (hang drum) instrument for touch-screen play with soothing synthesized tones</p>
-                <p>This interactive demo allows you to explore all the features and capabilities of the HandPan component. Use the controls above to modify the component's behavior and see the results in real-time.</p>
-            </div>
-            
-            <!-- API Reference Tab -->
-            <div id="api" class="tab-content">
-                <h3>API Reference</h3>
-                <p>The HandPan component provides a comprehensive API for integration into your applications.</p>
-                <p><strong>Properties:</strong> Configure the component with various properties to customize its behavior.</p>
-                <p><strong>Methods:</strong> Programmatically control the component using built-in methods for key/scale changes and audio control.</p>
-                <p><strong>Events:</strong> Listen to component events to respond to user interactions and state changes.</p>
-            </div>
-            
-            <!-- Events Tab -->
-            <div id="events" class="tab-content">
-                <h3>Component Events</h3>
-                <p>The HandPan component emits various events that you can listen to:</p>
-                <p>• <strong>Initialization:</strong> Fired when the component is ready for use</p>
-                <p>• <strong>Note Played:</strong> Fired when users touch the hand pan keys</p>
-                <p>• <strong>Key Changes:</strong> Fired when the key or scale is modified</p>
-                <p>• <strong>Audio Control:</strong> Fired when mute/unmute actions occur</p>
-                <p>View the Event Log tab to see real-time events as they occur.</p>
-            </div>
-            
-            <!-- Examples Tab -->
-            <div id="examples" class="tab-content">
-                <h3>Usage Examples</h3>
-                <p>Here are some common ways to use the HandPan component in your projects:</p>
-                <p><strong>Basic Usage:</strong><br><code>&lt;hand-pan&gt;&lt;/hand-pan&gt;</code></p>
-                <p><strong>With Properties:</strong><br><code>&lt;hand-pan key="D" scale="minor" size="large"&gt;&lt;/hand-pan&gt;</code></p>
-                <p><strong>Event Listeners:</strong><br><code>handPan.addEventListener('note-played', handleNotePlay);</code></p>
-            </div>
-            
-            <!-- Event Log Tab -->
-            <div id="events-log" class="tab-content">
-                <h3>Event Log</h3>
-                <div class="event-log" id="event-log">
-                    <div class="event info">Component initialized</div>
+                
+                <!-- Documentation Section -->
+                <div class="docs-section">
+                    <div class="tabs">
+                        <button class="tab active" onclick="showTab('overview')">Overview</button>
+                        <button class="tab" onclick="showTab('api')">API Reference</button>
+                        <button class="tab" onclick="showTab('events')">Events</button>
+                        <button class="tab" onclick="showTab('examples')">Examples</button>
+                        <button class="tab" onclick="showTab('events-log')">Event Log</button>
+                    </div>
+                    
+                    <!-- Overview Tab -->
+                    <div id="overview" class="tab-content active">
+                        <h3>Component Overview</h3>
+                        <p>Interactive hand pan (hang drum) instrument for touch-screen play with soothing synthesized tones</p>
+                        <p>This interactive demo allows you to explore all the features and capabilities of the HandPan component. Use the controls above to modify the component's behavior and see the results in real-time.</p>
+                    </div>
+                    
+                    <!-- API Reference Tab -->
+                    <div id="api" class="tab-content">
+                        <h3>API Reference</h3>
+                        <p>The HandPan component provides a comprehensive API for integration into your applications.</p>
+                        <p><strong>Properties:</strong> Configure the component with various properties to customize its behavior.</p>
+                        <p><strong>Methods:</strong> Programmatically control the component using built-in methods.</p>
+                        <p><strong>Events:</strong> Listen to component events to respond to user interactions and state changes.</p>
+                    </div>
+                    
+                    <!-- Events Tab -->
+                    <div id="events" class="tab-content">
+                        <h3>Component Events</h3>
+                        <p>The HandPan component emits various events that you can listen to:</p>
+                        <p>• <strong>Initialization:</strong> Fired when the component is ready for use</p>
+                        <p>• <strong>Note Playback:</strong> Fired when notes are played</p>
+                        <p>• <strong>Key Changes:</strong> Fired when the musical key is modified</p>
+                        <p>• <strong>Scale Changes:</strong> Fired when the scale type is modified</p>
+                        <p>View the Event Log tab to see real-time events as they occur.</p>
+                    </div>
+                    
+                    <!-- Examples Tab -->
+                    <div id="examples" class="tab-content">
+                        <h3>Usage Examples</h3>
+                        <p>Here are some common ways to use the HandPan component in your projects:</p>
+                        <p><strong>Basic Usage:</strong><br><code>&lt;hand-pan&gt;&lt;/hand-pan&gt;</code></p>
+                        <p><strong>With Properties:</strong><br><code>&lt;hand-pan key="D" scale="minor" size="medium"&gt;&lt;/hand-pan&gt;</code></p>
+                        <p><strong>Event Listeners:</strong><br><code>handPan.addEventListener('note-played', handleNotePlayed);</code></p>
+                    </div>
+                    
+                    <!-- Event Log Tab -->
+                    <div id="events-log" class="tab-content">
+                        <h3>Event Log</h3>
+                        <div class="event-log" id="event-log">
+                            <div class="event info">Component initialized</div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -586,6 +625,7 @@
     
     <script type="module">
         import './components/hand-pan/hand-pan.js';
+        import './components/demo-navigation/demo-navigation.js';
         
         document.addEventListener('DOMContentLoaded', function() {
             console.log('HandPan Demo: DOM loaded');

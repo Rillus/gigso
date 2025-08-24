@@ -402,6 +402,39 @@
                 text-align: center;
             }
         }
+        
+        /* Page Layout with Navigation */
+        .page-layout {
+            display: flex;
+            min-height: calc(100vh - 200px); /* Account for header */
+        }
+        
+        .nav-sidebar {
+            flex-shrink: 0;
+            background: #f8f9fa;
+            border-right: 1px solid #e9ecef;
+        }
+        
+        .main-content {
+            flex: 1;
+            min-width: 0; /* Allow flex item to shrink below content size */
+        }
+        
+        .main-content .container {
+            max-width: none;
+            padding: 0 20px;
+        }
+        
+        @media (max-width: 768px) {
+            .page-layout {
+                flex-direction: column;
+            }
+            
+            .nav-sidebar {
+                border-right: none;
+                border-bottom: 1px solid #e9ecef;
+            }
+        }
     </style>
 </head>
 <body>
@@ -421,99 +454,107 @@
         </div>
     </div>
     
-    <div class="container">
-        <!-- Component Showcase -->
-        <div class="component-showcase">
-            <div class="showcase-header">
-                <h2>Component Preview</h2>
-                <p>Interactive demonstration of the PianoRoll component</p>
-            </div>
-            <div class="component-container" id="component-container">
+    <div class="page-layout">
+        <div class="nav-sidebar">
+            <demo-navigation></demo-navigation>
+        </div>
+        
+        <div class="main-content">
+            <div class="container">
+                <!-- Component Showcase -->
+                <div class="component-showcase">
+                    <div class="showcase-header">
+                        <h2>Component Preview</h2>
+                        <p>Interactive demonstration of the PianoRoll component</p>
+                    </div>
+                    <div class="component-container" id="component-container">
 <pianoroll id="demo-component"></pianoroll>
 </div>
-        </div>
+                </div>
         
-        <!-- Controls Section -->
-        <div class="controls-section">
-            <div class="controls-header">
-                <h3>🎛️ Interactive Controls</h3>
-            </div>
-            <div class="controls-grid" id="controls-grid">
-                <div class="control-group">
-                    <label for="tempo-input">Tempo (BPM):</label>
-                    <input type="number" id="tempo-input" value="120" min="60" max="200">
+                <!-- Controls Section -->
+                <div class="controls-section">
+                    <div class="controls-header">
+                        <h3>🎛️ Interactive Controls</h3>
+                    </div>
+                    <div class="controls-grid" id="controls-grid">
+                        <div class="control-group">
+                            <label for="tempo-input">Tempo (BPM):</label>
+                            <input type="number" id="tempo-input" value="120" min="60" max="200">
+                        </div>
+                        <div class="control-group">
+                            <label for="time-signature">Time Signature:</label>
+                            <select id="time-signature">
+                                <option value="4/4" selected>4/4</option>
+                                <option value="3/4">3/4</option>
+                                <option value="6/8">6/8</option>
+                            </select>
+                        </div>
+                        <div class="control-group">
+                            <label>Actions:</label>
+                            <button id="play-roll">Play</button>
+                            <button id="stop-roll" class="secondary">Stop</button>
+                            <button id="clear-roll">Clear</button>
+                        </div>
+                    </div>
+                    <div id="status" class="status info">
+                        PianoRoll component loaded! Use the controls above to interact with the component.
+                    </div>
                 </div>
-                <div class="control-group">
-                    <label for="time-signature">Time Signature:</label>
-                    <select id="time-signature">
-                        <option value="4/4" selected>4/4</option>
-                        <option value="3/4">3/4</option>
-                        <option value="6/8">6/8</option>
-                    </select>
-                </div>
-                <div class="control-group">
-                    <label>Actions:</label>
-                    <button id="play-roll">Play</button>
-                    <button id="stop-roll" class="secondary">Stop</button>
-                    <button id="clear-roll">Clear</button>
-                </div>
-            </div>
-            <div id="status" class="status info">
-                PianoRoll component loaded! Use the controls above to interact with the component.
-            </div>
-        </div>
-        
-        <!-- Documentation Section -->
-        <div class="docs-section">
-            <div class="tabs">
-                <button class="tab active" onclick="showTab('overview')">Overview</button>
-                <button class="tab" onclick="showTab('api')">API Reference</button>
-                <button class="tab" onclick="showTab('events')">Events</button>
-                <button class="tab" onclick="showTab('examples')">Examples</button>
-                <button class="tab" onclick="showTab('events-log')">Event Log</button>
-            </div>
-            
-            <!-- Overview Tab -->
-            <div id="overview" class="tab-content active">
-                <h3>Component Overview</h3>
-                <p>Visual timeline interface for arranging and playing chord progressions</p>
-                <p>This interactive demo allows you to explore all the features and capabilities of the PianoRoll component. Use the controls above to modify the component's behavior and see the results in real-time.</p>
-            </div>
-            
-            <!-- API Reference Tab -->
-            <div id="api" class="tab-content">
-                <h3>API Reference</h3>
-                <p>The PianoRoll component provides a comprehensive API for integration into your applications.</p>
-                <p><strong>Properties:</strong> Configure the component with various properties to customize its behavior.</p>
-                <p><strong>Methods:</strong> Programmatically control the component using built-in methods like play(), stop(), and clear().</p>
-                <p><strong>Events:</strong> Listen to component events to respond to user interactions and state changes.</p>
-            </div>
-            
-            <!-- Events Tab -->
-            <div id="events" class="tab-content">
-                <h3>Component Events</h3>
-                <p>The PianoRoll component emits various events that you can listen to:</p>
-                <p>• <strong>Initialization:</strong> Fired when the component is ready for use</p>
-                <p>• <strong>Playback Events:</strong> Fired when playback starts, stops, or encounters errors</p>
-                <p>• <strong>User Interaction:</strong> Fired when users interact with the timeline</p>
-                <p>• <strong>Tempo Changes:</strong> Fired when the tempo is modified</p>
-                <p>View the Event Log tab to see real-time events as they occur.</p>
-            </div>
-            
-            <!-- Examples Tab -->
-            <div id="examples" class="tab-content">
-                <h3>Usage Examples</h3>
-                <p>Here are some common ways to use the PianoRoll component in your projects:</p>
-                <p><strong>Basic Usage:</strong><br><code>&lt;pianoroll&gt;&lt;/pianoroll&gt;</code></p>
-                <p><strong>With Properties:</strong><br><code>&lt;pianoroll tempo="120" time-signature="4/4"&gt;&lt;/pianoroll&gt;</code></p>
-                <p><strong>Event Listeners:</strong><br><code>pianoroll.addEventListener('play', handlePlay);</code></p>
-            </div>
-            
-            <!-- Event Log Tab -->
-            <div id="events-log" class="tab-content">
-                <h3>Event Log</h3>
-                <div class="event-log" id="event-log">
-                    <div class="event info">Component initialized</div>
+                
+                <!-- Documentation Section -->
+                <div class="docs-section">
+                    <div class="tabs">
+                        <button class="tab active" onclick="showTab('overview')">Overview</button>
+                        <button class="tab" onclick="showTab('api')">API Reference</button>
+                        <button class="tab" onclick="showTab('events')">Events</button>
+                        <button class="tab" onclick="showTab('examples')">Examples</button>
+                        <button class="tab" onclick="showTab('events-log')">Event Log</button>
+                    </div>
+                    
+                    <!-- Overview Tab -->
+                    <div id="overview" class="tab-content active">
+                        <h3>Component Overview</h3>
+                        <p>Visual timeline interface for arranging and playing chord progressions</p>
+                        <p>This interactive demo allows you to explore all the features and capabilities of the PianoRoll component. Use the controls above to modify the component's behavior and see the results in real-time.</p>
+                    </div>
+                    
+                    <!-- API Reference Tab -->
+                    <div id="api" class="tab-content">
+                        <h3>API Reference</h3>
+                        <p>The PianoRoll component provides a comprehensive API for integration into your applications.</p>
+                        <p><strong>Properties:</strong> Configure the component with various properties to customize its behavior.</p>
+                        <p><strong>Methods:</strong> Programmatically control the component using built-in methods like play(), stop(), and clear().</p>
+                        <p><strong>Events:</strong> Listen to component events to respond to user interactions and state changes.</p>
+                    </div>
+                    
+                    <!-- Events Tab -->
+                    <div id="events" class="tab-content">
+                        <h3>Component Events</h3>
+                        <p>The PianoRoll component emits various events that you can listen to:</p>
+                        <p>• <strong>Initialization:</strong> Fired when the component is ready for use</p>
+                        <p>• <strong>Playback Events:</strong> Fired when playback starts, stops, or encounters errors</p>
+                        <p>• <strong>User Interaction:</strong> Fired when users interact with the timeline</p>
+                        <p>• <strong>Tempo Changes:</strong> Fired when the tempo is modified</p>
+                        <p>View the Event Log tab to see real-time events as they occur.</p>
+                    </div>
+                    
+                    <!-- Examples Tab -->
+                    <div id="examples" class="tab-content">
+                        <h3>Usage Examples</h3>
+                        <p>Here are some common ways to use the PianoRoll component in your projects:</p>
+                        <p><strong>Basic Usage:</strong><br><code>&lt;pianoroll&gt;&lt;/pianoroll&gt;</code></p>
+                        <p><strong>With Properties:</strong><br><code>&lt;pianoroll tempo="120" time-signature="4/4"&gt;&lt;/pianoroll&gt;</code></p>
+                        <p><strong>Event Listeners:</strong><br><code>pianoroll.addEventListener('play', handlePlay);</code></p>
+                    </div>
+                    
+                    <!-- Event Log Tab -->
+                    <div id="events-log" class="tab-content">
+                        <h3>Event Log</h3>
+                        <div class="event-log" id="event-log">
+                            <div class="event info">Component initialized</div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -568,12 +609,121 @@
         import './helpers/eventHandlers.js';
         import './state/state.js';
         import './components/piano-roll/piano-roll.js';
+        import './components/chord-diagram/chord-diagram.js';
+        import './components/base-component.js';
+        import './components/demo-navigation/demo-navigation.js';
         
         document.addEventListener('DOMContentLoaded', function() {
-            const component = document.getElementById('demo-component');
+            console.log('PianoRoll Demo: DOM loaded');
             
-            // Component-specific event listeners
+            let retryCount = 0;
+            const maxRetries = 50; // 5 seconds max
             
+            // Wait for the custom element to be defined AND the component element to exist
+            const waitForComponent = () => {
+                retryCount++;
+                if (retryCount > maxRetries) {
+                    console.error('PianoRoll Demo: Max retries exceeded, component failed to initialize');
+                    logEvent('Component failed to initialize after maximum retries', 'error');
+                    updateStatus('Error: Component failed to initialize', 'error');
+                    return;
+                }
+                
+                console.log(`PianoRoll Demo: waitForComponent called (attempt ${retryCount}/${maxRetries})`);
+                
+                // First check if all required custom elements are defined
+                const pianoRollElement = customElements.get('piano-roll');
+                const chordDiagramElement = customElements.get('chord-diagram');
+                
+                if (!pianoRollElement) {
+                    console.log('PianoRoll Demo: PianoRoll custom element not defined yet, retrying...');
+                    setTimeout(waitForComponent, 100);
+                    return;
+                }
+                
+                if (!chordDiagramElement) {
+                    console.log('PianoRoll Demo: ChordDiagram custom element not defined yet, retrying...');
+                    setTimeout(waitForComponent, 100);
+                    return;
+                }
+                
+                console.log('PianoRoll Demo: All custom elements are defined');
+                console.log('PianoRoll Demo: PianoRoll element:', pianoRollElement);
+                console.log('PianoRoll Demo: ChordDiagram element:', chordDiagramElement);
+                
+                // Check if component element exists and needs to be upgraded
+                let component = document.getElementById('demo-component');
+                if (!component) {
+                    console.log('PianoRoll Demo: Component element not found, retrying...');
+                    logEvent('Component element not found, retrying...', 'warning');
+                    setTimeout(waitForComponent, 100);
+                    return;
+                }
+                
+                console.log('PianoRoll Demo: Component element found:', component);
+                console.log('PianoRoll Demo: Component tagName:', component.tagName);
+                console.log('PianoRoll Demo: Component constructor:', component.constructor.name);
+                
+                // If the element is still HTMLUnknownElement, we need to recreate it
+                if (component.constructor.name === 'HTMLUnknownElement') {
+                    console.log('PianoRoll Demo: Component needs to be recreated, doing so now...');
+                    
+                    // Store the current attributes
+                    const tempo = component.getAttribute('tempo');
+                    const timeSignature = component.getAttribute('time-signature');
+                    
+                    // Remove the old element
+                    component.remove();
+                    
+                    // Create a new element
+                    const newComponent = document.createElement('piano-roll');
+                    newComponent.id = 'demo-component';
+                    if (tempo) newComponent.setAttribute('tempo', tempo);
+                    if (timeSignature) newComponent.setAttribute('time-signature', timeSignature);
+                    
+                    // Insert it back into the DOM
+                    document.getElementById('component-container').appendChild(newComponent);
+                    
+                    // Update our reference
+                    component = newComponent;
+                    
+                    console.log('PianoRoll Demo: Component recreated:', component);
+                    console.log('PianoRoll Demo: New component constructor:', component.constructor.name);
+                    
+                    // Wait a bit for the new component to be fully initialized
+                    setTimeout(() => {
+                        // Continue with the normal flow
+                        if (!component.shadowRoot) {
+                            console.log('PianoRoll Demo: New component shadow DOM not ready, retrying...');
+                            setTimeout(waitForComponent, 100);
+                            return;
+                        }
+                        
+                        console.log('PianoRoll Demo: New component shadow DOM ready');
+                        
+                        // Component is ready, set up event listeners
+                        setupComponent(component);
+                    }, 100);
+                    
+                    return; // Exit early since we're handling the new component separately
+                }
+                
+                // Wait for the component to be fully connected and have its shadow DOM
+                if (!component.shadowRoot) {
+                    console.log('PianoRoll Demo: Component shadow DOM not ready, retrying...');
+                    setTimeout(waitForComponent, 100);
+                    return;
+                }
+                
+                console.log('PianoRoll Demo: Component shadow DOM ready');
+                
+                // Component is ready, set up event listeners
+                setupComponent(component);
+            };
+            
+            const setupComponent = (component) => {
+                console.log('PianoRoll Demo: setupComponent called with:', component);
+                
                 // PianoRoll specific controls
                 const tempoInput = document.getElementById('tempo-input');
                 const timeSignature = document.getElementById('time-signature');
@@ -581,40 +731,111 @@
                 const stopRollBtn = document.getElementById('stop-roll');
                 const clearRollBtn = document.getElementById('clear-roll');
                 
-                tempoInput.addEventListener('change', (e) => {
-                    component.setTempo(parseInt(e.target.value));
-                    logEvent('Tempo changed to ' + e.target.value + ' BPM', 'info');
-                    updateStatus('Tempo updated to ' + e.target.value + ' BPM');
+                console.log('PianoRoll Demo: Found controls:', {
+                    tempoInput: !!tempoInput,
+                    timeSignature: !!timeSignature,
+                    playRollBtn: !!playRollBtn,
+                    stopRollBtn: !!stopRollBtn,
+                    clearRollBtn: !!clearRollBtn
                 });
                 
-                timeSignature.addEventListener('change', (e) => {
-                    component.setTimeSignature(e.target.value);
-                    logEvent('Time signature changed to ' + e.target.value, 'info');
-                    updateStatus('Time signature updated to ' + e.target.value);
-                });
+                if (tempoInput) {
+                    tempoInput.addEventListener('change', (e) => {
+                        try {
+                            if (component.setTempo) {
+                                component.setTempo(parseInt(e.target.value));
+                                logEvent('Tempo changed to ' + e.target.value + ' BPM', 'info');
+                                updateStatus('Tempo updated to ' + e.target.value + ' BPM');
+                            } else {
+                                console.warn('PianoRoll Demo: setTempo method not available');
+                                logEvent('setTempo method not available', 'warning');
+                            }
+                        } catch (error) {
+                            console.error('PianoRoll Demo: Error setting tempo:', error);
+                            logEvent('Error setting tempo: ' + error.message, 'error');
+                        }
+                    });
+                }
                 
-                playRollBtn.addEventListener('click', () => {
-                    component.play();
-                    logEvent('PianoRoll playback started', 'success');
-                    updateStatus('PianoRoll playing');
-                });
+                if (timeSignature) {
+                    timeSignature.addEventListener('change', (e) => {
+                        try {
+                            if (component.setTimeSignature) {
+                                component.setTimeSignature(e.target.value);
+                                logEvent('Time signature changed to ' + e.target.value, 'info');
+                                updateStatus('Time signature updated to ' + e.target.value);
+                            } else {
+                                console.warn('PianoRoll Demo: setTimeSignature method not available');
+                                logEvent('setTimeSignature method not available', 'warning');
+                            }
+                        } catch (error) {
+                            console.error('PianoRoll Demo: Error setting time signature:', error);
+                            logEvent('Error setting time signature: ' + error.message, 'error');
+                        }
+                    });
+                }
                 
-                stopRollBtn.addEventListener('click', () => {
-                    component.stop();
-                    logEvent('PianoRoll playback stopped', 'warning');
-                    updateStatus('PianoRoll stopped');
-                });
+                if (playRollBtn) {
+                    playRollBtn.addEventListener('click', () => {
+                        try {
+                            if (component.play) {
+                                component.play();
+                                logEvent('PianoRoll playback started', 'success');
+                                updateStatus('PianoRoll playing');
+                            } else {
+                                console.warn('PianoRoll Demo: play method not available');
+                                logEvent('play method not available', 'warning');
+                            }
+                        } catch (error) {
+                            console.error('PianoRoll Demo: Error starting playback:', error);
+                            logEvent('Error starting playback: ' + error.message, 'error');
+                        }
+                    });
+                }
                 
-                clearRollBtn.addEventListener('click', () => {
-                    component.clear();
-                    logEvent('PianoRoll cleared', 'info');
-                    updateStatus('PianoRoll cleared');
-                });
+                if (stopRollBtn) {
+                    stopRollBtn.addEventListener('click', () => {
+                        try {
+                            if (component.stop) {
+                                component.stop();
+                                logEvent('PianoRoll playback stopped', 'warning');
+                                updateStatus('PianoRoll stopped');
+                            } else {
+                                console.warn('PianoRoll Demo: stop method not available');
+                                logEvent('stop method not available', 'warning');
+                            }
+                        } catch (error) {
+                            console.error('PianoRoll Demo: Error stopping playback:', error);
+                            logEvent('Error stopping playback: ' + error.message, 'error');
+                        }
+                    });
+                }
+                
+                if (clearRollBtn) {
+                    clearRollBtn.addEventListener('click', () => {
+                        try {
+                            if (component.clear) {
+                                component.clear();
+                                logEvent('PianoRoll cleared', 'info');
+                                updateStatus('PianoRoll cleared');
+                            } else {
+                                console.warn('PianoRoll Demo: clear method not available');
+                                logEvent('clear method not available', 'warning');
+                            }
+                        } catch (error) {
+                            console.error('PianoRoll Demo: Error clearing PianoRoll:', error);
+                            logEvent('Error clearing PianoRoll: ' + error.message, 'error');
+                        }
+                    });
+                }
+                
+                // Log component initialization
+                logEvent('PianoRoll component initialized', 'success');
+                updateStatus('PianoRoll component ready for interaction');
+            };
             
-            
-            // Log component initialization
-            logEvent('PianoRoll component initialized', 'success');
-            updateStatus('PianoRoll component ready for interaction');
+            // Start waiting for the component
+            waitForComponent();
         });
     </script>
     

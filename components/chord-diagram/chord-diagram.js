@@ -108,59 +108,32 @@ export default class ChordDiagram extends BaseComponent {
                     justify-content: center;
                 }
                 
-                .fret.active::after {
-                    content: '';
-                    display: block;
-                    width: 12pt;
-                    height: 12pt;
-                    border-radius: 50%;
-                    background: black !important;
-                    line-height: 12pt;
-                    text-align: center;
-                    z-index: 2;
-                    border: none;
+                .string {
+                    width: 14pt;
+                    height: 14pt;
+                    font-size: 10pt;
                 }
-                
-                .fret.active::before {
-                    z-index: 1;
-                }
-                
-                /* First row - string markers */
-                .fret:nth-child(-n+4),
-                .chord-diagram--guitar .fret:nth-child(-n+6) {
-                    border-top: 2px solid black;
-                }
-                
-                /* Last column borders */
-                // .fret:nth-child(4n),
-                // .chord-diagram--guitar .fret:nth-child(6n) {
-                //     border-right: 1px solid black;
-                // }
-                
-                /* First column borders */
-                // .fret:nth-child(4n-3),
-                // .chord-diagram--guitar .fret:nth-child(6n-5) {
-                //     border-left: 1px solid black;
-                // }
-                
-                // /* Bottom border for last row */
-                // .fret:nth-last-child(-n+4),
-                // .chord-diagram--guitar .fret:nth-last-child(-n+6) {
-                //     border-bottom: 1px solid black;
-                // }
             }
         `;
-
-        super(template, styles)
         
+        super(template, styles);
+        
+        // Initialize the component after calling super
+        this.initializeComponent();
+    }
+
+    initializeComponent() {
         this.instrument = instrumentState();
         this.chord = this.getAttribute('chord');
         this.chords = chordLibrary.chords;
         this.initialised = false;
-
-        this.shadowRoot.querySelector('.chord-diagram').innerHTML = this.createFretboard();
-        this.initialised = true;
-
+        
+        // Set up the initial fretboard
+        if (this.shadowRoot) {
+            this.shadowRoot.querySelector('.chord-diagram').innerHTML = this.createFretboard();
+            this.initialised = true;
+        }
+        
         // Add event listener for set-chord event
         this.addEventListener('set-chord', (event) => {
             this.chord = event.detail;

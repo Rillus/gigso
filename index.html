@@ -300,10 +300,10 @@
 
         /* Footer */
         .footer {
-            background: #1a1a1a;
+            background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
             color: white;
-            padding: 60px 20px 40px;
-            text-align: center;
+            padding: 3rem 0 2rem;
+            margin-top: 4rem;
         }
 
         .footer-content {
@@ -385,6 +385,194 @@
         .animate-on-scroll {
             animation: fadeInUp 0.8s ease-out;
         }
+
+        /* Unclelele Section */
+        .unclelele-section {
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            padding: 4rem 0;
+            margin: 2rem 0;
+        }
+
+        .unclelele-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 3rem;
+            align-items: start;
+            margin-top: 2rem;
+        }
+
+        .unclelele-info h3 {
+            color: #2c3e50;
+            margin-bottom: 1rem;
+            font-size: 1.5rem;
+        }
+
+        .unclelele-info p {
+            color: #6c757d;
+            margin-bottom: 2rem;
+            line-height: 1.6;
+        }
+
+        .unclelele-features {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .unclelele-feature {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 1.5rem;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            border: 1px solid #e9ecef;
+        }
+
+        .unclelele-feature:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+            border-color: #3498db;
+        }
+
+        .unclelele-feature .feature-icon {
+            font-size: 2rem;
+            flex-shrink: 0;
+            width: 50px;
+            height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
+            color: white;
+            border-radius: 10px;
+        }
+
+        .unclelele-feature-content {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .unclelele-feature h4 {
+            color: #2c3e50;
+            margin-bottom: 0.5rem;
+            font-size: 1.1rem;
+            font-weight: 600;
+        }
+
+        .unclelele-feature p {
+            color: #6c757d;
+            font-size: 0.9rem;
+            margin: 0;
+            line-height: 1.4;
+        }
+
+        .unclelele-cta {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+            padding: 1rem 0;
+        }
+
+        .unclelele-visual {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: sticky;
+            top: 2rem;
+            padding: 1rem;
+        }
+
+        .unclelele-preview {
+            background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
+            color: white;
+            padding: 2.5rem;
+            border-radius: 16px;
+            text-align: center;
+            box-shadow: 0 8px 25px rgba(52, 152, 219, 0.3);
+            position: relative;
+            overflow: hidden;
+            width: 100%;
+            max-width: 300px;
+        }
+
+        .unclelele-preview::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255, 255, 255, 0.1) 0%, transparent 70%);
+            animation: float 6s ease-in-out infinite;
+        }
+
+        .unclelele-logo {
+            width: 80px;
+            height: 80px;
+            margin-bottom: 1rem;
+            filter: brightness(0) invert(1);
+            position: relative;
+            z-index: 1;
+        }
+
+        .unclelele-preview h4 {
+            margin-bottom: 0.5rem;
+            font-size: 1.3rem;
+            position: relative;
+            z-index: 1;
+        }
+
+        .unclelele-preview p {
+            margin-bottom: 0;
+            opacity: 0.9;
+            position: relative;
+            z-index: 1;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px) rotate(0deg); }
+            50% { transform: translateY(-20px) rotate(180deg); }
+        }
+
+        @keyframes bounce {
+            0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
+            40% { transform: translateY(-10px); }
+            60% { transform: translateY(-5px); }
+        }
+
+        @media (max-width: 768px) {
+            .unclelele-content {
+                grid-template-columns: 1fr;
+                gap: 2rem;
+            }
+            
+            .unclelele-features {
+                grid-template-columns: 1fr;
+            }
+            
+            .unclelele-cta {
+                flex-direction: column;
+                padding: 1rem 0;
+            }
+            
+            .unclelele-cta .btn {
+                width: 100%;
+                text-align: center;
+            }
+
+            .unclelele-visual {
+                position: static;
+                padding: 1rem 0;
+            }
+
+            .unclelele-preview {
+                max-width: 100%;
+            }
+        }
     </style>
 </head>
 <body>
@@ -453,6 +641,61 @@
                     <span class="feature-icon">🔧</span>
                     <h3>Open Source</h3>
                     <p>Built with modern web technologies. All components are modular and can be integrated into your own projects.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Unclelele Special Section -->
+    <section class="unclelele-section">
+        <div class="container">
+            <div class="section-header">
+                <h2>🎵 Special Feature: Unclelele Ukulele Workshop</h2>
+                <p>Dedicated tools and resources for ukulele education and workshops</p>
+            </div>
+            
+            <div class="unclelele-content">
+                <div class="unclelele-info">
+                    <h3>Ukulele Workshop Tools</h3>
+                    <p>Access specialized ukulele resources including song sheets, chord charts, and interactive learning tools designed specifically for ukulele workshops and education.</p>
+                    
+                    <div class="unclelele-features">
+                        <div class="unclelele-feature">
+                            <span class="feature-icon">📚</span>
+                            <div class="unclelele-feature-content">
+                                <h4>Song Library</h4>
+                                <p>Curated collection of ukulele songs with chord charts and lyrics</p>
+                            </div>
+                        </div>
+                        <div class="unclelele-feature">
+                            <span class="feature-icon">🎼</span>
+                            <div class="unclelele-feature-content">
+                                <h4>Chord Charts</h4>
+                                <p>Interactive chord diagrams and progressions for learning</p>
+                            </div>
+                        </div>
+                        <div class="unclelele-feature">
+                            <span class="feature-icon">🎵</span>
+                            <div class="unclelele-feature-content">
+                                <h4>Workshop Materials</h4>
+                                <p>Resources designed for group learning and workshops</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="unclelele-cta">
+                        <a href="unclelele.html" class="btn btn-primary">
+                            🎵 Visit Unclelele Workshop
+                        </a>
+                    </div>
+                </div>
+                
+                <div class="unclelele-visual">
+                    <div class="unclelele-preview">
+                        <img src="unclelele.svg" alt="Unclelele Logo" class="unclelele-logo">
+                        <h4>🎵 Ukulele Workshop</h4>
+                        <p>Specialized tools for ukulele education</p>
+                    </div>
                 </div>
             </div>
         </div>
