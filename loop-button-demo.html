@@ -456,7 +456,7 @@
                         <p>Interactive demonstration of the LoopButton component</p>
                     </div>
                     <div class="component-container" id="component-container">
-                        <loopbutton id="demo-component"></loopbutton>
+                        <loop-button id="demo-component"></loop-button>
                     </div>
                 </div>
                 
@@ -541,143 +541,143 @@
         import './components/loop-button/loop-button.js';
         import './components/demo-navigation/demo-navigation.js';
         
-        document.addEventListener('DOMContentLoaded', function() {
-            console.log('LoopButton Demo: Page loaded, initializing...');
+        // Wait for component to be defined and upgraded
+        function waitForComponent(componentName, maxAttempts = 50) {
+            return new Promise((resolve, reject) => {
+                let attempts = 0;
+                
+                const checkComponent = () => {
+                    attempts++;
+                    
+                    if (customElements.get(componentName)) {
+                        resolve();
+                        return;
+                    }
+                    
+                    if (attempts >= maxAttempts) {
+                        reject(new Error(`Component ${componentName} failed to load after ${maxAttempts} attempts`));
+                        return;
+                    }
+                    
+                    setTimeout(checkComponent, 100);
+                };
+                
+                checkComponent();
+            });
+        }
+        
+        // Setup component after it's ready
+        function setupComponent() {
+            const component = document.getElementById('demo-component');
             
-            // Tab functionality
-            function showTab(tabName) {
-                // Hide all tab contents
-                const tabContents = document.querySelectorAll('.tab-content');
-                tabContents.forEach(content => content.classList.remove('active'));
-                
-                // Remove active class from all tabs
-                const tabs = document.querySelectorAll('.tab');
-                tabs.forEach(tab => tab.classList.remove('active'));
-                
-                // Show selected tab content
-                const selectedContent = document.getElementById(tabName);
-                if (selectedContent) {
-                    selectedContent.classList.add('active');
-                }
-                
-                // Add active class to selected tab
-                const selectedTab = document.querySelector(`[onclick="showTab('${tabName}')"]`);
-                if (selectedTab) {
-                    selectedTab.classList.add('active');
-                }
+            if (!component || component instanceof HTMLUnknownElement) {
+                logEvent('Component not ready, retrying...', 'warning');
+                setTimeout(setupComponent, 100);
+                return;
             }
             
-            // Make showTab function globally available
-            window.showTab = showTab;
+            // Component-specific event listeners
             
-            // Status update function
-            function updateStatus(message, type = 'info') {
-                const statusElement = document.getElementById('status');
-                if (statusElement) {
-                    statusElement.textContent = message;
-                    statusElement.className = `status ${type}`;
-                }
-            }
-            
-            // Event logging function
-            function logEvent(message, type = 'info') {
-                const eventLog = document.getElementById('event-log');
-                if (eventLog) {
-                    const eventElement = document.createElement('div');
-                    eventElement.className = `event ${type}`;
-                    eventElement.textContent = message;
-                    eventLog.appendChild(eventElement);
-                    eventLog.scrollTop = eventLog.scrollHeight;
-                }
-            }
-            
-            // Component initialization
-            function initializeComponent() {
-                const component = document.getElementById('demo-component');
-                if (!component) {
-                    console.error('LoopButton Demo: Component not found');
-                    updateStatus('Error: Component not found', 'error');
-                    return;
-                }
+                // Loop Button specific controls
+                const loopTextInput = document.getElementById('loop-text');
+                const loopIconInput = document.getElementById('loop-icon');
+                const loopSizeInput = document.getElementById('loop-size');
+                const loopColorInput = document.getElementById('loop-color');
+                const loopDisabledInput = document.getElementById('loop-disabled');
+                const loopActiveInput = document.getElementById('loop-active');
                 
-                console.log('LoopButton Demo: Component found, setting up event listeners...');
-                
-                // Test component button
-                const testBtn = document.getElementById('test-component');
-                if (testBtn) {
-                    testBtn.addEventListener('click', () => {
-                        try {
-                            // Test component functionality
-                            logEvent('Testing component functionality...', 'info');
-                            updateStatus('Component test initiated');
-                            
-                            // Simulate a test action
-                            setTimeout(() => {
-                                logEvent('Component test completed successfully', 'success');
-                                updateStatus('Component test completed', 'success');
-                            }, 1000);
-                            
-                        } catch (error) {
-                            console.error('LoopButton Demo: Error testing component:', error);
-                            logEvent('Error testing component: ' + error.message, 'error');
-                            updateStatus('Component test failed', 'error');
-                        }
-                    });
-                }
-                
-                // Reset component button
-                const resetBtn = document.getElementById('reset-component');
-                if (resetBtn) {
-                    resetBtn.addEventListener('click', () => {
-                        try {
-                            logEvent('Resetting component...', 'info');
-                            updateStatus('Component reset initiated');
-                            
-                            // Reset logic here
-                            setTimeout(() => {
-                                logEvent('Component reset completed', 'success');
-                                updateStatus('Component reset completed', 'success');
-                            }, 500);
-                            
-                        } catch (error) {
-                            console.error('LoopButton Demo: Error resetting component:', error);
-                            logEvent('Error resetting component: ' + error.message, 'error');
-                            updateStatus('Component reset failed', 'error');
-                        }
-                    });
-                }
-                
-                // Listen for component events
-                component.addEventListener('loop-enabled', (e) => {
-                    logEvent('Loop enabled: ' + JSON.stringify(e.detail), 'success');
+                loopTextInput.addEventListener('change', (e) => {
+                    try {
+                        component.setText(e.target.value);
+                        logEvent('Loop text changed to ' + e.target.value, 'info');
+                        updateStatus('Loop button text updated');
+                    } catch (error) {
+                        logEvent('Error setting loop text: ' + error.message, 'error');
+                    }
                 });
                 
-                component.addEventListener('loop-disabled', (e) => {
-                    logEvent('Loop disabled: ' + JSON.stringify(e.detail), 'info');
+                loopIconInput.addEventListener('change', (e) => {
+                    try {
+                        component.setIcon(e.target.value);
+                        logEvent('Loop icon changed to ' + e.target.value, 'info');
+                        updateStatus('Loop button icon updated');
+                    } catch (error) {
+                        logEvent('Error setting loop icon: ' + error.message, 'error');
+                    }
+                });
+                
+                loopSizeInput.addEventListener('change', (e) => {
+                    try {
+                        component.setSize(e.target.value);
+                        logEvent('Loop size changed to ' + e.target.value, 'info');
+                        updateStatus('Loop button size updated');
+                    } catch (error) {
+                        logEvent('Error setting loop size: ' + error.message, 'error');
+                    }
+                });
+                
+                loopColorInput.addEventListener('change', (e) => {
+                    try {
+                        component.setColor(e.target.value);
+                        logEvent('Loop color changed to ' + e.target.value, 'info');
+                        updateStatus('Loop button color updated');
+                    } catch (error) {
+                        logEvent('Error setting loop color: ' + error.message, 'error');
+                    }
+                });
+                
+                loopDisabledInput.addEventListener('change', (e) => {
+                    try {
+                        component.setDisabled(e.target.checked);
+                        logEvent('Loop disabled state: ' + e.target.checked, 'info');
+                        updateStatus('Loop button disabled state updated');
+                    } catch (error) {
+                        logEvent('Error setting loop disabled: ' + error.message, 'error');
+                    }
+                });
+                
+                loopActiveInput.addEventListener('change', (e) => {
+                    try {
+                        component.setActive(e.target.checked);
+                        logEvent('Loop active state: ' + e.target.checked, 'info');
+                        updateStatus('Loop button active state updated');
+                    } catch (error) {
+                        logEvent('Error setting loop active: ' + error.message, 'error');
+                    }
+                });
+                
+                // Listen for loop button events
+                component.addEventListener('loop-click', (e) => {
+                    logEvent('Loop button clicked', 'info');
                 });
                 
                 component.addEventListener('loop-toggle', (e) => {
-                    logEvent('Loop toggled: ' + JSON.stringify(e.detail), 'info');
+                    logEvent('Loop toggled: ' + e.detail.active, 'info');
                 });
                 
-                // Log component initialization
-                logEvent('LoopButton component initialized successfully', 'success');
-                updateStatus('LoopButton component ready for interaction');
-            }
+                component.addEventListener('loop-start', (e) => {
+                    logEvent('Loop started', 'success');
+                });
+                
+                component.addEventListener('loop-stop', (e) => {
+                    logEvent('Loop stopped', 'warning');
+                });
             
-            // Wait for component to be defined
-            function waitForComponent() {
-                if (customElements.get('loopbutton')) {
-                    console.log('LoopButton Demo: Component already defined, initializing...');
-                    initializeComponent();
-                } else {
-                    console.log('LoopButton Demo: Waiting for component definition...');
-                    setTimeout(waitForComponent, 100);
-                }
-            }
             
-            // Start waiting for custom element definition
-            waitForComponent();
+            // Log component initialization
+            logEvent('Loop Button component initialized', 'success');
+            updateStatus('Loop Button component ready for interaction');
+        }
+        
+        document.addEventListener('DOMContentLoaded', async function() {
+            try {
+                await waitForComponent('loop-button');
+                logEvent('Loop Button component loaded successfully', 'success');
+                setupComponent();
+            } catch (error) {
+                logEvent('Failed to load Loop Button component: ' + error.message, 'error');
+                updateStatus('Component failed to load', 'error');
+            }
         });
     </script>
     

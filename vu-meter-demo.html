@@ -456,7 +456,7 @@
                         <p>Interactive demonstration of the VUMeter component</p>
                     </div>
                     <div class="component-container" id="component-container">
-                        <vumeter id="demo-component"></vumeter>
+                        <vu-meter id="demo-component"></vu-meter>
                     </div>
                 </div>
                 
@@ -541,143 +541,145 @@
         import './components/vu-meter/vu-meter.js';
         import './components/demo-navigation/demo-navigation.js';
         
-        document.addEventListener('DOMContentLoaded', function() {
-            console.log('VUMeter Demo: Page loaded, initializing...');
+        // Wait for component to be defined and upgraded
+        function waitForComponent(componentName, maxAttempts = 50) {
+            return new Promise((resolve, reject) => {
+                let attempts = 0;
+                
+                const checkComponent = () => {
+                    attempts++;
+                    
+                    if (customElements.get(componentName)) {
+                        resolve();
+                        return;
+                    }
+                    
+                    if (attempts >= maxAttempts) {
+                        reject(new Error(`Component ${componentName} failed to load after ${maxAttempts} attempts`));
+                        return;
+                    }
+                    
+                    setTimeout(checkComponent, 100);
+                };
+                
+                checkComponent();
+            });
+        }
+        
+        // Setup component after it's ready
+        function setupComponent() {
+            const component = document.getElementById('demo-component');
             
-            // Tab functionality
-            function showTab(tabName) {
-                // Hide all tab contents
-                const tabContents = document.querySelectorAll('.tab-content');
-                tabContents.forEach(content => content.classList.remove('active'));
-                
-                // Remove active class from all tabs
-                const tabs = document.querySelectorAll('.tab');
-                tabs.forEach(tab => tab.classList.remove('active'));
-                
-                // Show selected tab content
-                const selectedContent = document.getElementById(tabName);
-                if (selectedContent) {
-                    selectedContent.classList.add('active');
-                }
-                
-                // Add active class to selected tab
-                const selectedTab = document.querySelector(`[onclick="showTab('${tabName}')"]`);
-                if (selectedTab) {
-                    selectedTab.classList.add('active');
-                }
+            if (!component || component instanceof HTMLUnknownElement) {
+                logEvent('Component not ready, retrying...', 'warning');
+                setTimeout(setupComponent, 100);
+                return;
             }
             
-            // Make showTab function globally available
-            window.showTab = showTab;
+            // Component-specific event listeners
             
-            // Status update function
-            function updateStatus(message, type = 'info') {
-                const statusElement = document.getElementById('status');
-                if (statusElement) {
-                    statusElement.textContent = message;
-                    statusElement.className = `status ${type}`;
-                }
-            }
-            
-            // Event logging function
-            function logEvent(message, type = 'info') {
-                const eventLog = document.getElementById('event-log');
-                if (eventLog) {
-                    const eventElement = document.createElement('div');
-                    eventElement.className = `event ${type}`;
-                    eventElement.textContent = message;
-                    eventLog.appendChild(eventElement);
-                    eventLog.scrollTop = eventLog.scrollHeight;
-                }
-            }
-            
-            // Component initialization
-            function initializeComponent() {
-                const component = document.getElementById('demo-component');
-                if (!component) {
-                    console.error('VUMeter Demo: Component not found');
-                    updateStatus('Error: Component not found', 'error');
-                    return;
-                }
+                // VU Meter specific controls
+                const volumeInput = document.getElementById('volume-input');
+                const peakInput = document.getElementById('peak-input');
+                const updateMeterBtn = document.getElementById('update-meter');
+                const resetMeterBtn = document.getElementById('reset-meter');
+                const autoUpdateInput = document.getElementById('auto-update');
+                const thresholdInput = document.getElementById('threshold');
                 
-                console.log('VUMeter Demo: Component found, setting up event listeners...');
+                volumeInput.addEventListener('change', (e) => {
+                    try {
+                        component.setVolume(parseFloat(e.target.value));
+                        logEvent('Volume changed to ' + e.target.value + ' dB', 'info');
+                        updateStatus('Volume updated to ' + e.target.value + ' dB');
+                    } catch (error) {
+                        logEvent('Error setting volume: ' + error.message, 'error');
+                    }
+                });
                 
-                // Test component button
-                const testBtn = document.getElementById('test-component');
-                if (testBtn) {
-                    testBtn.addEventListener('click', () => {
-                        try {
-                            // Test component functionality
-                            logEvent('Testing component functionality...', 'info');
-                            updateStatus('Component test initiated');
-                            
-                            // Simulate a test action
-                            setTimeout(() => {
-                                logEvent('Component test completed successfully', 'success');
-                                updateStatus('Component test completed', 'success');
-                            }, 1000);
-                            
-                        } catch (error) {
-                            console.error('VUMeter Demo: Error testing component:', error);
-                            logEvent('Error testing component: ' + error.message, 'error');
-                            updateStatus('Component test failed', 'error');
-                        }
-                    });
-                }
+                peakInput.addEventListener('change', (e) => {
+                    try {
+                        component.setPeak(parseFloat(e.target.value));
+                        logEvent('Peak level changed to ' + e.target.value + ' dB', 'info');
+                        updateStatus('Peak level updated to ' + e.target.value + ' dB');
+                    } catch (error) {
+                        logEvent('Error setting peak level: ' + error.message, 'error');
+                    }
+                });
                 
-                // Reset component button
-                const resetBtn = document.getElementById('reset-component');
-                if (resetBtn) {
-                    resetBtn.addEventListener('click', () => {
-                        try {
-                            logEvent('Resetting component...', 'info');
-                            updateStatus('Component reset initiated');
-                            
-                            // Reset logic here
-                            setTimeout(() => {
-                                logEvent('Component reset completed', 'success');
-                                updateStatus('Component reset completed', 'success');
-                            }, 500);
-                            
-                        } catch (error) {
-                            console.error('VUMeter Demo: Error resetting component:', error);
-                            logEvent('Error resetting component: ' + error.message, 'error');
-                            updateStatus('Component test failed', 'error');
-                        }
-                    });
-                }
+                updateMeterBtn.addEventListener('click', () => {
+                    try {
+                        const volume = parseFloat(volumeInput.value);
+                        const peak = parseFloat(peakInput.value);
+                        component.updateMeter(volume, peak);
+                        logEvent('Meter updated: ' + volume + ' dB, peak: ' + peak + ' dB', 'success');
+                        updateStatus('VU meter updated');
+                    } catch (error) {
+                        logEvent('Error updating meter: ' + error.message, 'error');
+                    }
+                });
                 
-                // Listen for component events
+                resetMeterBtn.addEventListener('click', () => {
+                    try {
+                        component.resetMeter();
+                        logEvent('Meter reset', 'warning');
+                        updateStatus('VU meter reset');
+                    } catch (error) {
+                        logEvent('Error resetting meter: ' + error.message, 'error');
+                    }
+                });
+                
+                autoUpdateInput.addEventListener('change', (e) => {
+                    try {
+                        component.setAutoUpdate(e.target.checked);
+                        logEvent('Auto update: ' + e.target.checked, 'info');
+                        updateStatus('Auto update setting updated');
+                    } catch (error) {
+                        logEvent('Error setting auto update: ' + error.message, 'error');
+                    }
+                });
+                
+                thresholdInput.addEventListener('change', (e) => {
+                    try {
+                        component.setThreshold(parseFloat(e.target.value));
+                        logEvent('Threshold changed to ' + e.target.value + ' dB', 'info');
+                        updateStatus('Threshold updated to ' + e.target.value + ' dB');
+                    } catch (error) {
+                        logEvent('Error setting threshold: ' + error.message, 'error');
+                    }
+                });
+                
+                // Listen for VU meter events
                 component.addEventListener('volume-change', (e) => {
-                    logEvent('Volume changed: ' + JSON.stringify(e.detail), 'success');
+                    logEvent('Volume changed: ' + e.detail.volume + ' dB', 'info');
                 });
                 
                 component.addEventListener('peak-level', (e) => {
-                    logEvent('Peak level: ' + JSON.stringify(e.detail), 'warning');
+                    logEvent('Peak level: ' + e.detail.peak + ' dB', 'info');
                 });
                 
                 component.addEventListener('overload-warning', (e) => {
-                    logEvent('Overload warning: ' + JSON.stringify(e.detail), 'error');
+                    logEvent('Overload warning: ' + e.detail.level + ' dB', 'warning');
                 });
                 
-                // Log component initialization
-                logEvent('VUMeter component initialized successfully', 'success');
-                updateStatus('VUMeter component ready for interaction');
-            }
+                component.addEventListener('meter-update', (e) => {
+                    logEvent('Meter updated', 'success');
+                });
             
-            // Wait for component to be defined
-            function waitForComponent() {
-                if (customElements.get('vumeter')) {
-                    console.log('VUMeter Demo: Component already defined, initializing...');
-                    initializeComponent();
-                } else {
-                    console.log('VUMeter Demo: Waiting for component definition...');
-                    setTimeout(waitForComponent, 100);
-                }
-            }
             
-            // Start waiting for custom element definition
-            waitForComponent();
+            // Log component initialization
+            logEvent('VU Meter component initialized', 'success');
+            updateStatus('VU Meter component ready for monitoring');
+        }
+        
+        document.addEventListener('DOMContentLoaded', async function() {
+            try {
+                await waitForComponent('vu-meter');
+                logEvent('VU Meter component loaded successfully', 'success');
+                setupComponent();
+            } catch (error) {
+                logEvent('Failed to load VU Meter component: ' + error.message, 'error');
+                updateStatus('Component failed to load', 'error');
+            }
         });
     </script>
     

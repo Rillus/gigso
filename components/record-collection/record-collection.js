@@ -22,6 +22,7 @@ export default class RecordCollection extends BaseComponent {
         display: flex;
         flex-wrap: wrap;
         gap: 10px;
+        width: 342px;
         padding: 10px;
         border: 1px  #ccc;
         background: #f9f9f9;

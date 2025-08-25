@@ -456,7 +456,7 @@
                         <p>Interactive demonstration of the PlayButton component</p>
                     </div>
                     <div class="component-container" id="component-container">
-                        <playbutton id="demo-component"></playbutton>
+                        <play-button id="demo-component"></play-button>
                     </div>
                 </div>
                 
@@ -541,139 +541,139 @@
         import './components/play-button/play-button.js';
         import './components/demo-navigation/demo-navigation.js';
         
-        document.addEventListener('DOMContentLoaded', function() {
-            console.log('PlayButton Demo: Page loaded, initializing...');
+        // Wait for component to be defined and upgraded
+        function waitForComponent(componentName, maxAttempts = 50) {
+            return new Promise((resolve, reject) => {
+                let attempts = 0;
+                
+                const checkComponent = () => {
+                    attempts++;
+                    
+                    if (customElements.get(componentName)) {
+                        resolve();
+                        return;
+                    }
+                    
+                    if (attempts >= maxAttempts) {
+                        reject(new Error(`Component ${componentName} failed to load after ${maxAttempts} attempts`));
+                        return;
+                    }
+                    
+                    setTimeout(checkComponent, 100);
+                };
+                
+                checkComponent();
+            });
+        }
+        
+        // Setup component after it's ready
+        function setupComponent() {
+            const component = document.getElementById('demo-component');
             
-            // Tab functionality
-            function showTab(tabName) {
-                // Hide all tab contents
-                const tabContents = document.querySelectorAll('.tab-content');
-                tabContents.forEach(content => content.classList.remove('active'));
-                
-                // Remove active class from all tabs
-                const tabs = document.querySelectorAll('.tab');
-                tabs.forEach(tab => tab.classList.remove('active'));
-                
-                // Show selected tab content
-                const selectedContent = document.getElementById(tabName);
-                if (selectedContent) {
-                    selectedContent.classList.add('active');
-                }
-                
-                // Add active class to selected tab
-                const selectedTab = document.querySelector(`[onclick="showTab('${tabName}')"]`);
-                if (selectedTab) {
-                    selectedTab.classList.add('active');
-                }
+            if (!component || component instanceof HTMLUnknownElement) {
+                logEvent('Component not ready, retrying...', 'warning');
+                setTimeout(setupComponent, 100);
+                return;
             }
             
-            // Make showTab function globally available
-            window.showTab = showTab;
+            // Component-specific event listeners
             
-            // Status update function
-            function updateStatus(message, type = 'info') {
-                const statusElement = document.getElementById('status');
-                if (statusElement) {
-                    statusElement.textContent = message;
-                    statusElement.className = `status ${type}`;
-                }
-            }
-            
-            // Event logging function
-            function logEvent(message, type = 'info') {
-                const eventLog = document.getElementById('event-log');
-                if (eventLog) {
-                    const eventElement = document.createElement('div');
-                    eventElement.className = `event ${type}`;
-                    eventElement.textContent = message;
-                    eventLog.appendChild(eventElement);
-                    eventLog.scrollTop = eventLog.scrollHeight;
-                }
-            }
-            
-            // Component initialization
-            function initializeComponent() {
-                const component = document.getElementById('demo-component');
-                if (!component) {
-                    console.error('PlayButton Demo: Component not found');
-                    updateStatus('Error: Component not found', 'error');
-                    return;
-                }
+                // Play Button specific controls
+                const playTextInput = document.getElementById('play-text');
+                const playIconInput = document.getElementById('play-icon');
+                const playSizeInput = document.getElementById('play-size');
+                const playColorInput = document.getElementById('play-color');
+                const playDisabledInput = document.getElementById('play-disabled');
+                const playLoadingInput = document.getElementById('play-loading');
                 
-                console.log('PlayButton Demo: Component found, setting up event listeners...');
-                
-                // Test component button
-                const testBtn = document.getElementById('test-component');
-                if (testBtn) {
-                    testBtn.addEventListener('click', () => {
-                        try {
-                            // Test component functionality
-                            logEvent('Testing component functionality...', 'info');
-                            updateStatus('Component test initiated');
-                            
-                            // Simulate a test action
-                            setTimeout(() => {
-                                logEvent('Component test completed successfully', 'success');
-                                updateStatus('Component test completed', 'success');
-                            }, 1000);
-                            
-                        } catch (error) {
-                            console.error('PlayButton Demo: Error testing component:', error);
-                            logEvent('Error testing component: ' + error.message, 'error');
-                            updateStatus('Component test failed', 'error');
-                        }
-                    });
-                }
-                
-                // Reset component button
-                const resetBtn = document.getElementById('reset-component');
-                if (resetBtn) {
-                    resetBtn.addEventListener('click', () => {
-                        try {
-                            logEvent('Resetting component...', 'info');
-                            updateStatus('Component reset initiated');
-                            
-                            // Reset logic here
-                            setTimeout(() => {
-                                logEvent('Component reset completed', 'success');
-                                updateStatus('Component reset completed', 'success');
-                            }, 500);
-                            
-                        } catch (error) {
-                            console.error('PlayButton Demo: Error resetting component:', error);
-                            logEvent('Error resetting component: ' + error.message, 'error');
-                            updateStatus('Component reset failed', 'error');
-                        }
-                    });
-                }
-                
-                // Listen for component events
-                component.addEventListener('playback-start', (e) => {
-                    logEvent('Playback started: ' + JSON.stringify(e.detail), 'success');
+                playTextInput.addEventListener('change', (e) => {
+                    try {
+                        component.setText(e.target.value);
+                        logEvent('Play text changed to ' + e.target.value, 'info');
+                        updateStatus('Play button text updated');
+                    } catch (error) {
+                        logEvent('Error setting play text: ' + error.message, 'error');
+                    }
                 });
                 
-                component.addEventListener('button-state-change', (e) => {
-                    logEvent('Button state changed: ' + JSON.stringify(e.detail), 'info');
+                playIconInput.addEventListener('change', (e) => {
+                    try {
+                        component.setIcon(e.target.value);
+                        logEvent('Play icon changed to ' + e.target.value, 'info');
+                        updateStatus('Play button icon updated');
+                    } catch (error) {
+                        logEvent('Error setting play icon: ' + error.message, 'error');
+                    }
                 });
                 
-                // Log component initialization
-                logEvent('PlayButton component initialized successfully', 'success');
-                updateStatus('PlayButton component ready for interaction');
-            }
+                playSizeInput.addEventListener('change', (e) => {
+                    try {
+                        component.setSize(e.target.value);
+                        logEvent('Play size changed to ' + e.target.value, 'info');
+                        updateStatus('Play button size updated');
+                    } catch (error) {
+                        logEvent('Error setting play size: ' + error.message, 'error');
+                    }
+                });
+                
+                playColorInput.addEventListener('change', (e) => {
+                    try {
+                        component.setColor(e.target.value);
+                        logEvent('Play color changed to ' + e.target.value, 'info');
+                        updateStatus('Play button color updated');
+                    } catch (error) {
+                        logEvent('Error setting play color: ' + error.message, 'error');
+                    }
+                });
+                
+                playDisabledInput.addEventListener('change', (e) => {
+                    try {
+                        component.setDisabled(e.target.checked);
+                        logEvent('Play disabled state: ' + e.target.checked, 'info');
+                        updateStatus('Play button disabled state updated');
+                    } catch (error) {
+                        logEvent('Error setting play disabled: ' + error.message, 'error');
+                    }
+                });
+                
+                playLoadingInput.addEventListener('change', (e) => {
+                    try {
+                        component.setLoading(e.target.checked);
+                        logEvent('Play loading state: ' + e.target.checked, 'info');
+                        updateStatus('Play button loading state updated');
+                    } catch (error) {
+                        logEvent('Error setting play loading: ' + error.message, 'error');
+                    }
+                });
+                
+                // Listen for play button events
+                component.addEventListener('play-click', (e) => {
+                    logEvent('Play button clicked', 'success');
+                });
+                
+                component.addEventListener('play-start', (e) => {
+                    logEvent('Play action started', 'success');
+                });
+                
+                component.addEventListener('play-complete', (e) => {
+                    logEvent('Play action completed', 'success');
+                });
             
-            // Wait for component to be defined
-            function waitForComponent() {
-                if (customElements.get('playbutton')) {
-                    console.log('PlayButton Demo: Component already defined, initializing...');
-                    initializeComponent();
-                } else {
-                    console.log('PlayButton Demo: Waiting for component definition...');
-                    setTimeout(waitForComponent, 100);
-                }
-            }
             
-            // Start waiting for custom element definition
-            waitForComponent();
+            // Log component initialization
+            logEvent('Play Button component initialized', 'success');
+            updateStatus('Play Button component ready for interaction');
+        }
+        
+        document.addEventListener('DOMContentLoaded', async function() {
+            try {
+                await waitForComponent('play-button');
+                logEvent('Play Button component loaded successfully', 'success');
+                setupComponent();
+            } catch (error) {
+                logEvent('Failed to load Play Button component: ' + error.message, 'error');
+                updateStatus('Component failed to load', 'error');
+            }
         });
     </script>
     

@@ -456,7 +456,7 @@
                         <p>Interactive demonstration of the FrequencyMonitor component</p>
                     </div>
                     <div class="component-container" id="component-container">
-                        <frequencymonitor id="demo-component"></frequencymonitor>
+                        <frequency-monitor id="demo-component"></frequency-monitor>
                     </div>
                 </div>
                 
@@ -541,143 +541,132 @@
         import './components/frequency-monitor/frequency-monitor.js';
         import './components/demo-navigation/demo-navigation.js';
         
-        document.addEventListener('DOMContentLoaded', function() {
-            console.log('FrequencyMonitor Demo: Page loaded, initializing...');
+        // Wait for component to be defined and upgraded
+        function waitForComponent(componentName, maxAttempts = 50) {
+            return new Promise((resolve, reject) => {
+                let attempts = 0;
+                
+                const checkComponent = () => {
+                    attempts++;
+                    
+                    if (customElements.get(componentName)) {
+                        resolve();
+                        return;
+                    }
+                    
+                    if (attempts >= maxAttempts) {
+                        reject(new Error(`Component ${componentName} failed to load after ${maxAttempts} attempts`));
+                        return;
+                    }
+                    
+                    setTimeout(checkComponent, 100);
+                };
+                
+                checkComponent();
+            });
+        }
+        
+        // Setup component after it's ready
+        function setupComponent() {
+            const component = document.getElementById('demo-component');
             
-            // Tab functionality
-            function showTab(tabName) {
-                // Hide all tab contents
-                const tabContents = document.querySelectorAll('.tab-content');
-                tabContents.forEach(content => content.classList.remove('active'));
-                
-                // Remove active class from all tabs
-                const tabs = document.querySelectorAll('.tab');
-                tabs.forEach(tab => tab.classList.remove('active'));
-                
-                // Show selected tab content
-                const selectedContent = document.getElementById(tabName);
-                if (selectedContent) {
-                    selectedContent.classList.add('active');
-                }
-                
-                // Add active class to selected tab
-                const selectedTab = document.querySelector(`[onclick="showTab('${tabName}')"]`);
-                if (selectedTab) {
-                    selectedTab.classList.add('active');
-                }
+            if (!component || component instanceof HTMLUnknownElement) {
+                logEvent('Component not ready, retrying...', 'warning');
+                setTimeout(setupComponent, 100);
+                return;
             }
             
-            // Make showTab function globally available
-            window.showTab = showTab;
+            // Component-specific event listeners
             
-            // Status update function
-            function updateStatus(message, type = 'info') {
-                const statusElement = document.getElementById('status');
-                if (statusElement) {
-                    statusElement.textContent = message;
-                    statusElement.className = `status ${type}`;
-                }
-            }
-            
-            // Event logging function
-            function logEvent(message, type = 'info') {
-                const eventLog = document.getElementById('event-log');
-                if (eventLog) {
-                    const eventElement = document.createElement('div');
-                    eventElement.className = `event ${type}`;
-                    eventElement.textContent = message;
-                    eventLog.appendChild(eventElement);
-                    eventLog.scrollTop = eventLog.scrollHeight;
-                }
-            }
-            
-            // Component initialization
-            function initializeComponent() {
-                const component = document.getElementById('demo-component');
-                if (!component) {
-                    console.error('FrequencyMonitor Demo: Component not found');
-                    updateStatus('Error: Component not found', 'error');
-                    return;
-                }
+                // Frequency Monitor specific controls
+                const startAnalysisBtn = document.getElementById('start-analysis');
+                const stopAnalysisBtn = document.getElementById('stop-analysis');
+                const sensitivityInput = document.getElementById('sensitivity');
+                const thresholdInput = document.getElementById('threshold');
+                const clearHistoryBtn = document.getElementById('clear-history');
                 
-                console.log('FrequencyMonitor Demo: Component found, setting up event listeners...');
+                startAnalysisBtn.addEventListener('click', () => {
+                    try {
+                        component.startAnalysis();
+                        logEvent('Frequency analysis started', 'success');
+                        updateStatus('Frequency analysis is now active', 'success');
+                    } catch (error) {
+                        logEvent('Error starting analysis: ' + error.message, 'error');
+                    }
+                });
                 
-                // Test component button
-                const testBtn = document.getElementById('test-component');
-                if (testBtn) {
-                    testBtn.addEventListener('click', () => {
-                        try {
-                            // Test component functionality
-                            logEvent('Testing component functionality...', 'info');
-                            updateStatus('Component test initiated');
-                            
-                            // Simulate a test action
-                            setTimeout(() => {
-                                logEvent('Component test completed successfully', 'success');
-                                updateStatus('Component test completed', 'success');
-                            }, 1000);
-                            
-                        } catch (error) {
-                            console.error('FrequencyMonitor Demo: Error testing component:', error);
-                            logEvent('Error testing component: ' + error.message, 'error');
-                            updateStatus('Component test failed', 'error');
-                        }
-                    });
-                }
+                stopAnalysisBtn.addEventListener('click', () => {
+                    try {
+                        component.stopAnalysis();
+                        logEvent('Frequency analysis stopped', 'warning');
+                        updateStatus('Frequency analysis stopped', 'warning');
+                    } catch (error) {
+                        logEvent('Error stopping analysis: ' + error.message, 'error');
+                    }
+                });
                 
-                // Reset component button
-                const resetBtn = document.getElementById('reset-component');
-                if (resetBtn) {
-                    resetBtn.addEventListener('click', () => {
-                        try {
-                            logEvent('Resetting component...', 'info');
-                            updateStatus('Component reset initiated');
-                            
-                            // Reset logic here
-                            setTimeout(() => {
-                                logEvent('Component reset completed', 'success');
-                                updateStatus('Component reset completed', 'success');
-                            }, 500);
-                            
-                        } catch (error) {
-                            console.error('FrequencyMonitor Demo: Error resetting component:', error);
-                            logEvent('Error resetting component: ' + error.message, 'error');
-                            updateStatus('Component reset failed', 'error');
-                        }
-                    });
-                }
+                sensitivityInput.addEventListener('change', (e) => {
+                    try {
+                        component.setSensitivity(parseFloat(e.target.value));
+                        logEvent('Sensitivity changed to ' + e.target.value, 'info');
+                        updateStatus('Sensitivity updated to ' + e.target.value);
+                    } catch (error) {
+                        logEvent('Error setting sensitivity: ' + error.message, 'error');
+                    }
+                });
                 
-                // Listen for component events
+                thresholdInput.addEventListener('change', (e) => {
+                    try {
+                        component.setThreshold(parseFloat(e.target.value));
+                        logEvent('Threshold changed to ' + e.target.value + ' dB', 'info');
+                        updateStatus('Threshold updated to ' + e.target.value + ' dB');
+                    } catch (error) {
+                        logEvent('Error setting threshold: ' + error.message, 'error');
+                    }
+                });
+                
+                clearHistoryBtn.addEventListener('click', () => {
+                    try {
+                        component.clearHistory();
+                        logEvent('Frequency history cleared', 'warning');
+                        updateStatus('Frequency history cleared');
+                    } catch (error) {
+                        logEvent('Error clearing history: ' + error.message, 'error');
+                    }
+                });
+                
+                // Listen for frequency monitor events
                 component.addEventListener('frequency-detected', (e) => {
-                    logEvent('Frequency detected: ' + JSON.stringify(e.detail), 'success');
+                    logEvent('Frequency detected: ' + e.detail.frequency + ' Hz', 'success');
                 });
                 
                 component.addEventListener('peak-frequency', (e) => {
-                    logEvent('Peak frequency: ' + JSON.stringify(e.detail), 'info');
+                    logEvent('Peak frequency: ' + e.detail.frequency + ' Hz', 'info');
                 });
                 
                 component.addEventListener('analysis-start', (e) => {
-                    logEvent('Analysis started: ' + JSON.stringify(e.detail), 'info');
+                    logEvent('Analysis started', 'success');
                 });
                 
-                // Log component initialization
-                logEvent('FrequencyMonitor component initialized successfully', 'success');
-                updateStatus('FrequencyMonitor component ready for interaction');
-            }
+                component.addEventListener('analysis-stop', (e) => {
+                    logEvent('Analysis stopped', 'warning');
+                });
             
-            // Wait for component to be defined
-            function waitForComponent() {
-                if (customElements.get('frequencymonitor')) {
-                    console.log('FrequencyMonitor Demo: Component already defined, initializing...');
-                    initializeComponent();
-                } else {
-                    console.log('FrequencyMonitor Demo: Waiting for component definition...');
-                    setTimeout(waitForComponent, 100);
-                }
-            }
             
-            // Start waiting for custom element definition
-            waitForComponent();
+            // Log component initialization
+            logEvent('Frequency Monitor component initialized', 'success');
+            updateStatus('Frequency Monitor component ready for analysis');
+        }
+        
+        document.addEventListener('DOMContentLoaded', async function() {
+            try {
+                await waitForComponent('frequency-monitor');
+                logEvent('Frequency Monitor component loaded successfully', 'success');
+                setupComponent();
+            } catch (error) {
+                logEvent('Failed to load Frequency Monitor component: ' + error.message, 'error');
+                updateStatus('Component failed to load', 'error');
+            }
         });
     </script>
     
