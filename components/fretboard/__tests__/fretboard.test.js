@@ -16,6 +16,8 @@ jest.mock('../fretboard-renderer.js', () => {
     clearAll() {}
     renderChord(chordData) {}
     renderScale(scaleData) {}
+    setCurrentScale(scaleData) {}
+    renderKeySignature(keySignatureData) {}
     setInstrument(instrument) {}
     setTheme(theme) {}
     setFretRange(start, end) {}

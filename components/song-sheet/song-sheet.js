@@ -1206,6 +1206,53 @@ export default class SongSheet extends BaseComponent {
             document.exitFullscreen();
         }
     }
+    
+    getSectionType(sectionLabel) {
+        const normalized = sectionLabel.toLowerCase().replace(/[\[\]]/g, '').trim();
+        
+        if (normalized.includes('pre-chorus')) return 'pre-chorus';
+        if (normalized.includes('verse')) return 'verse';
+        if (normalized.includes('chorus')) return 'chorus';
+        if (normalized.includes('bridge')) return 'bridge';
+        if (normalized.includes('intro')) return 'intro';
+        if (normalized.includes('outro')) return 'outro';
+        
+        return 'other';
+    }
+    
+    generateShareableUrl() {
+        if (!this.currentSong) return '';
+        
+        const baseUrl = window.location.origin + window.location.pathname.replace(/\/[^/]*$/, '/unclelele.html');
+        return `${baseUrl}#song/${this.currentSong.id}`;
+    }
+    
+    convertInlineChordsToPositioned(text) {
+        let visualPosition = 0;
+        let chordsHtml = '';
+        let lyricsText = '';
+        
+        const parts = text.split(/(\{[^}]+\})/);
+        
+        parts.forEach(part => {
+            if (part.match(/^\{[^}]+\}$/)) {
+                const chord = part.replace(/[{}]/g, '');
+                const chordClass = this.getChordColorClass(chord);
+                const leftPosition = visualPosition * 0.7;
+                
+                chordsHtml += `<span class="chord-above ${chordClass}" style="left: ${leftPosition}em;">${chord}</span>`;
+            } else {
+                lyricsText += part;
+                visualPosition += part.length;
+            }
+        });
+        
+        return `<div class="lyrics-line">${chordsHtml}${lyricsText}</div>`;
+    }
+    
+    shareSheet() {
+        return this.shareSong();
+    }
 }
 
 customElements.define('song-sheet', SongSheet);

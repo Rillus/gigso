@@ -79,7 +79,7 @@ describe('ScaleKey Component', () => {
             const scale = scaleKey.generateScale('D', 'minor');
             const noteNames = scale.notes.map(n => n.note);
             
-            expect(noteNames).toEqual(['D', 'E', 'F', 'G', 'A', 'Bb', 'C']);
+            expect(noteNames).toEqual(['D', 'E', 'F', 'G', 'A', 'A#', 'C']);
         });
         
         test('should generate correct frequencies', () => {

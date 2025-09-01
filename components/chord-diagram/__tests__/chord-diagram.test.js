@@ -69,4 +69,180 @@ describe('ChordDiagram Component', () => {
         // Replace the expected number with the actual number of active frets for the 'G' chord
         expect(activeFrets.length).toBeGreaterThan(0);
     });
+
+    describe('Instrument Support', () => {
+        test('should support mandolin instrument', () => {
+            chordDiagramElement.setAttribute('instrument', 'mandolin');
+            const frets = chordDiagramElement.shadowRoot.querySelectorAll('.fret');
+            expect(frets.length).toBe(20); // Mandolin uses same as ukulele
+        });
+
+        test('should handle case insensitive instrument names', () => {
+            chordDiagramElement.setAttribute('instrument', 'GUITAR');
+            expect(chordDiagramElement.instrument).toBe('guitar');
+            
+            chordDiagramElement.setAttribute('instrument', 'UkUlElE');
+            expect(chordDiagramElement.instrument).toBe('ukulele');
+        });
+
+        test('should apply correct CSS classes for instruments', () => {
+            const diagram = chordDiagramElement.shadowRoot.querySelector('.chord-diagram');
+            
+            chordDiagramElement.setAttribute('instrument', 'guitar');
+            expect(diagram.classList.contains('chord-diagram--guitar')).toBe(true);
+            
+            chordDiagramElement.setAttribute('instrument', 'ukulele');
+            expect(diagram.classList.contains('chord-diagram--ukulele')).toBe(true);
+            expect(diagram.classList.contains('chord-diagram--guitar')).toBe(false);
+        });
+    });
+
+    describe('Chord Rendering', () => {
+        test('should clear previous chord when rendering new one', () => {
+            chordDiagramElement.setAttribute('instrument', 'guitar');
+            
+            // Render first chord
+            chordDiagramElement.renderChord('C');
+            let activeFrets = chordDiagramElement.shadowRoot.querySelectorAll('.fret.active');
+            const firstChordCount = activeFrets.length;
+            
+            // Render different chord
+            chordDiagramElement.renderChord('G');
+            activeFrets = chordDiagramElement.shadowRoot.querySelectorAll('.fret.active');
+            
+            // Should have different number of active frets (or at least cleared previous)
+            expect(activeFrets.length).toBeGreaterThan(0);
+        });
+
+        test('should handle chord with undefined instrument data', () => {
+            const consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
+            
+            chordDiagramElement.setAttribute('instrument', 'guitar');
+            chordDiagramElement.renderChord('SomeUnknownChord');
+            
+            expect(consoleErrorSpy).toHaveBeenCalled();
+            consoleErrorSpy.mockRestore();
+        });
+
+        test('should handle chord with undefined positions', () => {
+            const consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
+            
+            // Mock a chord that exists but has no positions for the instrument
+            const originalChords = chordDiagramElement.chords;
+            chordDiagramElement.chords = {
+                'TestChord': {
+                    guitar: {} // No positions property
+                }
+            };
+            
+            chordDiagramElement.setAttribute('instrument', 'guitar');
+            chordDiagramElement.renderChord('TestChord');
+            
+            expect(consoleErrorSpy).toHaveBeenCalledWith('positions undefined for this chord/instrument: ', 'TestChord', 'guitar');
+            
+            chordDiagramElement.chords = originalChords;
+            consoleErrorSpy.mockRestore();
+        });
+
+        test('should handle out of bounds fret positions', () => {
+            const consoleWarnSpy = jest.spyOn(console, 'warn').mockImplementation(() => {});
+            
+            // Mock a chord with invalid fret positions
+            const originalChords = chordDiagramElement.chords;
+            chordDiagramElement.chords = {
+                'TestChord': {
+                    guitar: {
+                        positions: [0, 0, 0, 99, 0, 0] // 99 is way out of bounds
+                    }
+                }
+            };
+            
+            chordDiagramElement.setAttribute('instrument', 'guitar');
+            chordDiagramElement.renderChord('TestChord');
+            
+            expect(consoleWarnSpy).toHaveBeenCalled();
+            
+            chordDiagramElement.chords = originalChords;
+            consoleWarnSpy.mockRestore();
+        });
+    });
+
+    describe('Component Lifecycle', () => {
+        test('should not initialize twice', () => {
+            chordDiagramElement.setAttribute('instrument', 'guitar');
+            chordDiagramElement.connectedCallback();
+            
+            const firstHTML = chordDiagramElement.shadowRoot.innerHTML;
+            
+            // Call connectedCallback again
+            chordDiagramElement.connectedCallback();
+            
+            expect(chordDiagramElement.shadowRoot.innerHTML).toBe(firstHTML);
+        });
+
+        test('should handle multiple attribute changes', () => {
+            // Change instrument
+            chordDiagramElement.setAttribute('instrument', 'guitar');
+            expect(chordDiagramElement.instrument).toBe('guitar');
+            
+            // Change chord
+            chordDiagramElement.setAttribute('chord', 'Am');
+            expect(chordDiagramElement.chord).toBe('Am');
+            
+            // Change back to different instrument
+            chordDiagramElement.setAttribute('instrument', 'ukulele');
+            expect(chordDiagramElement.instrument).toBe('ukulele');
+        });
+    });
+
+    describe('Fret Calculations', () => {
+        test('should calculate correct fret positions for chords', () => {
+            chordDiagramElement.setAttribute('instrument', 'ukulele');
+            chordDiagramElement.renderChord('C');
+            
+            const activeFrets = chordDiagramElement.shadowRoot.querySelectorAll('.fret.active');
+            // Should have the correct number of active frets for C chord on ukulele
+            expect(activeFrets.length).toBeGreaterThan(0);
+            expect(activeFrets.length).toBeLessThanOrEqual(4); // Max 4 strings on ukulele
+        });
+
+        test('should handle open string positions correctly', () => {
+            chordDiagramElement.setAttribute('instrument', 'guitar');
+            chordDiagramElement.renderChord('Em'); // Em has open strings
+            
+            // Should not crash and should render correctly
+            const activeFrets = chordDiagramElement.shadowRoot.querySelectorAll('.fret.active');
+            expect(activeFrets.length).toBeGreaterThanOrEqual(0);
+        });
+    });
+
+    describe('Visual Feedback', () => {
+        test('should have proper grid layout for different instruments', () => {
+            const diagram = chordDiagramElement.shadowRoot.querySelector('.chord-diagram');
+            
+            chordDiagramElement.setAttribute('instrument', 'guitar');
+            expect(diagram.classList.contains('chord-diagram--guitar')).toBe(true);
+            
+            chordDiagramElement.setAttribute('instrument', 'ukulele');
+            expect(diagram.classList.contains('chord-diagram--ukulele')).toBe(true);
+        });
+
+        test('should show active fret styling', () => {
+            chordDiagramElement.setAttribute('instrument', 'guitar');
+            chordDiagramElement.renderChord('C');
+            
+            const activeFrets = chordDiagramElement.shadowRoot.querySelectorAll('.fret.active');
+            activeFrets.forEach(fret => {
+                expect(fret.classList.contains('active')).toBe(true);
+            });
+        });
+    });
+
+    describe('Print Styles', () => {
+        test('should have print-specific CSS rules', () => {
+            const styles = chordDiagramElement.shadowRoot.querySelector('style');
+            expect(styles.textContent).toContain('@media print');
+            expect(styles.textContent).toContain('background: white !important');
+        });
+    });
 }); 
