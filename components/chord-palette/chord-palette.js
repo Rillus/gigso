@@ -192,6 +192,13 @@ export default class ChordPalette extends HTMLElement {
         detail: { ...chord, duration: 1, delay: 0 },
       })
     );
+    
+    // Also dispatch chord-selected for presentation demos
+    this.dispatchEvent(
+      new CustomEvent("chord-selected", {
+        detail: { chord: chord.name, notes: chord.notes },
+      })
+    );
   }
 }
 

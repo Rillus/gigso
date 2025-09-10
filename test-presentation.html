@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Presentation Components</title>
+    <style>
+        body {
+            margin: 20px;
+            font-family: Arial, sans-serif;
+            background: #f0f0f0;
+        }
+        .test-section {
+            margin-bottom: 30px;
+            padding: 20px;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .test-header {
+            color: #333;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 10px;
+            margin-bottom: 15px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Presentation Components Test</h1>
+    
+    <div class="test-section">
+        <h2 class="test-header">1. Presentation Slide Component</h2>
+        <presentation-slide slide-type="title-slide" title="Test Title"></presentation-slide>
+    </div>
+    
+    <div class="test-section">
+        <h2 class="test-header">2. Live Demo Component</h2>
+        <live-demo demo-type="song-building"></live-demo>
+    </div>
+    
+    <div class="test-section">
+        <h2 class="test-header">3. Demo Integration Components</h2>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+            <demo-chord-palette></demo-chord-palette>
+            <demo-transport-controls></demo-transport-controls>
+        </div>
+        <demo-piano-roll style="margin-top: 20px;"></demo-piano-roll>
+    </div>
+
+    <script type="module">
+        // Import components
+        import './components/base-component.js';
+        import './components/presentation-slide/presentation-slide.js';
+        import './components/live-demo/live-demo.js';
+        import './components/demo-integration/demo-chord-palette.js';
+        import './components/demo-integration/demo-transport-controls.js';
+        import './components/demo-integration/demo-piano-roll.js';
+        import './components/current-chord/current-chord.js';
+        
+        // Test component loading
+        window.addEventListener('load', () => {
+            console.log('🧪 Testing presentation components...');
+            
+            // Test if all components are defined
+            const componentNames = [
+                'presentation-slide',
+                'live-demo', 
+                'demo-chord-palette',
+                'demo-transport-controls',
+                'demo-piano-roll'
+            ];
+            
+            componentNames.forEach(name => {
+                if (customElements.get(name)) {
+                    console.log(`✅ ${name} component loaded successfully`);
+                } else {
+                    console.error(`❌ ${name} component failed to load`);
+                }
+            });
+            
+            // Test component interactions
+            setTimeout(() => {
+                const demoChordPalette = document.querySelector('demo-chord-palette');
+                if (demoChordPalette) {
+                    demoChordPalette.addEventListener('chord-selected', (event) => {
+                        console.log('🎵 Chord selected:', event.detail);
+                    });
+                }
+                
+                const demoTransport = document.querySelector('demo-transport-controls');
+                if (demoTransport) {
+                    demoTransport.addEventListener('play-started', () => {
+                        console.log('▶ Playback started');
+                    });
+                }
+            }, 1000);
+        });
+    </script>
+</body>
+</html>

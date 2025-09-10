@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>From Code to Chords: Building a Web-Based Music Maker Without Frameworks</title>
+    
+    <!-- External dependencies -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.8.49/Tone.js"></script>
+    
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #000;
+            overflow: hidden;
+        }
+        
+        .presentation-loader {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: linear-gradient(135deg, #1e3c72, #2a5298);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            color: white;
+            z-index: 10000;
+        }
+        
+        .loader-logo {
+            font-size: 4em;
+            margin-bottom: 20px;
+            animation: pulse 2s infinite;
+        }
+        
+        .loader-text {
+            font-size: 1.5em;
+            margin-bottom: 30px;
+        }
+        
+        .loader-progress {
+            width: 300px;
+            height: 4px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 2px;
+            overflow: hidden;
+        }
+        
+        .loader-progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, #00ff87, #60efff);
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.1); opacity: 0.8; }
+        }
+        
+        .hidden {
+            display: none;
+        }
+        
+        /* Presentation mode styles */
+        .presentation-mode {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            z-index: 9999;
+        }
+        
+        .exit-presentation {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            z-index: 10001;
+            transition: all 0.3s ease;
+        }
+        
+        .exit-presentation:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+    </style>
+</head>
+<body>
+    <!-- Loading screen -->
+    <div class="presentation-loader" id="loader">
+        <div class="loader-logo">🎵</div>
+        <div class="loader-text">Loading Presentation...</div>
+        <div class="loader-progress">
+            <div class="loader-progress-bar" id="loader-progress"></div>
+        </div>
+    </div>
+    
+    <!-- Main presentation application -->
+    <div id="app" class="hidden">
+        <gigso-presentation id="main-presentation"></gigso-presentation>
+    </div>
+    
+    <!-- Scripts -->
+    <script type="module">
+        // Import all necessary components
+        import './components/base-component.js';
+        import './components/gigso-presentation/gigso-presentation.js';
+        import './components/presentation-slide/presentation-slide.js';
+        import './components/live-demo/live-demo.js';
+        
+        // Import Gigso components for demos
+        import './components/chord-palette/chord-palette.js';
+        import './components/current-chord/current-chord.js';
+        import './components/transport-controls/transport-controls.js';
+        import './components/piano-roll/piano-roll.js';
+        import './components/add-chord/add-chord.js';
+        import './components/fretboard/fretboard.js';
+        import './components/chord-diagram/chord-diagram.js';
+        import './components/hand-pan/hand-pan.js';
+        
+        // Original components will be used directly for demos
+        
+        // Application initialization
+        class PresentationApp {
+            constructor() {
+                this.presentation = null;
+                this.isLoaded = false;
+                
+                this.init();
+            }
+            
+            async init() {
+                try {
+                    // Simulate loading process
+                    await this.loadComponents();
+                    await this.setupAudioEngine();
+                    await this.initializePresentation();
+                    
+                    this.hideLoader();
+                    this.showPresentation();
+                    
+                } catch (error) {
+                    console.error('Presentation initialization error:', error);
+                    this.showError(error);
+                }
+            }
+            
+            async loadComponents() {
+                this.updateLoader(20, 'Loading components...');
+                
+                // Wait for all custom elements to be defined
+                const componentNames = [
+                    'gigso-presentation',
+                    'presentation-slide', 
+                    'live-demo',
+                    'chord-palette',
+                    'current-chord',
+                    'transport-controls',
+                    'piano-roll',
+                    'add-chord',
+                    'fretboard-component',
+                    'chord-diagram',
+                    'hand-pan'
+                ];
+                
+                await Promise.all(
+                    componentNames.map(name => customElements.whenDefined(name))
+                );
+                
+                this.updateLoader(50, 'Components loaded');
+            }
+            
+            async setupAudioEngine() {
+                this.updateLoader(70, 'Setting up audio engine...');
+                
+                try {
+                    if (window.Tone) {
+                        // Pre-initialize Tone.js
+                        await new Promise(resolve => {
+                            if (Tone.context.state === 'running') {
+                                resolve();
+                            } else {
+                                // Don't start audio context yet - wait for user interaction
+                                resolve();
+                            }
+                        });
+                    }
+                    
+                    this.updateLoader(90, 'Audio engine ready');
+                } catch (error) {
+                    console.warn('Audio setup warning:', error);
+                    this.updateLoader(90, 'Audio engine unavailable');
+                }
+            }
+            
+            async initializePresentation() {
+                this.updateLoader(95, 'Initializing presentation...');
+                
+                this.presentation = document.getElementById('main-presentation');
+                
+                // Set up presentation event listeners
+                this.presentation.addEventListener('presentation-exit', () => {
+                    this.exitPresentation();
+                });
+                
+                this.presentation.addEventListener('slide-changed', (event) => {
+                    console.log('Slide changed:', event.detail);
+                });
+                
+                this.updateLoader(100, 'Ready to present!');
+            }
+            
+            updateLoader(progress, message) {
+                const progressBar = document.getElementById('loader-progress');
+                const loaderText = document.querySelector('.loader-text');
+                
+                progressBar.style.width = `${progress}%`;
+                loaderText.textContent = message;
+            }
+            
+            hideLoader() {
+                setTimeout(() => {
+                    const loader = document.getElementById('loader');
+                    loader.style.opacity = '0';
+                    loader.style.transform = 'scale(0.9)';
+                    loader.style.transition = 'all 0.5s ease';
+                    
+                    setTimeout(() => {
+                        loader.classList.add('hidden');
+                    }, 500);
+                }, 1000);
+            }
+            
+            showPresentation() {
+                const app = document.getElementById('app');
+                app.classList.remove('hidden');
+                
+                // Add presentation mode class
+                document.body.classList.add('presentation-mode');
+                
+                this.isLoaded = true;
+                
+                // Dispatch ready event
+                window.dispatchEvent(new CustomEvent('presentation-ready', {
+                    detail: { timestamp: Date.now() }
+                }));
+            }
+            
+            exitPresentation() {
+                // Exit presentation mode
+                document.body.classList.remove('presentation-mode');
+                
+                // Return to main Gigso app or close window
+                if (window.opener) {
+                    window.close();
+                } else {
+                    window.location.href = 'index.html';
+                }
+            }
+            
+            showError(error) {
+                const loader = document.getElementById('loader');
+                loader.innerHTML = `
+                    <div class="loader-logo">⚠️</div>
+                    <div class="loader-text">Presentation Load Error</div>
+                    <div style="color: #ff6b6b; margin-top: 20px; max-width: 400px; text-align: center;">
+                        ${error.message}
+                    </div>
+                    <button onclick="window.location.reload()" style="
+                        margin-top: 20px;
+                        background: #00ff87;
+                        border: none;
+                        color: #000;
+                        padding: 12px 24px;
+                        border-radius: 8px;
+                        cursor: pointer;
+                        font-size: 14px;
+                        font-weight: 600;
+                    ">Retry</button>
+                `;
+            }
+        }
+        
+        // Initialize the presentation app
+        const app = new PresentationApp();
+        
+        // Keyboard shortcuts for presentation control
+        document.addEventListener('keydown', (event) => {
+            // Global shortcuts that work even when presentation isn't focused
+            if (event.key === 'Escape' && document.fullscreenElement) {
+                document.exitFullscreen();
+            }
+        });
+        
+        // Handle fullscreen changes
+        document.addEventListener('fullscreenchange', () => {
+            const presentation = document.getElementById('main-presentation');
+            if (presentation) {
+                const isFullscreen = !!document.fullscreenElement;
+                presentation.shadowRoot.querySelector('.presentation-container')
+                    .classList.toggle('fullscreen', isFullscreen);
+            }
+        });
+        
+        // Handle page visibility changes
+        document.addEventListener('visibilitychange', () => {
+            if (document.hidden) {
+                // Pause any running demos when page is hidden
+                const liveDemos = document.querySelectorAll('live-demo');
+                liveDemos.forEach(demo => {
+                    if (demo.isRunning) {
+                        demo.pauseDemo();
+                    }
+                });
+            }
+        });
+        
+        // Prevent accidental page navigation
+        window.addEventListener('beforeunload', (event) => {
+            if (app.isLoaded) {
+                event.preventDefault();
+                event.returnValue = 'Are you sure you want to leave the presentation?';
+                return event.returnValue;
+            }
+        });
+        
+        // Debug helpers (remove in production)
+        window.presentationApp = app;
+        window.goToSlide = (index) => {
+            if (app.presentation) {
+                app.presentation.goToSlide(index);
+            }
+        };
+        
+        console.log('🎵 Gigso Presentation System Loaded');
+        console.log('Use window.goToSlide(index) to jump to specific slides');
+        console.log('Press F11 or Ctrl/Cmd+F for fullscreen');
+        console.log('Press Ctrl/Cmd+N for speaker notes');
+    </script>
+</body>
+</html>

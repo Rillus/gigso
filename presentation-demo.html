@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gigso Live Demo - Full Screen</title>
+    
+    <!-- External dependencies -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.8.49/Tone.js"></script>
+    
+    <style>
+        body {
+            margin: 0;
+            padding: 20px;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1e3c72, #2a5298);
+            color: white;
+            min-height: 100vh;
+        }
+        
+        .demo-header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding: 20px;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 15px;
+        }
+        
+        .demo-header h1 {
+            margin: 0 0 10px 0;
+            font-size: 2.5em;
+            background: linear-gradient(135deg, #00ff87, #60efff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .demo-header p {
+            margin: 0;
+            font-size: 1.2em;
+            opacity: 0.8;
+        }
+        
+        .demo-controls {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            display: flex;
+            gap: 10px;
+            z-index: 1000;
+        }
+        
+        .control-btn {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+        }
+        
+        .control-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: translateY(-2px);
+        }
+        
+        .demo-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        
+        .demo-section {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            padding: 25px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .demo-section h2 {
+            margin: 0 0 20px 0;
+            font-size: 1.5em;
+            color: #60efff;
+            text-align: center;
+        }
+        
+        .component-wrapper {
+            margin-bottom: 20px;
+            padding: 20px;
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 10px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .component-wrapper h3 {
+            margin: 0 0 15px 0;
+            font-size: 1.1em;
+            color: #00ff87;
+        }
+        
+        /* Make components responsive */
+        .component-wrapper > * {
+            max-width: 100%;
+            box-sizing: border-box;
+        }
+        
+        /* Single column layout on mobile */
+        @media (max-width: 768px) {
+            body {
+                padding: 10px;
+            }
+            
+            .demo-container {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+            
+            .demo-header h1 {
+                font-size: 2em;
+            }
+            
+            .demo-controls {
+                position: static;
+                justify-content: center;
+                margin-bottom: 20px;
+            }
+        }
+        
+        .loading {
+            text-align: center;
+            padding: 50px;
+            font-size: 1.2em;
+            opacity: 0.7;
+        }
+    </style>
+</head>
+<body>
+    <!-- Demo Controls -->
+    <div class="demo-controls">
+        <a href="presentation.html" class="control-btn">← Back to Presentation</a>
+        <button id="fullscreen-btn" class="control-btn">🔍 Fullscreen</button>
+    </div>
+    
+    <!-- Demo Header -->
+    <div class="demo-header">
+        <h1>🎵 Gigso Live Demo</h1>
+        <p>Interactive Web Components for Music Creation</p>
+    </div>
+    
+    <!-- Loading Message -->
+    <div id="loading" class="loading">
+        Loading components...
+    </div>
+    
+    <!-- Main Demo Container -->
+    <div id="demo-container" class="demo-container" style="display: none;">
+        <!-- Chord Creation Section -->
+        <div class="demo-section">
+            <h2>🎶 Chord Creation</h2>
+            
+            <div class="component-wrapper">
+                <h3>Chord Palette</h3>
+                <chord-palette id="demo-chord-palette"></chord-palette>
+            </div>
+            
+            <div class="component-wrapper">
+                <h3>Current Chord Display</h3>
+                <current-chord id="demo-current-chord"></current-chord>
+            </div>
+        </div>
+        
+        <!-- Instrument Interfaces Section -->
+        <div class="demo-section">
+            <h2>🎹 Instrument Interfaces</h2>
+            
+            <div class="component-wrapper">
+                <h3>Hand Pan (Touch Interface)</h3>
+                <hand-pan id="demo-hand-pan" key="C" scale="major"></hand-pan>
+            </div>
+            
+            <div class="component-wrapper">
+                <h3>Guitar Fretboard</h3>
+                <fretboard-component id="demo-fretboard" instrument="guitar"></fretboard-component>
+            </div>
+        </div>
+        
+        <!-- Sequencing Section -->
+        <div class="demo-section">
+            <h2>📊 Sequencing & Playback</h2>
+            
+            <div class="component-wrapper">
+                <h3>Piano Roll Timeline</h3>
+                <piano-roll id="demo-piano-roll"></piano-roll>
+            </div>
+            
+            <div class="component-wrapper">
+                <h3>Transport Controls</h3>
+                <transport-controls id="demo-transport"></transport-controls>
+            </div>
+        </div>
+        
+        <!-- Additional Components Section -->
+        <div class="demo-section">
+            <h2>🔧 Additional Tools</h2>
+            
+            <div class="component-wrapper">
+                <h3>Add Chord Interface</h3>
+                <add-chord id="demo-add-chord"></add-chord>
+            </div>
+            
+            <div class="component-wrapper">
+                <h3>Chord Diagram</h3>
+                <chord-diagram id="demo-chord-diagram"></chord-diagram>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Scripts -->
+    <script type="module">
+        // Import all necessary components
+        import './components/base-component.js';
+        import './components/chord-palette/chord-palette.js';
+        import './components/current-chord/current-chord.js';
+        import './components/transport-controls/transport-controls.js';
+        import './components/piano-roll/piano-roll.js';
+        import './components/add-chord/add-chord.js';
+        import './components/fretboard/fretboard.js';
+        import './components/chord-diagram/chord-diagram.js';
+        import './components/hand-pan/hand-pan.js';
+        
+        class DemoApp {
+            constructor() {
+                this.init();
+            }
+            
+            async init() {
+                try {
+                    // Wait for all custom elements to be defined
+                    const componentNames = [
+                        'chord-palette',
+                        'current-chord',
+                        'transport-controls',
+                        'piano-roll',
+                        'add-chord',
+                        'fretboard-component',
+                        'chord-diagram',
+                        'hand-pan'
+                    ];
+                    
+                    await Promise.all(
+                        componentNames.map(name => customElements.whenDefined(name))
+                    );
+                    
+                    // Setup audio engine
+                    await this.setupAudio();
+                    
+                    // Setup component interactions
+                    this.setupInteractions();
+                    
+                    // Show demo
+                    this.showDemo();
+                    
+                } catch (error) {
+                    console.error('Demo initialization error:', error);
+                    document.getElementById('loading').textContent = 'Error loading demo. Please refresh the page.';
+                }
+            }
+            
+            async setupAudio() {
+                if (window.Tone && Tone.context.state !== 'running') {
+                    // Audio will be started on first user interaction
+                    console.log('Audio context ready');
+                }
+            }
+            
+            setupInteractions() {
+                // Connect chord palette to other components
+                const chordPalette = document.getElementById('demo-chord-palette');
+                const currentChord = document.getElementById('demo-current-chord');
+                const pianoRoll = document.getElementById('demo-piano-roll');
+                const chordDiagram = document.getElementById('demo-chord-diagram');
+                
+                chordPalette.addEventListener('chord-selected', (event) => {
+                    // Update current chord display
+                    currentChord.updateChord(event.detail.chord, event.detail.notes);
+                    
+                    // Add to piano roll timeline
+                    pianoRoll.dispatchEvent(new CustomEvent('add-chord', {
+                        detail: event.detail
+                    }));
+                    
+                    // Update chord diagram
+                    chordDiagram.dispatchEvent(new CustomEvent('show-chord', {
+                        detail: { chord: event.detail.chord }
+                    }));
+                });
+                
+                // Setup transport controls
+                const transport = document.getElementById('demo-transport');
+                transport.addEventListener('play-started', () => {
+                    console.log('Demo: Playback started');
+                });
+                
+                // Setup hand pan interactions
+                const handPan = document.getElementById('demo-hand-pan');
+                handPan.addEventListener('note-played', (event) => {
+                    console.log('Demo: Hand pan note played:', event.detail.note);
+                });
+                
+                console.log('Demo interactions configured');
+            }
+            
+            showDemo() {
+                document.getElementById('loading').style.display = 'none';
+                document.getElementById('demo-container').style.display = 'grid';
+                
+                // Dispatch ready event
+                window.dispatchEvent(new CustomEvent('demo-ready'));
+            }
+        }
+        
+        // Fullscreen functionality
+        document.getElementById('fullscreen-btn').addEventListener('click', () => {
+            if (!document.fullscreenElement) {
+                document.documentElement.requestFullscreen();
+            } else {
+                document.exitFullscreen();
+            }
+        });
+        
+        // Handle fullscreen changes
+        document.addEventListener('fullscreenchange', () => {
+            const btn = document.getElementById('fullscreen-btn');
+            if (document.fullscreenElement) {
+                btn.textContent = '🔍 Exit Fullscreen';
+            } else {
+                btn.textContent = '🔍 Fullscreen';
+            }
+        });
+        
+        // Initialize demo app
+        const demoApp = new DemoApp();
+        
+        // Debug helpers
+        window.demoApp = demoApp;
+        console.log('🎵 Gigso Full-Screen Demo Loaded');
+    </script>
+</body>
+</html>
