@@ -62,6 +62,12 @@ export default class HandPan extends HTMLElement {
             this.changeKey(key, scale);
         });
         
+        // Listen for song key changes from chord palette
+        this.boundHandleSongKeyChange = this.handleSongKeyChange.bind(this);
+        this.boundHandleSongKeySet = this.handleSongKeySet.bind(this);
+        document.addEventListener('key-changed', this.boundHandleSongKeyChange);
+        document.addEventListener('key-set', this.boundHandleSongKeySet);
+        
         this.addEventListener('mute', () => {
             this.isMuted = true;
         });
@@ -1098,6 +1104,109 @@ export default class HandPan extends HTMLElement {
         return generateScaleNotes(key, scale);
     }
     
+    /**
+     * Handle song key changes from chord palette
+     * Maps song keys to hand-pan supported keys
+     */
+    handleSongKeyChange(event) {
+        // Handle missing or invalid event detail gracefully
+        if (!event || !event.detail) {
+            console.warn('HandPan: Received key-changed event with missing detail');
+            return;
+        }
+        
+        const { key, scale } = event.detail;
+        console.log('HandPan: Received key-changed event', { key, scale });
+        
+        // Map the song key to a hand-pan supported key
+        const mappedKey = this.mapSongKeyToHandPanKey(key);
+        const mappedScale = this.mapSongScaleToHandPanScale(scale);
+        
+        if (mappedKey && mappedScale) {
+            console.log('HandPan: Mapping song key', { key, scale }, 'to hand-pan key', { mappedKey, mappedScale });
+            this.changeKey(mappedKey, mappedScale);
+        } else {
+            console.warn('HandPan: Could not map song key', { key, scale }, 'to hand-pan key');
+        }
+    }
+    
+    /**
+     * Handle initial song key set from chord palette
+     * Same as key-changed but with additional logging
+     */
+    handleSongKeySet(event) {
+        // Handle missing or invalid event detail gracefully
+        if (!event || !event.detail) {
+            console.warn('HandPan: Received key-set event with missing detail');
+            return;
+        }
+        
+        console.log('HandPan: Received key-set event (initial song key)', event.detail);
+        this.handleSongKeyChange(event);
+    }
+    
+    /**
+     * Map song keys to hand-pan supported keys
+     * Hand-pan supports: C, C#, D, D#, E, F, F#, G, G#, A, A#, B
+     */
+    mapSongKeyToHandPanKey(songKey) {
+        // If the song key is already supported by hand-pan, use it directly
+        if (this.validateKey(songKey)) {
+            return songKey;
+        }
+        
+        // Map common song keys to hand-pan keys
+        const keyMapping = {
+            'Db': 'C#',  // D flat -> C sharp
+            'Eb': 'D#',  // E flat -> D sharp
+            'Gb': 'F#',  // G flat -> F sharp
+            'Ab': 'G#',  // A flat -> G sharp
+            'Bb': 'A#',  // B flat -> A sharp
+        };
+        
+        const mappedKey = keyMapping[songKey];
+        if (mappedKey && this.validateKey(mappedKey)) {
+            return mappedKey;
+        }
+        
+        // Default to D if no mapping found
+        console.warn('HandPan: No mapping found for song key', songKey, ', defaulting to D');
+        return 'D';
+    }
+    
+    /**
+     * Map song scales to hand-pan supported scales
+     * Hand-pan supports: major, minor, pentatonic
+     */
+    mapSongScaleToHandPanScale(songScale) {
+        // If the song scale is already supported by hand-pan, use it directly
+        if (this.validateScale(songScale)) {
+            return songScale;
+        }
+        
+        // Map common song scales to hand-pan scales
+        const scaleMapping = {
+            'ionian': 'major',      // Ionian mode -> major
+            'dorian': 'minor',      // Dorian mode -> minor
+            'phrygian': 'minor',    // Phrygian mode -> minor
+            'lydian': 'major',      // Lydian mode -> major
+            'mixolydian': 'major',  // Mixolydian mode -> major
+            'aeolian': 'minor',     // Aeolian mode -> minor
+            'locrian': 'minor',     // Locrian mode -> minor
+            'pentatonic-major': 'pentatonic',  // Pentatonic major -> pentatonic
+            'pentatonic-minor': 'pentatonic',  // Pentatonic minor -> pentatonic
+        };
+        
+        const mappedScale = scaleMapping[songScale];
+        if (mappedScale && this.validateScale(mappedScale)) {
+            return mappedScale;
+        }
+        
+        // Default to minor if no mapping found
+        console.warn('HandPan: No mapping found for song scale', songScale, ', defaulting to minor');
+        return 'minor';
+    }
+    
     initializeAudioContext() {
         // Add a one-time click listener to initialize audio context
         const initializeAudio = async () => {
@@ -1259,6 +1368,14 @@ export default class HandPan extends HTMLElement {
             // Clean up accelerometer
             if (this.handleDeviceMotion) {
                 window.removeEventListener('devicemotion', this.handleDeviceMotion);
+            }
+            
+            // Clean up document event listeners
+            if (this.boundHandleSongKeyChange) {
+                document.removeEventListener('key-changed', this.boundHandleSongKeyChange);
+            }
+            if (this.boundHandleSongKeySet) {
+                document.removeEventListener('key-set', this.boundHandleSongKeySet);
             }
             
             // Clean up audio effects if they exist

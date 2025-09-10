@@ -115,3 +115,8 @@ frequency-monitor {
   width: 100%;
   grid-column: 1 / 4;
 }
+
+hand-pan {
+  grid-row: 4 / 6;
+  grid-column: 2 / 4;
+}

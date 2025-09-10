@@ -1,3 +1,5 @@
+import state from '../../state/state.js';
+
 export default class ChordPalette extends HTMLElement {
   constructor() {
     super();
@@ -16,9 +18,10 @@ export default class ChordPalette extends HTMLElement {
     this.shadowRoot.innerHTML = `
       <style>
         .palette {
+            position: relative;
             display: grid;
             grid-template-columns: repeat(7, 1fr);
-            padding: 10px;
+            padding: 20px;
             border: 1px solid #ccc;
             background: #f9f9f9;
             margin-bottom: 10px;
@@ -100,10 +103,37 @@ export default class ChordPalette extends HTMLElement {
         .chord-button[data-chord-name$="Bbm"] {
             grid-column: 6;
         }
+        
+        /* Key selection styles */
+        .chord-button.key-chord {
+            border: 3px solid var(--unclelele-accent, #F7931E);
+            box-shadow: 0 0 10px rgba(247, 147, 30, 0.5);
+            transform: scale(1.05);
+        }
+        
+        .key-indicator {
+            grid-column: 1 / -1;
+            grid-row: 1;
+            text-align: center;
+            font-weight: bold;
+            color: var(--unclelele-accent, #F7931E);
+            margin-bottom: 10px;
+            padding: 0px;
+            top: -15px;
+            left: -15px;
+            background: rgba(247, 147, 30, 0.1);
+            border-radius: 5px;
+            position: absolute;
+            font-size: 12px;
+        }
+        
         ${chordColours}
 
       </style>
       <div class="palette">
+          <div class="key-indicator" id="keyIndicator" style="display: none;">
+              Key: <span id="keyDisplay">Not Set</span>
+          </div>
           ${this.createChordButtons()}
       </div>
     `;
@@ -199,6 +229,96 @@ export default class ChordPalette extends HTMLElement {
         detail: { chord: chord.name, notes: chord.notes },
       })
     );
+    
+    // Handle key selection if no key is set
+    if (!state.isKeySet()) {
+      this.setKeyFromChord(chord);
+    }
+  }
+
+  // Key detection methods
+  extractRootNote(chordName) {
+    // Remove common chord suffixes to get the root note
+    const cleanName = chordName.replace(/[m7sus2add9majminaugdim]/g, '');
+    // Also remove octave numbers if present
+    return cleanName.replace(/\d/g, '');
+  }
+
+  determineScaleType(chordName) {
+    // Check if the chord is minor
+    if (chordName.includes('m') && !chordName.includes('maj')) {
+      return 'minor';
+    }
+    return 'major';
+  }
+
+  setKeyFromChord(chord) {
+    const rootNote = this.extractRootNote(chord.name);
+    const scaleType = this.determineScaleType(chord.name);
+    
+    // Update state
+    state.setSongKey(rootNote);
+    state.setSongScale(scaleType);
+    state.setIsKeySet(true);
+    
+    // Update visual feedback
+    this.updateKeyDisplay(rootNote, scaleType);
+    this.highlightKeyChord(rootNote, scaleType);
+    
+    // Dispatch key change events
+    this.dispatchKeyChangeEvent(rootNote, scaleType);
+  }
+
+  updateKeyDisplay(key, scale) {
+    const keyIndicator = this.shadowRoot.getElementById('keyIndicator');
+    const keyDisplay = this.shadowRoot.getElementById('keyDisplay');
+    
+    if (keyIndicator && keyDisplay) {
+      keyDisplay.textContent = `${key} ${scale.charAt(0).toUpperCase() + scale.slice(1)}`;
+      keyIndicator.style.display = 'block';
+    }
+  }
+
+  highlightKeyChord(key, scale) {
+    // Remove previous highlighting
+    this.shadowRoot.querySelectorAll('.chord-button.key-chord').forEach(button => {
+      button.classList.remove('key-chord');
+    });
+    
+    // Find and highlight the current key chord
+    const keyChordName = scale === 'minor' ? `${key}m` : key;
+    const keyButton = Array.from(this.shadowRoot.querySelectorAll('.chord-button')).find(button => {
+      const chordData = JSON.parse(button.getAttribute('data-chord'));
+      return chordData.name === keyChordName;
+    });
+    
+    if (keyButton) {
+      keyButton.classList.add('key-chord');
+    }
+  }
+
+  dispatchKeyChangeEvent(key, scale) {
+    const keyData = { key, scale };
+    
+    // Dispatch key-changed event
+    this.dispatchEvent(
+      new CustomEvent('key-changed', {
+        detail: keyData,
+        bubbles: true
+      })
+    );
+    
+    // Dispatch key-set event if this is the first key selection
+    // Check the state before we set it
+    const wasKeySet = state.isKeySet();
+    if (!wasKeySet) {
+      this.dispatchEvent(
+        new CustomEvent('key-set', {
+          detail: keyData,
+          bubbles: true
+        })
+      );
+    }
   }
 }
 

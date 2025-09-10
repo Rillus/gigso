@@ -75,6 +75,11 @@ export default class Fretboard extends BaseComponent {
     return ['instrument', 'chord', 'scale-root', 'scale-type', 'key', 'practice-mode', 'practice-level'];
   }
 
+  disconnectedCallback() {
+    // Clean up when component is removed from DOM
+    this.cleanup();
+  }
+
   attributeChangedCallback(name, oldValue, newValue) {
     if (oldValue === newValue) return;
 
@@ -153,12 +158,163 @@ export default class Fretboard extends BaseComponent {
       this.setInstrument(event.detail);
     });
 
+    // Listen for song key changes from chord palette
+    this.boundHandleSongKeyChange = this.handleSongKeyChange.bind(this);
+    this.boundHandleSongKeySet = this.handleSongKeySet.bind(this);
+    document.addEventListener('key-changed', this.boundHandleSongKeyChange);
+    document.addEventListener('key-set', this.boundHandleSongKeySet);
+
     // Listen for note clicks on the fretboard
     this.shadowRoot.addEventListener('click', (event) => {
       if (event.target.classList.contains('fret-position')) {
         this.handleNoteClick(event);
       }
     });
+  }
+
+  /**
+   * Clean up event listeners when component is removed
+   */
+  cleanup() {
+    try {
+      // Clean up document event listeners
+      if (this.boundHandleSongKeyChange) {
+        document.removeEventListener('key-changed', this.boundHandleSongKeyChange);
+      }
+      if (this.boundHandleSongKeySet) {
+        document.removeEventListener('key-set', this.boundHandleSongKeySet);
+      }
+      
+      console.log('Fretboard: Cleanup completed');
+    } catch (error) {
+      console.warn('Fretboard: Error during cleanup:', error);
+    }
+  }
+
+  /**
+   * Handle song key changes from chord palette
+   * Maps song keys to fretboard supported keys
+   */
+  handleSongKeyChange(event) {
+    // Handle missing or invalid event detail gracefully
+    if (!event || !event.detail) {
+      console.warn('Fretboard: Received key-changed event with missing detail');
+      return;
+    }
+    
+    const { key, scale } = event.detail;
+    console.log('Fretboard: Received key-changed event', { key, scale });
+    
+    // Map the song key to a fretboard supported key
+    const mappedKey = this.mapSongKeyToFretboardKey(key);
+    const mappedScale = this.mapSongScaleToFretboardScale(scale);
+    
+    if (mappedKey && mappedScale) {
+      console.log('Fretboard: Mapping song key', { key, scale }, 'to fretboard key', { mappedKey, mappedScale });
+      
+      // Update the current scale if one exists
+      if (this.currentScale) {
+        this.displayScale(mappedKey, mappedScale, mappedKey);
+      } else {
+        // If no current scale, create a default one
+        this.displayScale(mappedKey, mappedScale, mappedKey);
+      }
+    } else {
+      console.warn('Fretboard: Could not map song key', { key, scale }, 'to fretboard key');
+    }
+  }
+
+  /**
+   * Handle initial song key set from chord palette
+   * Same as key-changed but with additional logging
+   */
+  handleSongKeySet(event) {
+    // Handle missing or invalid event detail gracefully
+    if (!event || !event.detail) {
+      console.warn('Fretboard: Received key-set event with missing detail');
+      return;
+    }
+    
+    console.log('Fretboard: Received key-set event (initial song key)', event.detail);
+    this.handleSongKeyChange(event);
+  }
+
+  /**
+   * Map song keys to fretboard supported keys
+   * Fretboard supports all standard keys: C, C#, D, D#, E, F, F#, G, G#, A, A#, B
+   */
+  mapSongKeyToFretboardKey(songKey) {
+    // If the song key is already supported by fretboard, use it directly
+    if (this.validateKey(songKey)) {
+      return songKey;
+    }
+    
+    // Map common song keys to fretboard keys
+    const keyMapping = {
+      'Db': 'C#',  // D flat -> C sharp
+      'Eb': 'D#',  // E flat -> D sharp
+      'Gb': 'F#',  // G flat -> F sharp
+      'Ab': 'G#',  // A flat -> G sharp
+      'Bb': 'A#',  // B flat -> A sharp
+    };
+    
+    const mappedKey = keyMapping[songKey];
+    if (mappedKey && this.validateKey(mappedKey)) {
+      return mappedKey;
+    }
+    
+    // Default to C if no mapping found
+    console.warn('Fretboard: No mapping found for song key', songKey, ', defaulting to C');
+    return 'C';
+  }
+
+  /**
+   * Map song scales to fretboard supported scales
+   * Fretboard supports: major, minor, pentatonic, and other scales via ScaleKey
+   */
+  mapSongScaleToFretboardScale(songScale) {
+    // If the song scale is already supported by fretboard, use it directly
+    if (this.validateScale(songScale)) {
+      return songScale;
+    }
+    
+    // Map common song scales to fretboard scales
+    const scaleMapping = {
+      'ionian': 'major',      // Ionian mode -> major
+      'dorian': 'minor',      // Dorian mode -> minor
+      'phrygian': 'minor',    // Phrygian mode -> minor
+      'lydian': 'major',      // Lydian mode -> major
+      'mixolydian': 'major',  // Mixolydian mode -> major
+      'aeolian': 'minor',     // Aeolian mode -> minor
+      'locrian': 'minor',     // Locrian mode -> minor
+      'pentatonic-major': 'pentatonic',  // Pentatonic major -> pentatonic
+      'pentatonic-minor': 'pentatonic',  // Pentatonic minor -> pentatonic
+    };
+    
+    const mappedScale = scaleMapping[songScale];
+    if (mappedScale && this.validateScale(mappedScale)) {
+      return mappedScale;
+    }
+    
+    // Default to major if no mapping found
+    console.warn('Fretboard: No mapping found for song scale', songScale, ', defaulting to major');
+    return 'major';
+  }
+
+  /**
+   * Validate if a key is supported by the fretboard
+   */
+  validateKey(key) {
+    const validKeys = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'];
+    return validKeys.includes(key);
+  }
+
+  /**
+   * Validate if a scale is supported by the fretboard
+   */
+  validateScale(scale) {
+    const validScales = ['major', 'minor', 'pentatonic', 'blues', 'harmonic-minor', 'melodic-minor'];
+    return validScales.includes(scale);
   }
 
   handleNoteClick(event) {

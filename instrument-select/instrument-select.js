@@ -27,6 +27,10 @@ export default class InstrumentSelect extends HTMLElement {
       select.appendChild(option);
     });
 
+    // Create a wrapper div
+    const wrapper = document.createElement('div');
+    wrapper.className = 'instrument-select-wrapper';
+
     // Create a label
     const label = document.createElement('label');
     label.setAttribute('for', 'instrument-select');
@@ -39,6 +43,12 @@ export default class InstrumentSelect extends HTMLElement {
         display: inline-block;
         font-family: sans-serif;
       }
+      .instrument-select-wrapper {
+        background-color: white;
+        border-radius: 8px;
+        padding: 10px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      }
       label {
         margin-right: 5px;
       }
@@ -49,10 +59,13 @@ export default class InstrumentSelect extends HTMLElement {
       }
     `;
 
-    // Append the elements to the shadow root
+    // Append the elements to the wrapper
+    wrapper.appendChild(label);
+    wrapper.appendChild(select);
+
+    // Append the wrapper to the shadow root
     this.shadowRoot.appendChild(style);
-    this.shadowRoot.appendChild(label);
-    this.shadowRoot.appendChild(select);
+    this.shadowRoot.appendChild(wrapper);
 
     // Add event listener for changes
     select.addEventListener('change', (event) => {

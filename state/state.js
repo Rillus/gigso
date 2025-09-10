@@ -4,7 +4,10 @@ const state = {
     loopActive: false,
     currentChord: null,
     song: null,
-    instrument: 'guitar'
+    instrument: 'guitar',
+    songKey: null,
+    songScale: 'major',
+    isKeySet: false
 }
 
 // getters
@@ -13,6 +16,9 @@ const loopActive = () => state.loopActive;
 const currentChord = () => state.currentChord;
 const song = () => state.song;
 const instrument = () => state.instrument;
+const songKey = () => state.songKey;
+const songScale = () => state.songScale;
+const isKeySet = () => state.isKeySet;
 // setters
 const setIsPlaying = (value) => {
     state.isPlaying = value;
@@ -34,6 +40,18 @@ const setInstrument = (value) => {
     state.instrument = value;
 }
 
+const setSongKey = (value) => {
+    state.songKey = value;
+}
+
+const setSongScale = (value) => {
+    state.songScale = value;
+}
+
+const setIsKeySet = (value) => {
+    state.isKeySet = value;
+}
+
 export default {
     isPlaying,
     setIsPlaying,
@@ -44,5 +62,11 @@ export default {
     song,
     setSong,
     instrument,
-    setInstrument
+    setInstrument,
+    songKey,
+    setSongKey,
+    songScale,
+    setSongScale,
+    isKeySet,
+    setIsKeySet
 }
