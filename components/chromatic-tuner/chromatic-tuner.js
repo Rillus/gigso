@@ -81,30 +81,32 @@ export default class ChromaticTuner extends BaseComponent {
         position: absolute;
         left: 50%;
         transform: translateX(-50%);
-        color: #222;
+        color: #fff;
         font-family: Arial, sans-serif;
         font-weight: bold;
+        font-size: 1.2rem;
         z-index: 5;
         pointer-events: none;
         user-select: none;
         text-shadow: 0 0 5px #0008;
+        z-index: 10;
       }
       .current-frequency { 
-        top: 25px; 
-        font-size: 1.0rem;
+        bottom: 17px; 
+        font-size: 0.8rem;
       }
       .current-note { 
-        top: 45px; 
-        font-size: 1.2rem;
+        bottom: 0px; 
+        font-size: 0.8rem;
       }
       .current-instrument { 
-        bottom: 15px; 
+        bottom: 0px; 
         font-size: 0.9rem;
-        opacity: 0.8;
+        opacity: 0;
       }
       .tuner-ticks {
         position: absolute;
-        left: 0; top: 0; width: 100%; height: 100%;
+        left: -10px; top: 0; width: 100%; height: 100%;
         z-index: 2;
         pointer-events: none;
       }
@@ -153,6 +155,8 @@ export default class ChromaticTuner extends BaseComponent {
     this.currentInstrument = 'guitar';
     this.volumeThreshold = 0.01; // Minimum RMS volume to activate tuner (adjust as needed)
     this.currentVolume = 0;
+    this.isTuningActive = true; // Start in tuning mode
+    this.referenceFrequency = 440; // Standard A4 reference frequency
     this._boundFrequencyHandler = this.handleFrequencyDetected.bind(this);
     this._boundInstrumentChange = this.handleInstrumentSelected.bind(this);
     this._boundVolumeHandler = this.handleVolumeDetected.bind(this);
@@ -193,6 +197,11 @@ export default class ChromaticTuner extends BaseComponent {
 
   handleFrequencyDetected(event) {
     const { frequency, note, cents } = event.detail;
+    
+    // Only process if tuning is active
+    if (!this.isTuningActive) {
+      return;
+    }
     
     // Only process frequency data if volume is above threshold
     if (this.currentVolume < this.volumeThreshold) {
@@ -255,19 +264,19 @@ export default class ChromaticTuner extends BaseComponent {
     }
 
     // Draw labels
-    ticks.forEach((tick) => {
-      const angle = minAngle + ((tick.value + 50) / 100) * (maxAngle - minAngle);
-      const rad = (angle - 90) * Math.PI / 180;
-      const x = centreX + labelRadius * Math.cos(rad);
-      const y = centreY + labelRadius * Math.sin(rad);
-      const label = document.createElement('div');
-      label.className = 'tuner-tick-label';
-      label.textContent = tick.label;
-      label.style.left = `${x}px`;
-      label.style.top = `${y}px`;
-      label.style.transform = `translate(-50%, -50%) rotate(${angle}deg)`;
-      ticksContainer.appendChild(label);
-    });
+    // ticks.forEach((tick) => {
+    //   const angle = minAngle + ((tick.value + 50) / 100) * (maxAngle - minAngle);
+    //   const rad = (angle - 90) * Math.PI / 180;
+    //   const x = centreX + labelRadius * Math.cos(rad);
+    //   const y = centreY + labelRadius * Math.sin(rad);
+    //   const label = document.createElement('div');
+    //   label.className = 'tuner-tick-label';
+    //   label.textContent = tick.label;
+    //   label.style.left = `${x}px`;
+    //   label.style.top = `${y}px`;
+    //   label.style.transform = `translate(-50%, -50%) rotate(${angle}deg)`;
+    //   ticksContainer.appendChild(label);
+    // });
   }
 
   findClosestNote(frequency) {
@@ -294,6 +303,110 @@ export default class ChromaticTuner extends BaseComponent {
   setNeedleAngle(angle) {
     const needle = this.shadowRoot.querySelector('.tuner-needle');
     needle.style.transform = `translateX(-50%) rotate(${angle}deg)`;
+  }
+
+  // Public API methods for external control
+  setInstrument(instrumentName) {
+    if (INSTRUMENT_RANGES[instrumentName]) {
+      this.currentInstrument = instrumentName;
+      this.updateInstrumentDisplay();
+      this.renderTicks();
+      
+      // Dispatch instrument changed event
+      this.dispatchEvent(new CustomEvent('instrument-changed', {
+        detail: { instrument: instrumentName },
+        bubbles: true,
+        composed: true
+      }));
+    } else {
+      throw new Error(`Unsupported instrument: ${instrumentName}`);
+    }
+  }
+
+  setReferenceFrequency(frequency) {
+    if (frequency > 0 && frequency < 1000) {
+      this.referenceFrequency = frequency;
+      
+      // Dispatch reference frequency changed event
+      this.dispatchEvent(new CustomEvent('reference-changed', {
+        detail: { frequency: frequency },
+        bubbles: true,
+        composed: true
+      }));
+    } else {
+      throw new Error(`Invalid reference frequency: ${frequency}`);
+    }
+  }
+
+  setSensitivity(level) {
+    const sensitivityMap = {
+      'low': 0.05,
+      'medium': 0.01,
+      'high': 0.005
+    };
+    
+    if (sensitivityMap[level] !== undefined) {
+      this.volumeThreshold = sensitivityMap[level];
+      
+      // Dispatch sensitivity changed event
+      this.dispatchEvent(new CustomEvent('sensitivity-changed', {
+        detail: { level: level, threshold: this.volumeThreshold },
+        bubbles: true,
+        composed: true
+      }));
+    } else {
+      throw new Error(`Invalid sensitivity level: ${level}`);
+    }
+  }
+
+  startTuning() {
+    // Enable tuning mode (currently always active, but could add state management)
+    this.isTuningActive = true;
+    
+    // Dispatch tuning started event
+    this.dispatchEvent(new CustomEvent('tuning-started', {
+      detail: { active: true },
+      bubbles: true,
+      composed: true
+    }));
+  }
+
+  stopTuning() {
+    // Disable tuning mode
+    this.isTuningActive = false;
+    
+    // Reset display
+    this.setNeedleAngle(-50);
+    this.shadowRoot.querySelector('.current-frequency').textContent = '-- Hz';
+    this.shadowRoot.querySelector('.current-note').textContent = '--';
+    
+    // Dispatch tuning stopped event
+    this.dispatchEvent(new CustomEvent('tuning-stopped', {
+      detail: { active: false },
+      bubbles: true,
+      composed: true
+    }));
+  }
+
+  getInstrument() {
+    return this.currentInstrument;
+  }
+
+  getReferenceFrequency() {
+    return this.referenceFrequency;
+  }
+
+  getSensitivity() {
+    const thresholdMap = {
+      0.05: 'low',
+      0.01: 'medium',
+      0.005: 'high'
+    };
+    return thresholdMap[this.volumeThreshold] || 'medium';
+  }
+
+  isTuning() {
+    return this.isTuningActive;
   }
 
   disconnectedCallback() {
