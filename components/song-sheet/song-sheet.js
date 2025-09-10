@@ -120,7 +120,6 @@ export default class SongSheet extends BaseComponent {
                 border-left: 1px solid #e0e0e0;
                 position: sticky;
                 top: 0;
-                height: 100vh;
                 overflow-y: auto;
                 flex-shrink: 0;
             }

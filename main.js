@@ -29,6 +29,8 @@ import VUMeter from './components/vu-meter/vu-meter.js';
 import FrequencyMonitor from './components/frequency-monitor/frequency-monitor.js';
 import EQDisplay from './components/eq-display/eq-display.js';
 import Tuner from './components/chromatic-tuner/chromatic-tuner.js';
+import Fretboard from './components/fretboard/fretboard.js';
+
 const appContainer = document.getElementById('app');
 
 const elementsToAdd = [
@@ -36,8 +38,20 @@ const elementsToAdd = [
         tag: GigsoLogo,
     },
     {
-        tag: GigsoMenu,
+        tag: InstrumentSelect,
+        emittedEvents: [
+            {
+                name: 'instrument-selected',
+                function: (event) => {
+                    console.log('event', event)
+                    setInstrument(event.detail);
+                }
+            }
+        ]
     },
+    // {
+    //     tag: GigsoMenu,
+    // },
     // {
     //     tag: CurrentChord,
     // },
@@ -57,9 +71,6 @@ const elementsToAdd = [
     //     tag: 'chord-diagram',
     // },
     {
-        tag: GigsoKeyboard,
-    },
-    {
         tag: RecordCollection,
         emittedEvents: [
             {
@@ -71,20 +82,11 @@ const elementsToAdd = [
             }
         ]
     },
+    {
+        tag: GigsoKeyboard,
+    },
     {  
         tag: TransportControls,
-    },
-    {
-        tag: InstrumentSelect,
-        emittedEvents: [
-            {
-                name: 'instrument-selected',
-                function: (event) => {
-                    console.log('event', event)
-                    setInstrument(event.detail);
-                }
-            }
-        ]
     },
     {
         tag: PianoRoll,
@@ -109,18 +111,18 @@ const elementsToAdd = [
             }
         ]
     },
-    {
-        tag: AddChord,
-        emittedEvents: [
-            {
-                name: 'add-chord',
-                function: (event) => {
-                    const chord = event.detail;
-                    dispatchComponentEvent('piano-roll', 'add-chord', chord);
-                }
-            }
-        ]
-    },
+    // {
+    //     tag: AddChord,
+    //     emittedEvents: [
+    //         {
+    //             name: 'add-chord',
+    //             function: (event) => {
+    //                 const chord = event.detail;
+    //                 dispatchComponentEvent('piano-roll', 'add-chord', chord);
+    //             }
+    //         }
+    //     ]
+    // },
     {
         tag: HandPan,
         emittedEvents: [
@@ -145,11 +147,14 @@ const elementsToAdd = [
         tag: VUMeter,
     },
     {
+        tag: EQDisplay,
+    },
+    {
         tag: FrequencyMonitor,
     },
     {
-        tag: EQDisplay,
-    }
+        tag: Fretboard,
+    },
 ];
 
 document.addEventListener('DOMContentLoaded', async () => {
