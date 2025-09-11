@@ -1,6 +1,7 @@
 import { generateScaleNotes, getNoteFrequency } from '../../helpers/scaleUtils.js';
 import { applyNoteColor, getBaseNote } from '../../helpers/noteColorUtils.js';
 import { checkToneJsStatus, getAudioErrorMessage, logAudioStatus } from '../../helpers/audioUtils.js';
+import audioManager from '../../helpers/audioManager.js';
 
 export default class HandPan extends HTMLElement {
     constructor() {
@@ -16,6 +17,8 @@ export default class HandPan extends HTMLElement {
         this.activeTouches = new Map(); // Track multiple touches
         this.activeNotes = new Set(); // Track currently playing notes
         this.lastPlayTime = 0; // Track last play time for debouncing
+        this.maxSimultaneousNotes = 6; // Limit simultaneous notes for performance
+        this.minNoteInterval = 20; // Minimum time between notes (ms)
         
         // Create synthesiser
         this.createHandPanSynth();
@@ -67,6 +70,12 @@ export default class HandPan extends HTMLElement {
         this.boundHandleSongKeySet = this.handleSongKeySet.bind(this);
         document.addEventListener('key-changed', this.boundHandleSongKeyChange);
         document.addEventListener('key-set', this.boundHandleSongKeySet);
+        
+        // Add keyboard listeners for number keys 1-8
+        this.boundHandleKeydown = this.handleKeydown.bind(this);
+        this.boundHandleKeyup = this.handleKeyup.bind(this);
+        document.addEventListener('keydown', this.boundHandleKeydown);
+        document.addEventListener('keyup', this.boundHandleKeyup);
         
         this.addEventListener('mute', () => {
             this.isMuted = true;
@@ -801,6 +810,130 @@ export default class HandPan extends HTMLElement {
         }
     }
 
+    /**
+     * Handle keyboard keydown events for number keys 1-8
+     * Maps number keys to handpan tone fields clockwise from 12 o'clock
+     */
+    handleKeydown(event) {
+        // Only handle number keys 1-8
+        const key = event.key;
+        if (!/^[1-8]$/.test(key)) {
+            return;
+        }
+
+        // Prevent default behaviour for number keys
+        event.preventDefault();
+
+        // Check if handpan is muted
+        if (this.isMuted) {
+            return;
+        }
+
+        // Convert key to index (1-8 becomes 0-7)
+        const index = parseInt(key) - 1;
+        
+        // Check if we have sorted notes available
+        if (!this.sortedNotes || !this.sortedNotes[index]) {
+            console.warn('HandPan: No note available for key', key);
+            return;
+        }
+
+        const note = this.sortedNotes[index];
+        const noteId = `keyboard-${key}-${index}`;
+        
+        // Check if this key is already being played (prevent duplicate triggers)
+        if (this.activeNotes.has(noteId)) {
+            return;
+        }
+
+        console.log('HandPan: Keyboard keydown - Playing note', note, 'at index', index, 'for key', key);
+        
+        // Performance optimization: Use requestAnimationFrame for visual updates
+        requestAnimationFrame(() => {
+            // Add visual feedback to the corresponding tone field
+            if (this.toneFields && this.toneFields[index]) {
+                const field = this.toneFields[index];
+                field.classList.add('active');
+                field.setAttribute('aria-pressed', 'true');
+                
+                // Create ripple effect at the centre of the field
+                this.createRippleAtCentre(field);
+            }
+        });
+        
+        // Play the note (non-blocking)
+        this.playNote(note, '2n').catch(error => {
+            console.warn('HandPan: Error playing note from keyboard:', error);
+        });
+        
+        // Track active note
+        this.activeNotes.add(noteId);
+        
+        // Dispatch note-played event
+        this.dispatchNoteEvent(note, index);
+    }
+
+    /**
+     * Handle keyboard keyup events for number keys 1-8
+     */
+    handleKeyup(event) {
+        // Only handle number keys 1-8
+        const key = event.key;
+        if (!/^[1-8]$/.test(key)) {
+            return;
+        }
+
+        // Prevent default behaviour for number keys
+        event.preventDefault();
+
+        // Convert key to index (1-8 becomes 0-7)
+        const index = parseInt(key) - 1;
+        const noteId = `keyboard-${key}-${index}`;
+        
+        console.log('HandPan: Keyboard keyup - Stopping note at index', index, 'for key', key);
+        
+        // Remove from active notes
+        this.activeNotes.delete(noteId);
+        
+        // Remove visual feedback immediately
+        if (this.toneFields && this.toneFields[index]) {
+            const field = this.toneFields[index];
+            field.classList.remove('active');
+            field.setAttribute('aria-pressed', 'false');
+        }
+    }
+
+    /**
+     * Create a ripple effect at the centre of a tone field
+     * Used for keyboard interactions where we don't have mouse coordinates
+     */
+    createRippleAtCentre(element) {
+        if (!element) return;
+        
+        const ripple = document.createElement('span');
+        ripple.className = 'ripple';
+        
+        const rect = element.getBoundingClientRect();
+        const size = Math.max(rect.width, rect.height);
+        
+        // Position ripple at the centre of the element
+        const x = (rect.width - size) / 2;
+        const y = (rect.height - size) / 2;
+        
+        ripple.style.width = ripple.style.height = size + 'px';
+        ripple.style.left = x + 'px';
+        ripple.style.top = y + 'px';
+        
+        element.appendChild(ripple);
+        
+        // Memory management: Clean up ripple after animation
+        setTimeout(() => {
+            if (ripple && ripple.parentNode) {
+                ripple.remove();
+            }
+        }, 600);
+    }
+
     async handleTouchStart(event, index) {
         if (this.isMuted) return;
 
@@ -1022,10 +1155,25 @@ export default class HandPan extends HTMLElement {
             
             // Debounce rapid successive calls for performance
             const now = Date.now();
-            if (now - this.lastPlayTime < 50) { // 50ms debounce
+            if (now - this.lastPlayTime < this.minNoteInterval) {
                 return;
             }
             this.lastPlayTime = now;
+            
+            // Limit simultaneous notes to prevent audio dropouts
+            if (this.activeNotes.size >= this.maxSimultaneousNotes) {
+                // Remove oldest note (just from tracking, audio will decay naturally)
+                const firstNote = this.activeNotes.values().next().value;
+                this.activeNotes.delete(firstNote);
+            }
+            
+            // Add to active notes tracking
+            this.activeNotes.add(note);
+            
+            // Auto-remove from active notes after duration (8n ≈ 500ms)
+            setTimeout(() => {
+                this.activeNotes.delete(note);
+            }, 500);
             
             // Validate note before playing
             if (!note || typeof note !== 'string') {
@@ -1037,7 +1185,9 @@ export default class HandPan extends HTMLElement {
             if (typeof this.synth.triggerAttackRelease === 'function') {
                 this.synth.triggerAttackRelease(note, "8n");
             } else {
-                console.warn('HandPan: Synthesiser triggerAttackRelease method not available');
+                console.warn('HandPan: Local synthesiser not available, using AudioManager fallback');
+                // Fallback to AudioManager for reliable audio
+                audioManager.playNote(note, "8n", "handpan");
             }
             
         } catch (error) {
@@ -1376,6 +1526,12 @@ export default class HandPan extends HTMLElement {
             }
             if (this.boundHandleSongKeySet) {
                 document.removeEventListener('key-set', this.boundHandleSongKeySet);
+            }
+            if (this.boundHandleKeydown) {
+                document.removeEventListener('keydown', this.boundHandleKeydown);
+            }
+            if (this.boundHandleKeyup) {
+                document.removeEventListener('keyup', this.boundHandleKeyup);
             }
             
             // Clean up audio effects if they exist

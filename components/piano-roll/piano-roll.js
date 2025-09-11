@@ -80,10 +80,51 @@ export default class PianoRoll extends HTMLElement {
                 .chord-display {
                     margin-top: 10px;
                     font-size: 14px;
-                    white-space: pre-wrap;
                     background: #f0f0f0;
                     padding: 10px;
                     border: 1px solid #ccc;
+                    position: relative;
+                }
+                .chord-display-header {
+                    display: flex;
+                    justify-content: space-between;
+                    align-items: center;
+                    cursor: pointer;
+                    user-select: none;
+                    font-weight: bold;
+                    margin-bottom: 10px;
+                    padding: 5px;
+                    background: #e8e8e8;
+                    border-radius: 3px;
+                }
+                .chord-display-content {
+                    overflow: hidden;
+                    transition: all 0.3s ease-out;
+                    white-space: pre-wrap;
+                }
+                .chord-display.collapsed .chord-display-content {
+                    max-height: 0;
+                    opacity: 0;
+                    padding: 0;
+                    margin: 0;
+                }
+                .chord-display.expanded .chord-display-content {
+                    max-height: 200px;
+                    opacity: 1;
+                    padding: 10px;
+                    margin-bottom: 10px;
+                    overflow: auto;
+                }
+                .toggle-arrow {
+                    transition: transform 0.3s ease;
+                    font-size: 16px;
+                    color: #666;
+                }
+                .chord-display.collapsed .toggle-arrow {
+                    transform: rotate(0deg);
+                }
+                .chord-display.expanded .toggle-arrow {
+                    transform: rotate(180deg);
                 }
                 .chordName {
                     width: 100%;
@@ -94,10 +135,17 @@ export default class PianoRoll extends HTMLElement {
                 <div class="reel"></div>
                 <div class="play-head"></div>
             </div>
-            <div class="chord-display"></div>
+            <div class="chord-display collapsed">
+                <div class="chord-display-header">
+                    <span>Chord Data</span>
+                    <span class="toggle-arrow">▼</span>
+                </div>
+                <div class="chord-display-content"></div>
+            </div>
         `;
         this.reel = this.shadowRoot.querySelector('.reel');
         this.chordDisplay = this.shadowRoot.querySelector('.chord-display');
+        this.chordDisplayContent = this.shadowRoot.querySelector('.chord-display-content');
         this.chords = [];
         this.isPlaying = false;
         this.currentPosition = 0;
@@ -107,6 +155,9 @@ export default class PianoRoll extends HTMLElement {
     }
 
     connectedCallback() {
+        // Initialize chord display content
+        this.updateChordDisplay();
+        
         // Add a placeholder message when no chords are present
         if (this.chords.length === 0) {
             this.showPlaceholder();
@@ -148,6 +199,12 @@ export default class PianoRoll extends HTMLElement {
                 this.setInstrument(event.detail)
             }}
         ])
+
+        // Add toggle functionality for chord display
+        const chordDisplayHeader = this.shadowRoot.querySelector('.chord-display-header');
+        chordDisplayHeader.addEventListener('click', () => {
+            this.toggleChordDisplay();
+        });
 
         // Dispatch a "ready" event when the component is fully initialized
         const readyEvent = new CustomEvent('isReady');
@@ -291,7 +348,12 @@ export default class PianoRoll extends HTMLElement {
     }
 
     updateChordDisplay() {
-        this.chordDisplay.textContent = JSON.stringify(this.chords, null, 2);
+        this.chordDisplayContent.textContent = JSON.stringify(this.chords, null, 2);
+    }
+
+    toggleChordDisplay() {
+        this.chordDisplay.classList.toggle('collapsed');
+        this.chordDisplay.classList.toggle('expanded');
     }
 
     play() {

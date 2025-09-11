@@ -224,4 +224,161 @@ describe('HandPan Component', () => {
         const styleElement = handPan.shadowRoot.querySelector('style');
         expect(styleElement).toBeInTheDocument();
     });
+
+    describe('Keyboard Controls', () => {
+        beforeEach(() => {
+            handPan = document.createElement('hand-pan');
+            document.body.appendChild(handPan);
+            
+            const mockSynth = { triggerAttackRelease: jest.fn() };
+            handPan.synth = mockSynth;
+            handPan.isMuted = false;
+        });
+
+        test('should play note 1 when number key 1 is pressed', async () => {
+            // Arrange
+            const eventSpy = jest.fn();
+            handPan.addEventListener('note-played', eventSpy);
+
+            // Act
+            const keydownEvent = new KeyboardEvent('keydown', { key: '1', bubbles: true });
+            document.dispatchEvent(keydownEvent);
+
+            // Wait for async processing
+            await new Promise(resolve => setTimeout(resolve, 10));
+
+            // Assert
+            expect(handPan.synth.triggerAttackRelease).toHaveBeenCalled();
+            expect(eventSpy).toHaveBeenCalled();
+        });
+
+        test('should play note 2 when number key 2 is pressed', async () => {
+            // Arrange
+            const eventSpy = jest.fn();
+            handPan.addEventListener('note-played', eventSpy);
+
+            // Act
+            const keydownEvent = new KeyboardEvent('keydown', { key: '2', bubbles: true });
+            document.dispatchEvent(keydownEvent);
+
+            // Wait for async processing
+            await new Promise(resolve => setTimeout(resolve, 10));
+
+            // Assert
+            expect(handPan.synth.triggerAttackRelease).toHaveBeenCalled();
+            expect(eventSpy).toHaveBeenCalled();
+        });
+
+        test('should play all notes 1-8 with corresponding number keys', async () => {
+            // Arrange
+            const eventSpy = jest.fn();
+            handPan.addEventListener('note-played', eventSpy);
+
+            // Act & Assert - Test all number keys 1-8
+            for (let i = 1; i <= 8; i++) {
+                const keydownEvent = new KeyboardEvent('keydown', { key: i.toString(), bubbles: true });
+                document.dispatchEvent(keydownEvent);
+                
+                // Wait for async processing
+                await new Promise(resolve => setTimeout(resolve, 10));
+                
+                // Clear the mock to test each key individually
+                handPan.synth.triggerAttackRelease.mockClear();
+            }
+
+            // Should have been called 8 times total
+            expect(eventSpy).toHaveBeenCalledTimes(8);
+        });
+
+        test('should not play notes when other keys are pressed', async () => {
+            // Arrange
+            const eventSpy = jest.fn();
+            handPan.addEventListener('note-played', eventSpy);
+
+            // Act - Test various non-number keys
+            const testKeys = ['a', 'b', 'c', '9', '0', 'Enter', 'Space', 'ArrowUp'];
+            
+            for (const key of testKeys) {
+                const keydownEvent = new KeyboardEvent('keydown', { key, bubbles: true });
+                document.dispatchEvent(keydownEvent);
+                
+                // Wait for async processing
+                await new Promise(resolve => setTimeout(resolve, 10));
+            }
+
+            // Assert - No notes should have been played
+            expect(handPan.synth.triggerAttackRelease).not.toHaveBeenCalled();
+            expect(eventSpy).not.toHaveBeenCalled();
+        });
+
+        test('should not play notes when handpan is muted', async () => {
+            // Arrange
+            handPan.isMuted = true;
+            const eventSpy = jest.fn();
+            handPan.addEventListener('note-played', eventSpy);
+
+            // Act
+            const keydownEvent = new KeyboardEvent('keydown', { key: '1', bubbles: true });
+            document.dispatchEvent(keydownEvent);
+
+            // Wait for async processing
+            await new Promise(resolve => setTimeout(resolve, 10));
+
+            // Assert
+            expect(handPan.synth.triggerAttackRelease).not.toHaveBeenCalled();
+            expect(eventSpy).not.toHaveBeenCalled();
+        });
+
+        test('should add active visual state when key is pressed', async () => {
+            // Act
+            const keydownEvent = new KeyboardEvent('keydown', { key: '1', bubbles: true });
+            document.dispatchEvent(keydownEvent);
+
+            // Wait for requestAnimationFrame and visual updates
+            await new Promise(resolve => requestAnimationFrame(() => {
+                setTimeout(resolve, 10);
+            }));
+
+            // Assert - Check that active notes are tracked
+            expect(handPan.activeNotes.size).toBeGreaterThan(0);
+        });
+
+        test('should remove active visual state when key is released', async () => {
+            // Act - Press key
+            const keydownEvent = new KeyboardEvent('keydown', { key: '1', bubbles: true });
+            document.dispatchEvent(keydownEvent);
+
+            // Wait for processing
+            await new Promise(resolve => setTimeout(resolve, 10));
+
+            // Act - Release key
+            const keyupEvent = new KeyboardEvent('keyup', { key: '1', bubbles: true });
+            document.dispatchEvent(keyupEvent);
+
+            // Wait for processing
+            await new Promise(resolve => setTimeout(resolve, 10));
+
+            // Assert - Active notes should be cleared
+            expect(handPan.activeNotes.size).toBe(0);
+        });
+
+
+        test('should map number keys to correct note positions clockwise from 12 o\'clock', async () => {
+            // Arrange
+            const eventSpy = jest.fn();
+            handPan.addEventListener('note-played', eventSpy);
+
+            // Act - Press key 1 (should be 12 o'clock position)
+            const keydownEvent = new KeyboardEvent('keydown', { key: '1', bubbles: true });
+            document.dispatchEvent(keydownEvent);
+
+            // Wait for async processing
+            await new Promise(resolve => setTimeout(resolve, 10));
+
+            // Assert - Should play the first note in sortedNotes (12 o'clock)
+            expect(eventSpy).toHaveBeenCalledTimes(1);
+            const eventDetail = eventSpy.mock.calls[0][0].detail;
+            expect(eventDetail.index).toBe(0); // First position (12 o'clock)
+        });
+    });
 }); 

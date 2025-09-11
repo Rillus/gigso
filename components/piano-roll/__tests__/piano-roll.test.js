@@ -27,8 +27,8 @@ describe('PianoRoll Component', () => {
         fireEvent(pianoRollElement, new CustomEvent('add-chord', { detail: chord }));
 
         expect(pianoRollElement.chords).toContainEqual(chord);
-        const chordDisplayText = pianoRollElement.shadowRoot.querySelector('.chord-display').textContent;
-        expect(JSON.parse(chordDisplayText)).toEqual([chord]);
+        const chordDisplayContent = pianoRollElement.shadowRoot.querySelector('.chord-display-content');
+        expect(JSON.parse(chordDisplayContent.textContent)).toEqual([chord]);
     });
 
     test('should remove a chord when the remove button is clicked', () => {
@@ -39,7 +39,7 @@ describe('PianoRoll Component', () => {
         fireEvent.click(removeButton);
 
         expect(pianoRollElement.chords).toEqual([]);
-        expect(pianoRollElement.shadowRoot.querySelector('.chord-display')).toHaveTextContent('[]');
+        expect(pianoRollElement.shadowRoot.querySelector('.chord-display-content')).toHaveTextContent('[]');
     });
 
     test('should dispatch play-chord event when play is called', () => {
@@ -77,5 +77,75 @@ describe('PianoRoll Component', () => {
         pianoRollElement.play();
         expect(pianoRollElement.isPlaying).toBe(true);
         expect(loopActive()).toBe(true);
+    });
+
+    describe('Chord Display Collapsible Functionality', () => {
+        test('should be collapsed by default', () => {
+            const chordDisplay = pianoRollElement.shadowRoot.querySelector('.chord-display');
+            expect(chordDisplay).toHaveClass('collapsed');
+            expect(chordDisplay).not.toHaveClass('expanded');
+        });
+
+        test('should have a toggle header with down arrow', () => {
+            const header = pianoRollElement.shadowRoot.querySelector('.chord-display-header');
+            const arrow = pianoRollElement.shadowRoot.querySelector('.toggle-arrow');
+            
+            expect(header).toBeInTheDocument();
+            expect(arrow).toBeInTheDocument();
+            expect(arrow.textContent).toBe('▼');
+        });
+
+        test('should toggle between collapsed and expanded when header is clicked', () => {
+            const chordDisplay = pianoRollElement.shadowRoot.querySelector('.chord-display');
+            const header = pianoRollElement.shadowRoot.querySelector('.chord-display-header');
+            
+            // Initially collapsed
+            expect(chordDisplay).toHaveClass('collapsed');
+            expect(chordDisplay).not.toHaveClass('expanded');
+            
+            // Click to expand
+            fireEvent.click(header);
+            expect(chordDisplay).toHaveClass('expanded');
+            expect(chordDisplay).not.toHaveClass('collapsed');
+            
+            // Click to collapse again
+            fireEvent.click(header);
+            expect(chordDisplay).toHaveClass('collapsed');
+            expect(chordDisplay).not.toHaveClass('expanded');
+        });
+
+        test('should update chord display content when chords are added', () => {
+            const chord = { name: 'C Major', notes: ['C4', 'E4', 'G4'], duration: 1, delay: 0 };
+            fireEvent(pianoRollElement, new CustomEvent('add-chord', { detail: chord }));
+
+            const chordDisplayContent = pianoRollElement.shadowRoot.querySelector('.chord-display-content');
+            expect(JSON.parse(chordDisplayContent.textContent)).toEqual([chord]);
+        });
+
+        test('should have proper CSS classes for collapsed state', () => {
+            const chordDisplay = pianoRollElement.shadowRoot.querySelector('.chord-display');
+            const content = pianoRollElement.shadowRoot.querySelector('.chord-display-content');
+            const arrow = pianoRollElement.shadowRoot.querySelector('.toggle-arrow');
+            
+            expect(chordDisplay).toHaveClass('collapsed');
+            expect(chordDisplay).not.toHaveClass('expanded');
+            expect(content).toBeInTheDocument();
+            expect(arrow).toBeInTheDocument();
+        });
+
+        test('should have proper CSS classes for expanded state after toggle', () => {
+            const chordDisplay = pianoRollElement.shadowRoot.querySelector('.chord-display');
+            const content = pianoRollElement.shadowRoot.querySelector('.chord-display-content');
+            const arrow = pianoRollElement.shadowRoot.querySelector('.toggle-arrow');
+            const header = pianoRollElement.shadowRoot.querySelector('.chord-display-header');
+            
+            // Toggle to expanded
+            fireEvent.click(header);
+            
+            expect(chordDisplay).toHaveClass('expanded');
+            expect(chordDisplay).not.toHaveClass('collapsed');
+            expect(content).toBeInTheDocument();
+            expect(arrow).toBeInTheDocument();
+        });
     });
 }); 

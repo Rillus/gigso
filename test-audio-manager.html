@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AudioManager Integration Test - Gigso</title>
+    <style>
+        body {
+            font-family: 'Courier New', monospace;
+            background: #1a1a1a;
+            color: #e0e0e0;
+            padding: 20px;
+            line-height: 1.6;
+        }
+        
+        .test-container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: #2d2d2d;
+            padding: 20px;
+            border-radius: 10px;
+            border: 1px solid #444;
+        }
+        
+        h1 {
+            color: #66ff66;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        
+        .test-section {
+            background: #333;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 8px;
+            border-left: 4px solid #66ff66;
+        }
+        
+        button {
+            background: #444;
+            color: #e0e0e0;
+            border: 1px solid #666;
+            padding: 10px 20px;
+            margin: 5px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-family: inherit;
+        }
+        
+        button:hover {
+            background: #555;
+        }
+        
+        .test-button {
+            background: #1e5f1e;
+            border-color: #66ff66;
+        }
+        
+        .test-button:hover {
+            background: #2a7a2a;
+        }
+        
+        #console-output {
+            background: #000;
+            color: #00ff00;
+            padding: 15px;
+            border-radius: 5px;
+            font-size: 12px;
+            height: 300px;
+            overflow-y: auto;
+            white-space: pre-wrap;
+            margin-top: 20px;
+            border: 1px solid #333;
+        }
+        
+        .instructions {
+            background: #2d3d4d;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            border-left: 4px solid #4da6ff;
+        }
+    </style>
+</head>
+<body>
+    <div class="test-container">
+        <h1>🎵 AudioManager Integration Test</h1>
+        
+        <div class="instructions">
+            <h3>📋 Test Purpose</h3>
+            <p>This test verifies that the AudioManager system correctly prevents audio dropouts when playing simultaneous audio from piano roll and handpan components.</p>
+            <p><strong>Original Issue:</strong> Audio would stop when playing chords from piano roll while also playing handpan via keyboard.</p>
+        </div>
+
+        <div class="test-section">
+            <h3>🧪 Manual Tests</h3>
+            <p>Click the buttons below to simulate the problematic scenario:</p>
+            <button class="test-button" onclick="testRapidChords()">🎹 Test Rapid Chord Playback</button>
+            <button class="test-button" onclick="testSimultaneousAudio()">🥁 Test Piano Roll + HandPan</button>
+            <button class="test-button" onclick="testStressTest()">🚀 Stress Test (Heavy Load)</button>
+            <button onclick="audioDebugger.enable()">📊 Enable Audio Debug Panel</button>
+        </div>
+        
+        <div class="test-section">
+            <h3>🔧 Controls</h3>
+            <button onclick="runAllTests()">▶️ Run All Automated Tests</button>
+            <button onclick="Actions.stopSong()">⏹️ Emergency Stop All Audio</button>
+            <button onclick="clearConsole()">🗑️ Clear Console</button>
+            <button onclick="showAudioStatus()">📊 Show Audio Status</button>
+        </div>
+
+        <div class="test-section">
+            <h3>⌨️ Keyboard Shortcuts</h3>
+            <p><strong>Ctrl+Shift+A:</strong> Toggle Audio Debug Panel</p>
+            <p><strong>Space:</strong> Emergency stop all audio</p>
+        </div>
+
+        <div class="test-section">
+            <h3>📺 Console Output</h3>
+            <div id="console-output"></div>
+        </div>
+    </div>
+
+    <!-- Load Tone.js -->
+    <script src="https://unpkg.com/tone@14.7.77/build/Tone.js"></script>
+    
+    <!-- Load Gigso AudioManager system -->
+    <script type="module">
+        import audioManager from './helpers/audioManager.js';
+        import audioDebugger from './helpers/audioDebugger.js';
+        import Actions from './actions/actions.js';
+        
+        // Make available globally for testing
+        window.audioManager = audioManager;
+        window.audioDebugger = audioDebugger;
+        window.Actions = Actions;
+        
+        // Console output capture for the test UI
+        const consoleOutput = document.getElementById('console-output');
+        const originalLog = console.log;
+        const originalWarn = console.warn;
+        const originalError = console.error;
+        
+        const logToUI = (message, type = 'log') => {
+            const timestamp = new Date().toLocaleTimeString();
+            const color = type === 'error' ? '#ff6666' : type === 'warn' ? '#ffaa66' : '#00ff00';
+            consoleOutput.innerHTML += `<span style="color: #666;">[${timestamp}]</span> <span style="color: ${color};">${message}</span>\n`;
+            consoleOutput.scrollTop = consoleOutput.scrollHeight;
+        };
+        
+        console.log = (...args) => {
+            originalLog(...args);
+            logToUI(args.join(' '), 'log');
+        };
+        
+        console.warn = (...args) => {
+            originalWarn(...args);
+            logToUI('⚠️  ' + args.join(' '), 'warn');
+        };
+        
+        console.error = (...args) => {
+            originalError(...args);
+            logToUI('❌ ' + args.join(' '), 'error');
+        };
+        
+        // Test functions
+        window.testRapidChords = () => {
+            console.log('🎹 Testing rapid chord playback...');
+            const testChords = [
+                { name: 'C Major', notes: ['C4', 'E4', 'G4'] },
+                { name: 'F Major', notes: ['F4', 'A4', 'C5'] },
+                { name: 'G Major', notes: ['G4', 'B4', 'D5'] },
+                { name: 'Am', notes: ['A4', 'C5', 'E5'] }
+            ];
+            
+            testChords.forEach((chord, index) => {
+                setTimeout(() => {
+                    Actions.playChord({ chord, duration: '4n' });
+                }, index * 200);
+            });
+        };
+        
+        window.testSimultaneousAudio = async () => {
+            console.log('🥁 Testing simultaneous piano roll + handpan...');
+            
+            // Piano roll chord
+            Actions.playChord({ 
+                chord: { name: 'C Major', notes: ['C4', 'E4', 'G4'] }, 
+                duration: '2n' 
+            });
+            
+            // Handpan notes with slight delays (simulating user keyboard input)
+            setTimeout(() => audioManager.playNote('C5', '8n', 'handpan'), 100);
+            setTimeout(() => audioManager.playNote('D5', '8n', 'handpan'), 200);
+            setTimeout(() => audioManager.playNote('E5', '8n', 'handpan'), 300);
+            setTimeout(() => audioManager.playNote('G5', '8n', 'handpan'), 400);
+        };
+        
+        window.testStressTest = () => {
+            console.log('🚀 Running stress test - heavy audio load...');
+            
+            // Simulate the exact scenario that caused dropouts
+            for (let i = 0; i < 12; i++) {
+                setTimeout(() => {
+                    // Piano roll chord
+                    Actions.playChord({ 
+                        chord: { name: `Test ${i}`, notes: ['C4', 'E4', 'G4'] }, 
+                        duration: '8n' 
+                    });
+                    
+                    // Overlapping handpan notes
+                    setTimeout(() => audioManager.playNote('C5', '16n', 'handpan'), 25);
+                    setTimeout(() => audioManager.playNote('E5', '16n', 'handpan'), 50);
+                }, i * 150);
+            }
+        };
+        
+        window.clearConsole = () => {
+            consoleOutput.innerHTML = '';
+        };
+        
+        window.showAudioStatus = () => {
+            console.log('📊 AudioManager Status:', audioManager.getStatus());
+            console.log('📊 AudioDebugger Summary:', audioDebugger.getSummary());
+        };
+        
+        // Emergency stop on spacebar
+        document.addEventListener('keydown', (e) => {
+            if (e.code === 'Space' && !e.target.matches('input, textarea')) {
+                e.preventDefault();
+                Actions.stopSong();
+                console.log('🛑 Emergency stop triggered');
+            }
+        });
+        
+        // Initialize
+        console.log('🎵 AudioManager Test Environment Ready');
+        console.log('💡 Use the buttons above or keyboard shortcuts to test audio performance');
+        console.log('📊 Audio debugging available with Ctrl+Shift+A');
+    </script>
+    
+    <!-- Load the integration test script -->
+    <script src="./test-audio-integration.js"></script>
+</body>
+</html>

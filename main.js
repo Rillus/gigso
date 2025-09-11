@@ -30,6 +30,7 @@ import FrequencyMonitor from './components/frequency-monitor/frequency-monitor.j
 import EQDisplay from './components/eq-display/eq-display.js';
 import Tuner from './components/chromatic-tuner/chromatic-tuner.js';
 import Fretboard from './components/fretboard/fretboard.js';
+import audioDebugger from './helpers/audioDebugger.js';
 
 const appContainer = document.getElementById('app');
 

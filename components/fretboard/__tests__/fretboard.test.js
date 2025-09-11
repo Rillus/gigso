@@ -174,6 +174,134 @@ describe('Fretboard Component', () => {
     });
   });
 
+  describe('Instrument-Select Communication', () => {
+    beforeEach(() => {
+      // Mock console methods to prevent test pollution
+      jest.spyOn(console, 'log').mockImplementation(() => {});
+      jest.spyOn(console, 'warn').mockImplementation(() => {});
+    });
+
+    afterEach(() => {
+      // Restore console methods
+      console.log.mockRestore();
+      console.warn.mockRestore();
+    });
+
+    test('should listen for instrument-selected events from document', async () => {
+      // Arrange
+      const originalInstrument = fretboardElement.instrument;
+      
+      // Act - Dispatch instrument-selected event
+      const instrumentSelectedEvent = new CustomEvent('instrument-selected', {
+        detail: 'ukulele',
+        bubbles: true
+      });
+      document.dispatchEvent(instrumentSelectedEvent);
+
+      // Wait for event processing
+      await new Promise(resolve => setTimeout(resolve, 10));
+
+      // Assert - Should have received the event and updated instrument
+      expect(console.log).toHaveBeenCalledWith(
+        'Fretboard: Received instrument-selected event',
+        { instrument: 'ukulele' }
+      );
+      expect(fretboardElement.instrument).toBe('ukulele');
+    });
+
+    test('should handle missing event detail gracefully', async () => {
+      // Arrange
+      const originalInstrument = fretboardElement.instrument;
+      
+      // Act - Dispatch instrument-selected event with missing detail
+      const instrumentSelectedEvent = new CustomEvent('instrument-selected', {
+        detail: null,
+        bubbles: true
+      });
+      document.dispatchEvent(instrumentSelectedEvent);
+
+      // Wait for event processing
+      await new Promise(resolve => setTimeout(resolve, 10));
+
+      // Assert - Should warn about missing detail and not change instrument
+      expect(console.warn).toHaveBeenCalledWith(
+        'Fretboard: Received instrument-selected event with missing detail'
+      );
+      expect(fretboardElement.instrument).toBe(originalInstrument);
+    });
+
+    test('should handle invalid event gracefully', async () => {
+      // Arrange
+      const originalInstrument = fretboardElement.instrument;
+      
+      // Act - Dispatch invalid event
+      const invalidEvent = new CustomEvent('instrument-selected', {
+        bubbles: true
+        // No detail property
+      });
+      document.dispatchEvent(invalidEvent);
+
+      // Wait for event processing
+      await new Promise(resolve => setTimeout(resolve, 10));
+
+      // Assert - Should warn about missing detail and not change instrument
+      expect(console.warn).toHaveBeenCalledWith(
+        'Fretboard: Received instrument-selected event with missing detail'
+      );
+      expect(fretboardElement.instrument).toBe(originalInstrument);
+    });
+
+    test('should update fretboard renderer when instrument changes', async () => {
+      // Arrange
+      const mockRenderer = fretboardElement.renderer;
+      const setInstrumentSpy = jest.spyOn(mockRenderer, 'setInstrument');
+      
+      // Act - Dispatch instrument-selected event
+      const instrumentSelectedEvent = new CustomEvent('instrument-selected', {
+        detail: 'mandolin',
+        bubbles: true
+      });
+      document.dispatchEvent(instrumentSelectedEvent);
+
+      // Wait for event processing
+      await new Promise(resolve => setTimeout(resolve, 10));
+
+      // Assert - Should call setInstrument on renderer
+      expect(setInstrumentSpy).toHaveBeenCalledWith('mandolin');
+    });
+
+    test('should clean up instrument-selected event listener on component removal', () => {
+      // Arrange
+      const removeEventListenerSpy = jest.spyOn(document, 'removeEventListener');
+      
+      // Act - Remove the component
+      fretboardElement.cleanup();
+      
+      // Assert - Should remove the event listener
+      expect(removeEventListenerSpy).toHaveBeenCalledWith(
+        'instrument-selected',
+        fretboardElement.boundHandleInstrumentSelected
+      );
+    });
+
+    test('should dispatch instrument-changed event when instrument changes', () => {
+      // Arrange
+      const eventSpy = jest.fn();
+      fretboardElement.addEventListener('instrument-changed', eventSpy);
+      
+      // Act - Change instrument
+      fretboardElement.setInstrument('ukulele');
+      
+      // Assert - Should dispatch instrument-changed event
+      expect(eventSpy).toHaveBeenCalledWith(
+        expect.objectContaining({
+          type: 'instrument-changed',
+          detail: 'ukulele'
+        })
+      );
+    });
+  });
+
   describe('Attribute Changes', () => {
     test('should respond to chord attribute changes', () => {
       const spy = jest.spyOn(fretboardElement, 'displayChord');

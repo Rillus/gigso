@@ -158,6 +158,10 @@ export default class Fretboard extends BaseComponent {
       this.setInstrument(event.detail);
     });
 
+    // Listen for instrument selection from instrument-select component
+    this.boundHandleInstrumentSelected = this.handleInstrumentSelected.bind(this);
+    document.addEventListener('instrument-selected', this.boundHandleInstrumentSelected);
+
     // Listen for song key changes from chord palette
     this.boundHandleSongKeyChange = this.handleSongKeyChange.bind(this);
     this.boundHandleSongKeySet = this.handleSongKeySet.bind(this);
@@ -178,6 +182,9 @@ export default class Fretboard extends BaseComponent {
   cleanup() {
     try {
       // Clean up document event listeners
+      if (this.boundHandleInstrumentSelected) {
+        document.removeEventListener('instrument-selected', this.boundHandleInstrumentSelected);
+      }
       if (this.boundHandleSongKeyChange) {
         document.removeEventListener('key-changed', this.boundHandleSongKeyChange);
       }
@@ -237,6 +244,24 @@ export default class Fretboard extends BaseComponent {
     
     console.log('Fretboard: Received key-set event (initial song key)', event.detail);
     this.handleSongKeyChange(event);
+  }
+
+  /**
+   * Handle instrument selection from instrument-select component
+   * @param {CustomEvent} event - The instrument-selected event
+   */
+  handleInstrumentSelected(event) {
+    // Handle missing or invalid event detail gracefully
+    if (!event || !event.detail) {
+      console.warn('Fretboard: Received instrument-selected event with missing detail');
+      return;
+    }
+    
+    const selectedInstrument = event.detail;
+    console.log('Fretboard: Received instrument-selected event', { instrument: selectedInstrument });
+    
+    // Update the fretboard to the selected instrument
+    this.setInstrument(selectedInstrument);
   }
 
   /**
@@ -452,6 +477,13 @@ export default class Fretboard extends BaseComponent {
     if (this.currentScale) {
       this.displayScale(this.currentScale.root, this.currentScale.type, this.currentScale.key);
     }
+    
+    // Dispatch instrument-changed event for other components
+    this.dispatchEvent(new CustomEvent('instrument-changed', {
+      detail: instrumentType,
+      bubbles: true,
+      composed: true
+    }));
   }
 
   setTheme(themeName) {

@@ -2,12 +2,14 @@ import EventHandlers from '../helpers/eventHandlers.js';
 const { dispatchComponentEvent } = EventHandlers;
 import State from '../state/state.js';
 const { isPlaying, setIsPlaying } = State;
+import audioManager from '../helpers/audioManager.js';
 
 export default class Actions {
   static playChord({chord, duration}) {
-    const synth = new Tone.PolySynth(window.Tone.Synth).toDestination();
-    const time = Tone.now();    
-    synth.triggerAttackRelease(chord.notes, duration, time);
+    // Use the centralized audio manager instead of creating new synths
+    audioManager.playChord(chord, duration || '4n', 'poly');
+    
+    // Update UI components
     dispatchComponentEvent('current-chord', 'set-chord', chord.name);
     dispatchComponentEvent('chord-diagram', 'set-chord', chord.name );
     dispatchComponentEvent(
@@ -15,7 +17,7 @@ export default class Actions {
       'highlight-notes',
       { 
           notes: chord.notes, 
-          duration: duration
+          duration: duration || '4n'
       }
     );
   }
@@ -30,6 +32,9 @@ export default class Actions {
   }
 
   static stopSong() {
+    // Emergency stop all audio
+    audioManager.stopAll();
+    
     dispatchComponentEvent('piano-roll', 'stop');
     dispatchComponentEvent('chord-diagram', 'set-chord', null);
     dispatchComponentEvent('current-chord', 'set-chord', null);
