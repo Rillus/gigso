@@ -49,10 +49,17 @@ describe('PianoRoll Component', () => {
         const mockDispatchEvent = jest.spyOn(pianoRollElement, 'dispatchEvent');
         pianoRollElement.play();
 
-        expect(mockDispatchEvent).toHaveBeenCalledWith(expect.objectContaining({
-            type: 'play-chord',
-            detail: { chord, duration: 1 }
-        }));
+        // Check that play-chord event was dispatched
+        const playChordCalls = mockDispatchEvent.mock.calls.filter(call => 
+            call[0].type === 'play-chord'
+        );
+        expect(playChordCalls.length).toBeGreaterThan(0);
+        expect(playChordCalls[0][0].type).toBe('play-chord');
+        expect(playChordCalls[0][0].detail.chord).toEqual(chord);
+        expect(playChordCalls[0][0].detail.duration).toBe(499); // 1 beat at 120 BPM = 60000/120 - 1 = 499ms
+
+        // Clean up
+        pianoRollElement.stop();
     });
 
     test('should not play if no chords', () => {

@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Main App BPM Integration</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+            background: linear-gradient(135deg, #08113e 0%, #0DC9BB 100%);
+            color: white;
+            margin: 0;
+            padding: 20px;
+        }
+
+        .test-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        }
+
+        .test-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .test-header h1 {
+            margin: 0 0 10px 0;
+            font-size: 2.5em;
+            font-weight: 300;
+        }
+
+        .test-header p {
+            margin: 0;
+            opacity: 0.8;
+            font-size: 1.1em;
+        }
+
+        .status-display {
+            background: rgba(0, 0, 0, 0.2);
+            padding: 15px;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            margin: 20px 0;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .status-item {
+            margin: 5px 0;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .status-label {
+            color: #ccc;
+        }
+
+        .status-value {
+            color: #fff;
+            font-weight: bold;
+        }
+
+        .instructions {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 20px;
+            border-radius: 10px;
+            border-left: 4px solid #007bff;
+            margin: 20px 0;
+        }
+
+        .instructions h4 {
+            margin: 0 0 15px 0;
+            color: #007bff;
+        }
+
+        .instructions ul {
+            margin: 0;
+            padding-left: 20px;
+        }
+
+        .instructions li {
+            margin: 8px 0;
+            line-height: 1.5;
+        }
+    </style>
+</head>
+<body>
+    <div class="test-container">
+        <div class="test-header">
+            <h1>🎵 Main App BPM Integration Test</h1>
+            <p>Testing BPM controller integration in the main Gigso application</p>
+        </div>
+
+        <div class="status-display">
+            <div class="status-item">
+                <span class="status-label">Components Loaded:</span>
+                <span class="status-value" id="components-loaded">Loading...</span>
+            </div>
+            <div class="status-item">
+                <span class="status-label">BPM Controller Found:</span>
+                <span class="status-value" id="bpm-controller-found">Checking...</span>
+            </div>
+            <div class="status-item">
+                <span class="status-label">Piano Roll Found:</span>
+                <span class="status-value" id="piano-roll-found">Checking...</span>
+            </div>
+            <div class="status-item">
+                <span class="status-label">Transport Controls Found:</span>
+                <span class="status-value" id="transport-controls-found">Checking...</span>
+            </div>
+            <div class="status-item">
+                <span class="status-label">Current BPM:</span>
+                <span class="status-value" id="current-bpm">120</span>
+            </div>
+            <div class="status-item">
+                <span class="status-label">Events Received:</span>
+                <span class="status-value" id="events-received">0</span>
+            </div>
+        </div>
+
+        <div class="instructions">
+            <h4>Integration Test Instructions</h4>
+            <ul>
+                <li>The main app should load with all components including the BPM controller</li>
+                <li>BPM controller should be positioned near the transport controls</li>
+                <li>Changing BPM should update the piano roll playback speed</li>
+                <li>All components should communicate via events</li>
+                <li>Check the browser console for any error messages</li>
+            </ul>
+        </div>
+
+        <!-- Main app container -->
+        <div id="app"></div>
+    </div>
+
+    <!-- Load Tone.js -->
+    <script src="https://unpkg.com/tone@14.7.77/build/Tone.js"></script>
+    
+    <!-- Load main app -->
+    <script type="module">
+        import { initializeApp } from './app.js';
+        import EventHandlers from './helpers/eventHandlers.js';
+        import Actions from './actions/actions.js';
+        import State from './state/state.js';
+
+        import GigsoMenu from './components/gigso-menu/gigso-menu.js';
+        import GigsoLogo from './components/gigso-logo/gigso-logo.js';
+        import TransportControls from './components/transport-controls/transport-controls.js';
+        import CurrentChord from './components/current-chord/current-chord.js';
+        import GigsoKeyboard from './components/gigso-keyboard/gigso-keyboard.js';
+        import PianoRoll from './components/piano-roll/piano-roll.js';
+        import AddChord from './components/add-chord/add-chord.js';
+        import ChordPalette from './components/chord-palette/chord-palette.js';
+        import ChordDiagram from './components/chord-diagram/chord-diagram.js';
+        import RecordCollection from './components/record-collection/record-collection.js';
+        import HandPan from './components/hand-pan/hand-pan.js';
+        import InstrumentSelect from './instrument-select/instrument-select.js';
+        import VUMeter from './components/vu-meter/vu-meter.js';
+        import FrequencyMonitor from './components/frequency-monitor/frequency-monitor.js';
+        import EQDisplay from './components/eq-display/eq-display.js';
+        import Tuner from './components/chromatic-tuner/chromatic-tuner.js';
+        import Fretboard from './components/fretboard/fretboard.js';
+        import BpmController from './components/bpm-controller/bpm-controller.js';
+
+        const { dispatchComponentEvent } = EventHandlers;
+        const { playChord } = Actions;
+        const { setInstrument } = State;
+
+        let eventCount = 0;
+
+        // Test components array (same as main.js)
+        const elementsToAdd = [
+            {
+                tag: GigsoLogo,
+            },
+            {
+                tag: InstrumentSelect,
+                emittedEvents: [
+                    {
+                        name: 'instrument-selected',
+                        function: (event) => {
+                            console.log('Instrument selected:', event.detail);
+                            setInstrument(event.detail);
+                        }
+                    }
+                ]
+            },
+            {
+                tag: ChordPalette,
+                emittedEvents: [
+                    {
+                        name: 'add-chord',
+                        function: (event) => {
+                            const chord = event.detail;
+                            dispatchComponentEvent('piano-roll', 'add-chord', chord);
+                        }
+                    }
+                ]
+            },
+            {
+                tag: RecordCollection,
+                emittedEvents: [
+                    {
+                        name: 'load-song',
+                        function: (event) => {
+                            const song = event.detail;
+                            dispatchComponentEvent('piano-roll', 'load-song', song);
+                        }
+                    }
+                ]
+            },
+            {
+                tag: GigsoKeyboard,
+            },
+            {  
+                tag: TransportControls,
+            },
+            {
+                tag: BpmController,
+                emittedEvents: [
+                    {
+                        name: 'bpm-changed',
+                        function: (event) => {
+                            console.log('BPM changed to:', event.detail.bpm);
+                            eventCount++;
+                            updateStatusDisplay();
+                        }
+                    }
+                ]
+            },
+            {
+                tag: PianoRoll,
+                emittedEvents: [
+                    {
+                        name: 'isReady',
+                        function: () => {
+                            console.log('Piano roll is ready');
+                            updateStatusDisplay();
+                        }
+                    },
+                    {
+                        name: 'play-chord',
+                        function: (event) => {
+                            playChord(event.detail);
+                        }
+                    }
+                ]
+            },
+            {
+                tag: HandPan,
+                emittedEvents: [
+                    {
+                        name: 'note-played',
+                        function: (event) => {
+                            console.log('HandPan note played:', event.detail);
+                        }
+                    },
+                    {
+                        name: 'key-changed',
+                        function: (event) => {
+                            console.log('HandPan key changed:', event.detail);
+                        }
+                    }
+                ]
+            },
+            {
+                tag: Tuner,
+            },
+            {
+                tag: VUMeter,
+            },
+            {
+                tag: EQDisplay,
+            },
+            {
+                tag: FrequencyMonitor,
+            },
+            {
+                tag: Fretboard,
+            },
+        ];
+
+        document.addEventListener('DOMContentLoaded', async () => {
+            console.log('Starting main app BPM integration test...');
+            
+            // Wait for Tone.js to load
+            while (window.Tone === undefined) {
+                await new Promise(resolve => setTimeout(resolve, 50));
+            }
+            
+            console.log('Tone.js loaded, initializing app...');
+            initializeApp(elementsToAdd);
+            
+            // Wait a bit for components to load
+            setTimeout(() => {
+                updateStatusDisplay();
+            }, 1000);
+        });
+
+        function updateStatusDisplay() {
+            document.getElementById('components-loaded').textContent = 'Loaded';
+            
+            const bpmController = document.querySelector('bpm-controller');
+            document.getElementById('bpm-controller-found').textContent = bpmController ? 'Yes' : 'No';
+            
+            const pianoRoll = document.querySelector('piano-roll');
+            document.getElementById('piano-roll-found').textContent = pianoRoll ? 'Yes' : 'No';
+            
+            const transportControls = document.querySelector('transport-controls');
+            document.getElementById('transport-controls-found').textContent = transportControls ? 'Yes' : 'No';
+            
+            if (bpmController) {
+                document.getElementById('current-bpm').textContent = bpmController.getBpm();
+            }
+            
+            document.getElementById('events-received').textContent = eventCount;
+        }
+    </script>
+</body>
+</html>

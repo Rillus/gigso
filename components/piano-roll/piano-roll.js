@@ -1,16 +1,19 @@
 import EventHandlers from '../../helpers/eventHandlers.js';
 import State from '../../state/state.js';
 
-const { loopActive } = State;
+const { loopActive, bpm, setBpm } = State;
 
 export default class PianoRoll extends HTMLElement {
     constructor() {
         super();
         this.attachShadow({ mode: 'open' });
         
-        this.chordWidth = 100;
-        this.tempo = 120; // Default tempo in BPM
         this.timeSignature = '4/4'; // Default time signature
+        this.chordWidth = 25;
+        this.beatsPerBar = 4;
+        this.noteValue = 4; // note value is the length of the note (4 = quarter note, 8 = eighth note, etc.)
+        this.currentBpm = bpm() || 120; // Get BPM from state
+        this.lastFrameTime = 0;
         this.shadowRoot.innerHTML = `
             <style>
                 .piano-roll {
@@ -21,6 +24,7 @@ export default class PianoRoll extends HTMLElement {
                     border: 1px solid #ccc;
                     background: #f9f9f9;
                     margin-top: 10px;
+                    overflow-x: scroll;
                 }
                 .reel {
                     display: flex;
@@ -192,7 +196,12 @@ export default class PianoRoll extends HTMLElement {
 
         this.addEventListener('load-song', (song) => {
             this.loadSong(song.detail);
-        })
+        });
+
+        // Listen for BPM changes from BPM controller
+        document.addEventListener('bpm-changed', (event) => {
+            this.handleBpmChange(event.detail.bpm);
+        });
 
         EventHandlers.addEventListeners([
             {selector: this, event: 'set-instrument', handler: (event) => {
@@ -361,6 +370,7 @@ export default class PianoRoll extends HTMLElement {
             return;
         }
         this.isPlaying = true;
+        this.lastFrameTime = performance.now(); // Initialize timing for first frame
         this.scrollReel();
     }
 
@@ -369,20 +379,42 @@ export default class PianoRoll extends HTMLElement {
         this.chordPlaying = null;
         this.currentPosition = 0;
         this.reel.style.transform = `translateX(0px)`;
+        this.stopAllChords(); // Stop any sustaining chords
     }
 
     pause() {
         this.isPlaying = false;
         this.chordPlaying = null;
+        this.stopAllChords(); // Stop any sustaining chords
     }
 
     scrollReel() {
         if (!this.isPlaying) return;
+        
+        const now = performance.now();
+        const deltaTime = now - this.lastFrameTime;
+        this.lastFrameTime = now;
+        
+        // Cap deltaTime to prevent huge jumps (e.g., when tab was inactive)
+        const maxDeltaTime = 100; // 100ms max
+        const clampedDeltaTime = Math.min(deltaTime, maxDeltaTime);
+        
         if (this.currentPosition === 0) {
           this.playChord(this.chords[0], this.chords[0].duration);
           this.chordPlaying = 0;
         }
-        this.currentPosition += 1;
+        
+        // Calculate scroll speed based on BPM
+        // Duration "1" = 1 bar (4 beats) = 100 pixels (chordWidth)
+        // So 1 beat = 25 pixels (chordWidth / 4)
+        // At current BPM, scroll at: (BPM / 60) * 25 pixels per second
+        const pixelsPerBeat = this.chordWidth; // 25 pixels per beat
+        const pixelsPerSecond = (this.currentBpm / 60) * pixelsPerBeat;
+        const pixelsPerFrame = (pixelsPerSecond * clampedDeltaTime) / 1000;
+
+        console.log('PianoRoll: pixelsPerFrame', pixelsPerFrame, 'pixelsPerSecond', pixelsPerSecond, 'pixelsPerBeat', pixelsPerBeat, 'deltaTime', deltaTime, 'clampedDeltaTime', clampedDeltaTime, 'currentBpm', this.currentBpm);
+        
+        this.currentPosition += pixelsPerFrame;
         this.reel.style.transform = `translateX(-${this.currentPosition}px)`;
         
         const nextChord = this.chords[this.chordPlaying+1];
@@ -395,6 +427,7 @@ export default class PianoRoll extends HTMLElement {
                     this.chordPlaying = 0;
                 } else {
                     this.pause();
+                    this.stopAllChords(); // Stop sustaining chords when playback ends
                     return;
                 }
             }
@@ -410,8 +443,39 @@ export default class PianoRoll extends HTMLElement {
     }
 
     playChord(chord, duration) {
-        const event = new CustomEvent('play-chord', { detail: { chord, duration } });
+        // Stop any currently playing chords before starting the new one
+        this.stopAllChords();
+        
+        // Convert beat duration to milliseconds based on current BPM
+        // Duration "1" = 1 beat
+        // Duration in milliseconds = (duration * 60000) / BPM
+        const durationMs = (duration * 60000) / this.currentBpm - 1;
+
+        console.log('PianoRoll: playChord', chord, durationMs);
+        
+        const event = new CustomEvent('play-chord', { 
+            detail: { 
+                chord, 
+                duration: durationMs // Send duration in milliseconds
+            } 
+        });
         this.dispatchEvent(event);
+    }
+
+    // Helper method to convert beats to milliseconds
+    beatsToMs(beats) {
+        return (beats * 60000) / this.currentBpm;
+    }
+
+    // Stop all currently playing chords
+    stopAllChords() {
+        const event = new CustomEvent('stop-all-chords', { 
+            detail: { 
+                reason: 'piano-roll-stopped'
+            } 
+        });
+        this.dispatchEvent(event);
+        console.log('PianoRoll: Stopping all chords');
     }
 
     setInstrument(instrument) {
@@ -419,18 +483,31 @@ export default class PianoRoll extends HTMLElement {
         this.renderChords();
     }
 
+    handleBpmChange(newBpm) {
+        this.currentBpm = newBpm;
+        console.log('PianoRoll: BPM changed to', newBpm);
+        
+        // Update Tone.js Transport if available
+        if (window.Tone && window.Tone.Transport) {
+            window.Tone.Transport.bpm.value = newBpm;
+        }
+    }
+
     setTempo(tempo) {
-        this.tempo = tempo;
+        this.currentBpm = tempo;
+        setBpm(tempo); // Update global state
         console.log('PianoRoll: Tempo set to', tempo, 'BPM');
     }
 
     setTimeSignature(timeSignature) {
         this.timeSignature = timeSignature;
+        this.beatsPerBar = timeSignature.split('/')[0];
+        this.noteValue = timeSignature.split('/')[1];
         console.log('PianoRoll: Time signature set to', timeSignature);
     }
 
     getTempo() {
-        return this.tempo;
+        return this.currentBpm;
     }
 
     getTimeSignature() {

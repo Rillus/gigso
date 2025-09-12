@@ -57,4 +57,8 @@ export default class Actions {
     dispatchComponentEvent('piano-roll', 'set-instrument', instrument);
     // dispatchComponentEvent('chord-diagram', 'set-instrument', instrument);
   }
+
+  static stopAllChords() {
+    audioManager.stopAll();
+  }
 }

@@ -414,6 +414,45 @@ wrapper.setSize('large');
 
 ---
 
+### `BpmController` (`components/bpm-controller/bpm-controller.js`)
+
+**Purpose**: Controls tempo (BPM) with plus/minus buttons and text input.
+
+**Inputs**:
+- **Attributes**:
+  - `initial-bpm` (number): Initial BPM value (default: 120)
+  - `min-bpm` (number): Minimum allowed BPM (default: 60)
+  - `max-bpm` (number): Maximum allowed BPM (default: 200)
+  - `step-size` (number): BPM increment/decrement step (default: 5)
+- **Events**:
+  - `set-bpm`: Sets the BPM to a specific value
+  - `reset-bpm`: Resets BPM to default value
+
+**Outputs**:
+- **Events**:
+  - `bpm-changed`: Dispatched when BPM value changes
+- **Integration**: Updates Tone.js Transport.bpm.value
+
+**Expected Behaviour**:
+- Displays current BPM value in text input field
+- Plus button increases BPM by step size (respects max limit)
+- Minus button decreases BPM by step size (respects min limit)
+- Click input field to edit BPM directly
+- Validates input within min/max bounds
+- Integrates with global BPM state
+- Provides keyboard navigation support
+
+**Data Structure**:
+```javascript
+// BPM change event detail
+{
+  bpm: 120,           // New BPM value
+  previousBpm: 115    // Previous BPM value
+}
+```
+
+---
+
 ## Song Management
 
 ### `RecordCollection` (`components/record-collection/record-collection.js`)
@@ -504,6 +543,7 @@ document.body.dispatchEvent(new CustomEvent('event-name', {
 - `loopActive`: Boolean - loop mode status
 - `currentChord`: Object - currently selected chord
 - `song`: Object - current song data
+- `bpm`: Number - beats per minute (tempo)
 
 ### State Access Pattern
 ```javascript

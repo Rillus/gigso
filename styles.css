@@ -107,6 +107,15 @@ transport-controls {
   grid-row: 2;
 }
 
+bpm-controller {
+  grid-column: 1;
+  grid-row: 1;
+  margin-top: 10px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
 /* Full width components */
 piano-roll,
 fretboard-component,

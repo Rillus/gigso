@@ -18,6 +18,7 @@
 ### 2. Playback Controls
 - **Transport Controls**: Play, pause, stop functionality
 - **Loop Button**: Toggle loop playback for selected sections
+- **BPM Controller**: Adjust tempo with plus/minus buttons and text input
 - **Keyboard Shortcuts**:
   - Spacebar: Play/pause
   - Escape: Stop
@@ -70,6 +71,7 @@ Centralised state management in `state/state.js`:
 - `loopActive`: Boolean - loop mode status  
 - `currentChord`: Object - currently selected chord
 - `song`: Object - current song data
+- `bpm`: Number - beats per minute (tempo)
 
 ### Event System
 Custom event-driven architecture:
@@ -178,7 +180,8 @@ export default class ComponentName extends BaseComponent {
 {
   name: "Song Name",   // Song title
   chords: [/* array of chord objects */],
-  tempo: 120,         // BPM
+  tempo: 120,         // BPM (legacy field)
+  bpm: 120,           // Current BPM value
   timeSignature: "4/4" // Time signature
 }
 ```

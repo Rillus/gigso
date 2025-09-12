@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Play Button Fix Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            background: #f0f0f0;
+        }
+        .test-container {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+        .log {
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 4px;
+            padding: 10px;
+            font-family: monospace;
+            font-size: 12px;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+        .log-entry {
+            margin-bottom: 5px;
+        }
+        .log-entry.success { color: #28a745; }
+        .log-entry.error { color: #dc3545; }
+        .log-entry.info { color: #007bff; }
+    </style>
+</head>
+<body>
+    <h1>Play Button Fix Test</h1>
+    
+    <div class="test-container">
+        <h2>Transport Controls Test</h2>
+        <p>Click the buttons below to test if they're working:</p>
+        <transport-controls></transport-controls>
+    </div>
+    
+    <div class="test-container">
+        <h2>Event Log</h2>
+        <div id="log" class="log"></div>
+        <button onclick="clearLog()">Clear Log</button>
+    </div>
+
+    <script src="https://unpkg.com/tone@14.7.77/build/Tone.js"></script>
+    <script type="module">
+        import './components/transport-controls/transport-controls.js';
+        import './app.js';
+        
+        function log(message, type = 'info') {
+            const logDiv = document.getElementById('log');
+            const entry = document.createElement('div');
+            entry.className = `log-entry ${type}`;
+            entry.textContent = `[${new Date().toLocaleTimeString()}] ${message}`;
+            logDiv.appendChild(entry);
+            logDiv.scrollTop = logDiv.scrollHeight;
+        }
+        
+        function clearLog() {
+            document.getElementById('log').innerHTML = '';
+        }
+        
+        // Listen for all the events
+        document.addEventListener('play-clicked', () => {
+            log('✅ PLAY-CLICKED event fired!', 'success');
+        });
+        
+        document.addEventListener('pause-clicked', () => {
+            log('✅ PAUSE-CLICKED event fired!', 'success');
+        });
+        
+        document.addEventListener('stop-clicked', () => {
+            log('✅ STOP-CLICKED event fired!', 'success');
+        });
+        
+        document.addEventListener('loop-clicked', () => {
+            log('✅ LOOP-CLICKED event fired!', 'success');
+        });
+        
+        // Log when components are loaded
+        log('🚀 Test page loaded, try clicking the buttons above', 'info');
+        
+        // Make clearLog available globally
+        window.clearLog = clearLog;
+    </script>
+</body>
+</html>

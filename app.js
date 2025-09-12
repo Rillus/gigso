@@ -26,7 +26,9 @@ const chords = [
 
 // Listen for custom events from the web components
 document.body.addEventListener('play-clicked', async () => {
-    await Tone.start();
+    if (window.Tone) {
+        await window.Tone.start();
+    }
     playSong();
     dispatchComponentEvent('piano-roll', 'play');
 });
@@ -60,7 +62,9 @@ document.addEventListener('keydown', async (event) => {
         if (isPlaying()) {
             pauseSong();
         } else {
-            await Tone.start();
+            if (window.Tone) {
+                await window.Tone.start();
+            }
             playSong();
         }
     }

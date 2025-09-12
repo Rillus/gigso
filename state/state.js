@@ -7,7 +7,8 @@ const state = {
     instrument: 'guitar',
     songKey: null,
     songScale: 'major',
-    isKeySet: false
+    isKeySet: false,
+    bpm: 120
 }
 
 // getters
@@ -19,6 +20,7 @@ const instrument = () => state.instrument;
 const songKey = () => state.songKey;
 const songScale = () => state.songScale;
 const isKeySet = () => state.isKeySet;
+const bpm = () => state.bpm;
 // setters
 const setIsPlaying = (value) => {
     state.isPlaying = value;
@@ -52,6 +54,10 @@ const setIsKeySet = (value) => {
     state.isKeySet = value;
 }
 
+const setBpm = (value) => {
+    state.bpm = value;
+}
+
 export default {
     isPlaying,
     setIsPlaying,
@@ -68,5 +74,7 @@ export default {
     songScale,
     setSongScale,
     isKeySet,
-    setIsKeySet
+    setIsKeySet,
+    bpm,
+    setBpm
 }

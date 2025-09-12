@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BPM Timing Fix Test</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+            background: linear-gradient(135deg, #08113e 0%, #0DC9BB 100%);
+            color: white;
+            margin: 0;
+            padding: 20px;
+        }
+
+        .test-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        }
+
+        .test-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .test-header h1 {
+            margin: 0 0 10px 0;
+            font-size: 2.5em;
+            font-weight: 300;
+        }
+
+        .test-header p {
+            margin: 0;
+            opacity: 0.8;
+            font-size: 1.1em;
+        }
+
+        .timing-info {
+            background: rgba(0, 0, 0, 0.2);
+            padding: 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .timing-item {
+            margin: 8px 0;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .timing-label {
+            color: #ccc;
+        }
+
+        .timing-value {
+            color: #fff;
+            font-weight: bold;
+        }
+
+        .instructions {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 20px;
+            border-radius: 10px;
+            border-left: 4px solid #28a745;
+            margin: 20px 0;
+        }
+
+        .instructions h4 {
+            margin: 0 0 15px 0;
+            color: #28a745;
+        }
+
+        .instructions ul {
+            margin: 0;
+            padding-left: 20px;
+        }
+
+        .instructions li {
+            margin: 8px 0;
+            line-height: 1.5;
+        }
+
+        .test-controls {
+            display: flex;
+            gap: 15px;
+            margin: 20px 0;
+            flex-wrap: wrap;
+        }
+
+        .test-button {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .test-button:hover {
+            background: rgba(255, 255, 255, 0.2);
+            border-color: rgba(255, 255, 255, 0.5);
+        }
+
+        .test-button:active {
+            transform: translateY(1px);
+        }
+
+        .chord-examples {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin: 20px 0;
+        }
+
+        .chord-example {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 15px;
+            border-radius: 8px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .chord-example h5 {
+            margin: 0 0 10px 0;
+            color: #28a745;
+        }
+
+        .chord-example p {
+            margin: 5px 0;
+            font-size: 14px;
+            opacity: 0.8;
+        }
+    </style>
+</head>
+<body>
+    <div class="test-container">
+        <div class="test-header">
+            <h1>🎵 BPM Timing Fix Test</h1>
+            <p>Testing the corrected BPM to pixel ratio for piano roll scrolling</p>
+        </div>
+
+        <div class="timing-info">
+            <div class="timing-item">
+                <span class="timing-label">Duration "1" represents:</span>
+                <span class="timing-value">1 Bar (4 Beats)</span>
+            </div>
+            <div class="timing-item">
+                <span class="timing-label">Chord Width:</span>
+                <span class="timing-value">100 pixels per bar</span>
+            </div>
+            <div class="timing-item">
+                <span class="timing-label">Pixels per Beat:</span>
+                <span class="timing-value">25 pixels (100 ÷ 4)</span>
+            </div>
+            <div class="timing-item">
+                <span class="timing-label">At 120 BPM:</span>
+                <span class="timing-value">50 pixels/second scroll speed</span>
+            </div>
+            <div class="timing-item">
+                <span class="timing-label">At 60 BPM:</span>
+                <span class="timing-value">25 pixels/second scroll speed</span>
+            </div>
+            <div class="timing-item">
+                <span class="timing-label">At 240 BPM:</span>
+                <span class="timing-value">100 pixels/second scroll speed</span>
+            </div>
+        </div>
+
+        <div class="instructions">
+            <h4>Timing Fix Instructions</h4>
+            <ul>
+                <li>Add chords with different durations to test the timing</li>
+                <li>Change BPM and observe how scroll speed adjusts proportionally</li>
+                <li>Duration "1" should visually represent 1 bar (4 beats)</li>
+                <li>Duration "0.5" should represent half a bar (2 beats)</li>
+                <li>Duration "2" should represent 2 bars (8 beats)</li>
+                <li>The play head should scroll past chords at the correct musical timing</li>
+            </ul>
+        </div>
+
+        <div class="chord-examples">
+            <div class="chord-example">
+                <h5>Duration Examples</h5>
+                <p><strong>0.25</strong> = Quarter bar (1 beat)</p>
+                <p><strong>0.5</strong> = Half bar (2 beats)</p>
+                <p><strong>1</strong> = Full bar (4 beats)</p>
+                <p><strong>2</strong> = Two bars (8 beats)</p>
+            </div>
+            <div class="chord-example">
+                <h5>BPM Examples</h5>
+                <p><strong>60 BPM</strong> = Slow, relaxed tempo</p>
+                <p><strong>120 BPM</strong> = Standard tempo</p>
+                <p><strong>180 BPM</strong> = Fast tempo</p>
+                <p><strong>240 BPM</strong> = Very fast tempo</p>
+            </div>
+        </div>
+
+        <div class="test-controls">
+            <button class="test-button" onclick="addTestChord('C', 1)">Add C Major (1 bar)</button>
+            <button class="test-button" onclick="addTestChord('G', 0.5)">Add G Major (0.5 bar)</button>
+            <button class="test-button" onclick="addTestChord('Am', 2)">Add A Minor (2 bars)</button>
+            <button class="test-button" onclick="addTestChord('F', 0.25)">Add F Major (0.25 bar)</button>
+            <button class="test-button" onclick="clearChords()">Clear All Chords</button>
+        </div>
+
+        <!-- BPM Controller -->
+        <bpm-controller initial-bpm="120" min-bpm="60" max-bpm="240" step-size="10"></bpm-controller>
+
+        <!-- Piano Roll -->
+        <piano-roll></piano-roll>
+
+        <!-- Transport Controls -->
+        <transport-controls></transport-controls>
+    </div>
+
+    <!-- Load Tone.js -->
+    <script src="https://unpkg.com/tone@14.7.77/build/Tone.js"></script>
+    
+    <!-- Load components -->
+    <script type="module">
+        import BpmController from './components/bpm-controller/bpm-controller.js';
+        import PianoRoll from './components/piano-roll/piano-roll.js';
+        import TransportControls from './components/transport-controls/transport-controls.js';
+
+        // Wait for Tone.js to load
+        document.addEventListener('DOMContentLoaded', async () => {
+            while (window.Tone === undefined) {
+                await new Promise(resolve => setTimeout(resolve, 50));
+            }
+            console.log('BPM Timing Fix Test: Tone.js loaded');
+        });
+
+        // Global functions for test buttons
+        window.addTestChord = function(chordName, duration) {
+            const pianoRoll = document.querySelector('piano-roll');
+            const chord = {
+                name: chordName,
+                notes: [chordName + '4', chordName + '5', chordName + '6'],
+                duration: duration,
+                delay: 0
+            };
+            
+            const event = new CustomEvent('add-chord', { detail: chord });
+            pianoRoll.dispatchEvent(event);
+            
+            console.log(`Added ${chordName} chord with duration ${duration} (${duration * 4} beats)`);
+        };
+
+        window.clearChords = function() {
+            const pianoRoll = document.querySelector('piano-roll');
+            pianoRoll.chords = [];
+            pianoRoll.renderChords();
+            pianoRoll.updateChordDisplay();
+            console.log('Cleared all chords');
+        };
+
+        // Listen for BPM changes to update timing info
+        document.addEventListener('bpm-changed', (event) => {
+            const bpm = event.detail.bpm;
+            const pixelsPerSecond = (bpm / 60) * 25; // 25 pixels per beat
+            
+            console.log(`BPM changed to ${bpm}, scroll speed: ${pixelsPerSecond.toFixed(1)} pixels/second`);
+        });
+    </script>
+</body>
+</html>

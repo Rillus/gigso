@@ -1,0 +1,452 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BPM Controller Demo - Gigso</title>
+    <link rel="stylesheet" href="demo-main.css">
+    <style>
+        body {
+            font-family: Arial, Helvetica, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: white;
+        }
+
+        .demo-container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        }
+
+        .demo-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .demo-header h1 {
+            margin: 0 0 10px 0;
+            font-size: 2.5em;
+            font-weight: 300;
+        }
+
+        .demo-header p {
+            margin: 0;
+            opacity: 0.8;
+            font-size: 1.1em;
+        }
+
+        .demo-section {
+            margin: 30px 0;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .demo-section h2 {
+            margin: 0 0 15px 0;
+            font-size: 1.5em;
+            font-weight: 400;
+        }
+
+        .component-showcase {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            align-items: center;
+            justify-content: center;
+            margin: 20px 0;
+        }
+
+        .component-info {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 15px;
+            border-radius: 8px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            min-width: 200px;
+        }
+
+        .component-info h3 {
+            margin: 0 0 10px 0;
+            font-size: 1.2em;
+        }
+
+        .component-info p {
+            margin: 0;
+            opacity: 0.8;
+            font-size: 0.9em;
+        }
+
+        .controls-section {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin: 20px 0;
+        }
+
+        .control-group {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 15px;
+            border-radius: 8px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .control-group h3 {
+            margin: 0 0 10px 0;
+            font-size: 1.1em;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 10px;
+            margin: 10px 0;
+            flex-wrap: wrap;
+        }
+
+        .demo-button {
+            padding: 8px 16px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 5px;
+            color: white;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-size: 14px;
+        }
+
+        .demo-button:hover {
+            background: rgba(255, 255, 255, 0.2);
+            border-color: rgba(255, 255, 255, 0.4);
+        }
+
+        .demo-button:active {
+            transform: translateY(1px);
+        }
+
+        .status-display {
+            background: rgba(0, 0, 0, 0.2);
+            padding: 10px;
+            border-radius: 5px;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            margin: 10px 0;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .event-log {
+            max-height: 200px;
+            overflow-y: auto;
+            background: rgba(0, 0, 0, 0.3);
+            padding: 10px;
+            border-radius: 5px;
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .event-log .event {
+            margin: 2px 0;
+            padding: 2px 5px;
+            border-radius: 3px;
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .event-log .timestamp {
+            color: #888;
+            margin-right: 10px;
+        }
+
+        .feature-list {
+            list-style: none;
+            padding: 0;
+            margin: 10px 0;
+        }
+
+        .feature-list li {
+            padding: 5px 0;
+            padding-left: 20px;
+            position: relative;
+        }
+
+        .feature-list li:before {
+            content: "✓";
+            position: absolute;
+            left: 0;
+            color: #4CAF50;
+            font-weight: bold;
+        }
+
+        .instructions {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 15px;
+            border-radius: 8px;
+            border-left: 4px solid #007bff;
+            margin: 15px 0;
+        }
+
+        .instructions h4 {
+            margin: 0 0 10px 0;
+            color: #007bff;
+        }
+
+        .instructions ul {
+            margin: 0;
+            padding-left: 20px;
+        }
+
+        .instructions li {
+            margin: 5px 0;
+        }
+
+        @media (max-width: 768px) {
+            .demo-container {
+                margin: 10px;
+                padding: 20px;
+            }
+
+            .component-showcase {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .controls-section {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="demo-container">
+        <div class="demo-header">
+            <h1>🎵 BPM Controller Demo</h1>
+            <p>Test the tempo control component for Gigso</p>
+        </div>
+
+        <div class="demo-section">
+            <h2>Component Overview</h2>
+            <div class="component-showcase">
+                <div class="component-info">
+                    <h3>Default BPM Controller</h3>
+                    <p>Standard configuration with 60-200 BPM range</p>
+                    <bpm-controller id="default-bpm"></bpm-controller>
+                </div>
+                
+                <div class="component-info">
+                    <h3>Custom Configuration</h3>
+                    <p>Custom range and step size</p>
+                    <bpm-controller 
+                        id="custom-bpm" 
+                        initial-bpm="140" 
+                        min-bpm="80" 
+                        max-bpm="180" 
+                        step-size="10">
+                    </bpm-controller>
+                </div>
+            </div>
+        </div>
+
+        <div class="demo-section">
+            <h2>Interactive Controls</h2>
+            <div class="controls-section">
+                <div class="control-group">
+                    <h3>BPM Control</h3>
+                    <div class="button-group">
+                        <button class="demo-button" onclick="setBpm(120)">Set to 120 BPM</button>
+                        <button class="demo-button" onclick="setBpm(140)">Set to 140 BPM</button>
+                        <button class="demo-button" onclick="setBpm(80)">Set to 80 BPM</button>
+                        <button class="demo-button" onclick="resetBpm()">Reset to Default</button>
+                    </div>
+                </div>
+
+                <div class="control-group">
+                    <h3>State Display</h3>
+                    <div class="status-display" id="current-state">
+                        Current BPM: <span id="current-bpm">120</span><br>
+                        State BPM: <span id="state-bpm">120</span><br>
+                        Transport BPM: <span id="transport-bpm">120</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="demo-section">
+            <h2>Event Log</h2>
+            <div class="event-log" id="event-log">
+                <div class="event">
+                    <span class="timestamp">[Ready]</span>
+                    BPM Controller demo initialised
+                </div>
+            </div>
+            <button class="demo-button" onclick="clearEventLog()">Clear Log</button>
+        </div>
+
+        <div class="demo-section">
+            <h2>Usage Instructions</h2>
+            <div class="instructions">
+                <h4>Basic Usage</h4>
+                <ul>
+                    <li><strong>Plus Button (+):</strong> Increment BPM by step size</li>
+                    <li><strong>Minus Button (-):</strong> Decrement BPM by step size</li>
+                    <li><strong>Click Input:</strong> Enter edit mode for direct input</li>
+                    <li><strong>Enter Key:</strong> Commit changes in edit mode</li>
+                    <li><strong>Escape Key:</strong> Cancel changes in edit mode</li>
+                    <li><strong>Arrow Keys:</strong> Increment/decrement when input is focused</li>
+                </ul>
+            </div>
+
+            <div class="instructions">
+                <h4>Keyboard Navigation</h4>
+                <ul>
+                    <li><strong>Tab:</strong> Navigate between controls</li>
+                    <li><strong>Shift+Tab:</strong> Navigate backwards</li>
+                    <li><strong>Space/Enter:</strong> Activate focused button</li>
+                    <li><strong>Arrow Up/Down:</strong> Change BPM when input is focused</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="demo-section">
+            <h2>Features</h2>
+            <ul class="feature-list">
+                <li>Plus/minus buttons for easy BPM adjustment</li>
+                <li>Direct text input with validation</li>
+                <li>Configurable min/max BPM and step size</li>
+                <li>Full keyboard navigation support</li>
+                <li>Accessibility features (ARIA labels, screen reader support)</li>
+                <li>Tone.js Transport integration</li>
+                <li>Global state management</li>
+                <li>Event-driven architecture</li>
+                <li>Input validation and error handling</li>
+                <li>Responsive design for mobile devices</li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- Load Tone.js for Transport integration -->
+    <script src="https://unpkg.com/tone@14.7.77/build/Tone.js"></script>
+    
+    <!-- Load Gigso components -->
+    <script type="module">
+        import BpmController from './components/bpm-controller/bpm-controller.js';
+        import State from './state/state.js';
+
+        // Make components globally available
+        window.BpmController = BpmController;
+        window.State = State;
+
+        // Initialise demo
+        document.addEventListener('DOMContentLoaded', function() {
+            initialiseDemo();
+        });
+
+        function initialiseDemo() {
+            const defaultBpm = document.getElementById('default-bpm');
+            const customBpm = document.getElementById('custom-bpm');
+            
+            // Add event listeners to log BPM changes
+            [defaultBpm, customBpm].forEach(controller => {
+                controller.addEventListener('bpm-changed', (event) => {
+                    logEvent(`BPM changed to ${event.detail.bpm} (was ${event.detail.previousBpm})`, 'bpm-change');
+                    updateStatusDisplay();
+                });
+            });
+
+            // Start audio context on user interaction
+            document.addEventListener('click', startAudioContext, { once: true });
+            document.addEventListener('keydown', startAudioContext, { once: true });
+            
+            updateStatusDisplay();
+            logEvent('Demo initialised successfully');
+        }
+
+        function startAudioContext() {
+            if (window.Tone && window.Tone.context.state !== 'running') {
+                window.Tone.start().then(() => {
+                    logEvent('Audio context started');
+                    updateStatusDisplay();
+                }).catch(error => {
+                    logEvent(`Audio context start failed: ${error.message}`, 'error');
+                });
+            }
+        }
+
+        function setBpm(bpm) {
+            const defaultBpm = document.getElementById('default-bpm');
+            const customBpm = document.getElementById('custom-bpm');
+            
+            // Update both controllers
+            [defaultBpm, customBpm].forEach(controller => {
+                controller.dispatchEvent(new CustomEvent('set-bpm', { detail: { bpm } }));
+            });
+            
+            logEvent(`BPM set to ${bpm} via programmatic control`);
+        }
+
+        function resetBpm() {
+            const defaultBpm = document.getElementById('default-bpm');
+            const customBpm = document.getElementById('custom-bpm');
+            
+            [defaultBpm, customBpm].forEach(controller => {
+                controller.dispatchEvent(new CustomEvent('reset-bpm'));
+            });
+            
+            logEvent('BPM reset to default values');
+        }
+
+        function updateStatusDisplay() {
+            const currentBpmElement = document.getElementById('current-bpm');
+            const stateBpmElement = document.getElementById('state-bpm');
+            const transportBpmElement = document.getElementById('transport-bpm');
+            
+            const defaultBpm = document.getElementById('default-bpm');
+            const currentBpm = defaultBpm ? defaultBpm.getBpm() : 'N/A';
+            const stateBpm = State ? State.bpm() : 'N/A';
+            const transportBpm = window.Tone && window.Tone.Transport ? 
+                Math.round(window.Tone.Transport.bpm.value) : 'N/A';
+            
+            if (currentBpmElement) currentBpmElement.textContent = currentBpm;
+            if (stateBpmElement) stateBpmElement.textContent = stateBpm;
+            if (transportBpmElement) transportBpmElement.textContent = transportBpm;
+        }
+
+        function logEvent(message, type = 'info') {
+            const eventLog = document.getElementById('event-log');
+            if (!eventLog) return;
+            
+            const timestamp = new Date().toLocaleTimeString();
+            const eventDiv = document.createElement('div');
+            eventDiv.className = `event ${type}`;
+            eventDiv.innerHTML = `<span class="timestamp">[${timestamp}]</span> ${message}`;
+            
+            eventLog.appendChild(eventDiv);
+            eventLog.scrollTop = eventLog.scrollHeight;
+            
+            // Limit log size
+            const events = eventLog.querySelectorAll('.event');
+            if (events.length > 50) {
+                events[0].remove();
+            }
+        }
+
+        function clearEventLog() {
+            const eventLog = document.getElementById('event-log');
+            if (eventLog) {
+                eventLog.innerHTML = '<div class="event"><span class="timestamp">[Cleared]</span> Event log cleared</div>';
+            }
+        }
+
+        // Make functions globally available
+        window.setBpm = setBpm;
+        window.resetBpm = resetBpm;
+        window.clearEventLog = clearEventLog;
+        window.logEvent = logEvent;
+    </script>
+</body>
+</html>

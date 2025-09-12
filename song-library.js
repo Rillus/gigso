@@ -15,7 +15,7 @@ export default class songLibrary {
             "B4",
             "D5"
           ],
-          "duration": 1,
+          "duration": 4,
           "delay": 0,
           "startPosition": 0
         },
@@ -26,7 +26,7 @@ export default class songLibrary {
             "D5",
             "F#5"
           ],
-          "duration": 1,
+          "duration": 4,
           "delay": 0,
           "startPosition": 100
         },
@@ -37,7 +37,7 @@ export default class songLibrary {
             "E4",
             "G4"
           ],
-          "duration": 1,
+          "duration": 4,
           "delay": 0,
           "startPosition": 200
         },
@@ -48,7 +48,7 @@ export default class songLibrary {
             "D#4",
             "G4"
           ],
-          "duration": 1,
+          "duration": 4,
           "delay": 0,
           "startPosition": 300
         }
@@ -65,7 +65,7 @@ export default class songLibrary {
             "B4",
             "D5"
           ],
-          "duration": 1,
+          "duration": 4,
           "delay": 0,
           "startPosition": 0
         },
@@ -77,7 +77,7 @@ export default class songLibrary {
             "A4",
             "C5"
           ],
-          "duration": 1,
+          "duration": 4,
           "delay": 0,
           "startPosition": 100
         },
@@ -88,7 +88,7 @@ export default class songLibrary {
             "E4",
             "G4"
           ],
-          "duration": 1,
+          "duration": 4,
           "delay": 0,
           "startPosition": 200
         }
@@ -105,7 +105,7 @@ export default class songLibrary {
             "E4",
             "G4"
           ],
-          "duration": 1,
+          "duration": 4,
           "delay": 0,
           "startPosition": 0
         },
@@ -127,7 +127,7 @@ export default class songLibrary {
             "C5",
             "E5"
           ],
-          "duration": 1,
+          "duration": 4,
           "delay": 0,
           "startPosition": 203
         },
@@ -140,7 +140,7 @@ export default class songLibrary {
             "G5",
             "G4"
           ],
-          "duration": 1,
+          "duration": 4,
           "delay": 0,
           "startPosition": 303
         },
@@ -195,7 +195,7 @@ export default class songLibrary {
             "C5",
             "E5"
           ],
-          "duration": 1,
+          "duration": 4,
           "delay": 0,
           "startPosition": 607
         },
@@ -219,7 +219,7 @@ export default class songLibrary {
             "B5",
             "E5"
           ],
-          "duration": 1,
+          "duration": 4,
           "delay": 0.1899999999999995,
           "startPosition": 808
         },
@@ -230,7 +230,7 @@ export default class songLibrary {
             "F4",
             "A4"
           ],
-          "duration": 1,
+          "duration": 4,
           "delay": 1,
           "startPosition": 1008
         },
@@ -241,7 +241,7 @@ export default class songLibrary {
             "C5",
             "E5"
           ],
-          "duration": 1,
+          "duration": 4,
           "delay": 1,
           "startPosition": 1208
         },
@@ -254,7 +254,7 @@ export default class songLibrary {
             "B5",
             "E5"
           ],
-          "duration": 1,
+          "duration": 4,
           "delay": 1,
           "startPosition": 1390
         }
@@ -271,7 +271,7 @@ export default class songLibrary {
             "E4",
             "G4"
           ],
-          "duration": 0.3,
+          "duration": 1,
           "delay": 0,
           "startPosition": 0
         },
@@ -282,7 +282,7 @@ export default class songLibrary {
             "E4",
             "G4"
           ],
-          "duration": 0.3,
+          "duration": 1,
           "delay": 0,
           "startPosition": 30
         },
@@ -293,7 +293,7 @@ export default class songLibrary {
             "E4",
             "G4"
           ],
-          "duration": 0.3,
+          "duration": 1,
           "delay": 0,
           "startPosition": 61
         },
@@ -304,7 +304,7 @@ export default class songLibrary {
             "E4",
             "G4"
           ],
-          "duration": 0.3,
+          "duration": 1,
           "delay": 0,
           "startPosition": 92
         },
@@ -315,7 +315,7 @@ export default class songLibrary {
             "B4",
             "D5"
           ],
-          "duration": 0.3,
+          "duration": 1,
           "delay": 0,
           "startPosition": 121
         },
@@ -326,7 +326,7 @@ export default class songLibrary {
             "B4",
             "D5"
           ],
-          "duration": 0.3,
+          "duration": 1,
           "delay": 0,
           "startPosition": 152
         },
@@ -337,7 +337,7 @@ export default class songLibrary {
             "B4",
             "D5"
           ],
-          "duration": 0.3,
+          "duration": 1,
           "delay": 0,
           "startPosition": 185
         },
@@ -348,7 +348,7 @@ export default class songLibrary {
             "B4",
             "D5"
           ],
-          "duration": 0.3,
+          "duration": 1,
           "delay": 0,
           "startPosition": 217
         },
@@ -359,7 +359,7 @@ export default class songLibrary {
             "C5",
             "E5"
           ],
-          "duration": 0.3,
+          "duration": 1,
           "delay": 0,
           "startPosition": 247
         },
@@ -370,7 +370,7 @@ export default class songLibrary {
             "C5",
             "E5"
           ],
-          "duration": 0.3,
+          "duration": 1,
           "delay": 0,
           "startPosition": 277
         },
@@ -381,7 +381,7 @@ export default class songLibrary {
             "C5",
             "E5"
           ],
-          "duration": 0.3,
+          "duration": 1,
           "delay": 0,
           "startPosition": 307
         },
@@ -392,7 +392,7 @@ export default class songLibrary {
             "C5",
             "E5"
           ],
-          "duration": 0.3,
+          "duration": 1,
           "delay": 0,
           "startPosition": 339
         },
@@ -403,7 +403,7 @@ export default class songLibrary {
             "A4",
             "C5"
           ],
-          "duration": 0.3,
+          "duration": 1,
           "delay": 0,
           "startPosition": 372
         },
@@ -414,7 +414,7 @@ export default class songLibrary {
             "A4",
             "C5"
           ],
-          "duration": 0.3,
+          "duration": 1,
           "delay": 0,
           "startPosition": 402
         },
@@ -425,7 +425,7 @@ export default class songLibrary {
             "A4",
             "C5"
           ],
-          "duration": 0.3,
+          "duration": 1,
           "delay": 0,
           "startPosition": 431
         },
@@ -436,7 +436,7 @@ export default class songLibrary {
             "A4",
             "C5"
           ],
-          "duration": 0.3,
+          "duration": 1,
           "delay": 0,
           "startPosition": 464
         }

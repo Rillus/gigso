@@ -75,11 +75,11 @@ export default class PlayButton extends HTMLElement {
           />
         </svg>`;
 
-      EventHandlers.addEventListeners([
-          { selector: 'button', event: 'click', handler: () => this.handleClick() },
-          { selector: this, event: 'activate', handler: () => this.activate() },
-          { selector: this, event: 'deactivate', handler: () => this.deactivate() }
-      ]);
+      this.button.addEventListener('click', () => this.handleClick());
+      
+      // Listen for custom events to update button state
+      this.addEventListener('activate', () => this.activate());
+      this.addEventListener('deactivate', () => this.deactivate());
     }
 
     handleClick() {

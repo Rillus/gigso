@@ -3,7 +3,7 @@ import EventHandlers from './helpers/eventHandlers.js';
 const { dispatchComponentEvent } = EventHandlers;
 
 import Actions from './actions/actions.js';
-const { playChord } = Actions;
+const { playChord, stopAllChords } = Actions;
 
 import State from './state/state.js';
 const { setInstrument } = State;
@@ -30,6 +30,7 @@ import FrequencyMonitor from './components/frequency-monitor/frequency-monitor.j
 import EQDisplay from './components/eq-display/eq-display.js';
 import Tuner from './components/chromatic-tuner/chromatic-tuner.js';
 import Fretboard from './components/fretboard/fretboard.js';
+import BpmController from './components/bpm-controller/bpm-controller.js';
 import audioDebugger from './helpers/audioDebugger.js';
 
 const appContainer = document.getElementById('app');
@@ -90,6 +91,18 @@ const elementsToAdd = [
         tag: TransportControls,
     },
     {
+        tag: BpmController,
+        emittedEvents: [
+            {
+                name: 'bpm-changed',
+                function: (event) => {
+                    console.log('BPM changed to:', event.detail.bpm);
+                    // The piano roll will automatically listen for this event
+                }
+            }
+        ]
+    },
+    {
         tag: PianoRoll,
         emittedEvents: [
             {
@@ -108,6 +121,12 @@ const elementsToAdd = [
                 name: 'play-chord',
                 function: (event) => {
                     playChord(event.detail);
+                }
+            },
+            {
+                name: 'stop-all-chords',
+                function: (event) => {
+                    stopAllChords();
                 }
             }
         ]

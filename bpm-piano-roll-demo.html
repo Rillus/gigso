@@ -1,0 +1,422 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BPM Piano Roll Integration Demo - Gigso</title>
+    <link rel="stylesheet" href="demo-main.css">
+    <style>
+        body {
+            font-family: Arial, Helvetica, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: white;
+        }
+
+        .demo-container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        }
+
+        .demo-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .demo-header h1 {
+            margin: 0 0 10px 0;
+            font-size: 2.5em;
+            font-weight: 300;
+        }
+
+        .demo-header p {
+            margin: 0;
+            opacity: 0.8;
+            font-size: 1.1em;
+        }
+
+        .controls-section {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin: 20px 0;
+            align-items: start;
+        }
+
+        .control-group {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 20px;
+            border-radius: 10px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .control-group h3 {
+            margin: 0 0 15px 0;
+            font-size: 1.3em;
+            color: #fff;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 10px;
+            margin: 15px 0;
+            flex-wrap: wrap;
+        }
+
+        .demo-button {
+            padding: 10px 20px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 5px;
+            color: white;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .demo-button:hover {
+            background: rgba(255, 255, 255, 0.2);
+            border-color: rgba(255, 255, 255, 0.4);
+            transform: translateY(-2px);
+        }
+
+        .demo-button:active {
+            transform: translateY(0);
+        }
+
+        .demo-button.primary {
+            background: rgba(0, 123, 255, 0.3);
+            border-color: rgba(0, 123, 255, 0.5);
+        }
+
+        .demo-button.primary:hover {
+            background: rgba(0, 123, 255, 0.5);
+        }
+
+        .status-display {
+            background: rgba(0, 0, 0, 0.2);
+            padding: 15px;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            margin: 15px 0;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .status-display .status-item {
+            margin: 5px 0;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .status-display .status-label {
+            color: #ccc;
+        }
+
+        .status-display .status-value {
+            color: #fff;
+            font-weight: bold;
+        }
+
+        .piano-roll-container {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 20px;
+            border-radius: 10px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            margin: 20px 0;
+        }
+
+        .piano-roll-container h3 {
+            margin: 0 0 15px 0;
+            font-size: 1.3em;
+            color: #fff;
+        }
+
+        .instructions {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 20px;
+            border-radius: 10px;
+            border-left: 4px solid #007bff;
+            margin: 20px 0;
+        }
+
+        .instructions h4 {
+            margin: 0 0 15px 0;
+            color: #007bff;
+            font-size: 1.2em;
+        }
+
+        .instructions ul {
+            margin: 0;
+            padding-left: 20px;
+        }
+
+        .instructions li {
+            margin: 8px 0;
+            line-height: 1.5;
+        }
+
+        .instructions .highlight {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-family: 'Courier New', monospace;
+        }
+
+        .feature-list {
+            list-style: none;
+            padding: 0;
+            margin: 15px 0;
+        }
+
+        .feature-list li {
+            padding: 8px 0;
+            padding-left: 25px;
+            position: relative;
+            line-height: 1.4;
+        }
+
+        .feature-list li:before {
+            content: "✓";
+            position: absolute;
+            left: 0;
+            color: #4CAF50;
+            font-weight: bold;
+            font-size: 1.1em;
+        }
+
+        @media (max-width: 768px) {
+            .demo-container {
+                margin: 10px;
+                padding: 20px;
+            }
+
+            .controls-section {
+                grid-template-columns: 1fr;
+            }
+
+            .button-group {
+                justify-content: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="demo-container">
+        <div class="demo-header">
+            <h1>🎵 BPM Piano Roll Integration</h1>
+            <p>Test the tempo control integration with piano roll playback</p>
+        </div>
+
+        <div class="controls-section">
+            <div class="control-group">
+                <h3>🎛️ BPM Controller</h3>
+                <bpm-controller id="demo-bpm-controller"></bpm-controller>
+                
+                <div class="button-group">
+                    <button class="demo-button" onclick="setBpm(80)">80 BPM</button>
+                    <button class="demo-button" onclick="setBpm(120)">120 BPM</button>
+                    <button class="demo-button" onclick="setBpm(160)">160 BPM</button>
+                </div>
+            </div>
+
+            <div class="control-group">
+                <h3>🎮 Transport Controls</h3>
+                <div class="button-group">
+                    <button class="demo-button primary" onclick="playPianoRoll()">▶ Play</button>
+                    <button class="demo-button" onclick="pausePianoRoll()">⏸ Pause</button>
+                    <button class="demo-button" onclick="stopPianoRoll()">⏹ Stop</button>
+                </div>
+                
+                <div class="button-group">
+                    <button class="demo-button" onclick="addTestChord('C')">Add C</button>
+                    <button class="demo-button" onclick="addTestChord('G')">Add G</button>
+                    <button class="demo-button" onclick="addTestChord('Am')">Add Am</button>
+                    <button class="demo-button" onclick="addTestChord('F')">Add F</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="status-display">
+            <div class="status-item">
+                <span class="status-label">Current BPM:</span>
+                <span class="status-value" id="current-bpm">120</span>
+            </div>
+            <div class="status-item">
+                <span class="status-label">Piano Roll Tempo:</span>
+                <span class="status-value" id="piano-roll-tempo">120</span>
+            </div>
+            <div class="status-item">
+                <span class="status-label">Transport BPM:</span>
+                <span class="status-value" id="transport-bpm">120</span>
+            </div>
+            <div class="status-item">
+                <span class="status-label">Is Playing:</span>
+                <span class="status-value" id="is-playing">false</span>
+            </div>
+        </div>
+
+        <div class="piano-roll-container">
+            <h3>🎹 Piano Roll</h3>
+            <piano-roll id="demo-piano-roll"></piano-roll>
+        </div>
+
+        <div class="instructions">
+            <h4>How to Test BPM Integration</h4>
+            <ul>
+                <li><strong>Add Chords:</strong> Click the chord buttons to add chords to the piano roll</li>
+                <li><strong>Play:</strong> Click the Play button to start playback</li>
+                <li><strong>Change BPM:</strong> Use the BPM controller or preset buttons to change tempo</li>
+                <li><strong>Observe:</strong> Watch how the piano roll scrolling speed changes with BPM</li>
+                <li><strong>Chord Timing:</strong> Notice how chord durations are affected by BPM changes</li>
+            </ul>
+        </div>
+
+        <div class="instructions">
+            <h4>Integration Features</h4>
+            <ul class="feature-list">
+                <li>Real-time BPM synchronization between controller and piano roll</li>
+                <li>Dynamic scroll speed adjustment based on current BPM</li>
+                <li>Proper chord duration calculation in milliseconds</li>
+                <li>Tone.js Transport integration for audio timing</li>
+                <li>Event-driven communication between components</li>
+                <li>Smooth playback rate transitions</li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- Load Tone.js for Transport integration -->
+    <script src="https://unpkg.com/tone@14.7.77/build/Tone.js"></script>
+    
+    <!-- Load Gigso components -->
+    <script type="module">
+        import BpmController from './components/bpm-controller/bpm-controller.js';
+        import PianoRoll from './components/piano-roll/piano-roll.js';
+        import State from './state/state.js';
+
+        // Make components globally available
+        window.BpmController = BpmController;
+        window.PianoRoll = PianoRoll;
+        window.State = State;
+
+        // Initialise demo
+        document.addEventListener('DOMContentLoaded', function() {
+            initialiseDemo();
+        });
+
+        function initialiseDemo() {
+            const bpmController = document.getElementById('demo-bpm-controller');
+            const pianoRoll = document.getElementById('demo-piano-roll');
+            
+            // Add event listeners to log BPM changes
+            bpmController.addEventListener('bpm-changed', (event) => {
+                console.log('BPM changed to:', event.detail.bpm);
+                updateStatusDisplay();
+            });
+
+            // Listen for piano roll events
+            pianoRoll.addEventListener('play-chord', (event) => {
+                console.log('Playing chord:', event.detail.chord.name, 'for', event.detail.duration, 'ms');
+            });
+
+            // Start audio context on user interaction
+            document.addEventListener('click', startAudioContext, { once: true });
+            document.addEventListener('keydown', startAudioContext, { once: true });
+            
+            updateStatusDisplay();
+        }
+
+        function startAudioContext() {
+            if (window.Tone && window.Tone.context.state !== 'running') {
+                window.Tone.start().then(() => {
+                    console.log('Audio context started');
+                    updateStatusDisplay();
+                }).catch(error => {
+                    console.error('Audio context start failed:', error);
+                });
+            }
+        }
+
+        function setBpm(bpm) {
+            const bpmController = document.getElementById('demo-bpm-controller');
+            bpmController.dispatchEvent(new CustomEvent('set-bpm', { detail: { bpm } }));
+            updateStatusDisplay();
+        }
+
+        function playPianoRoll() {
+            const pianoRoll = document.getElementById('demo-piano-roll');
+            pianoRoll.dispatchEvent(new CustomEvent('play'));
+            updateStatusDisplay();
+        }
+
+        function pausePianoRoll() {
+            const pianoRoll = document.getElementById('demo-piano-roll');
+            pianoRoll.dispatchEvent(new CustomEvent('pause'));
+            updateStatusDisplay();
+        }
+
+        function stopPianoRoll() {
+            const pianoRoll = document.getElementById('demo-piano-roll');
+            pianoRoll.dispatchEvent(new CustomEvent('stop'));
+            updateStatusDisplay();
+        }
+
+        function addTestChord(chordName) {
+            const pianoRoll = document.getElementById('demo-piano-roll');
+            const chord = {
+                name: chordName,
+                notes: getChordNotes(chordName),
+                duration: 1, // 1 bar (4 beats)
+                delay: 0,
+                startPosition: 0
+            };
+            
+            pianoRoll.dispatchEvent(new CustomEvent('add-chord', { detail: chord }));
+        }
+
+        function getChordNotes(chordName) {
+            const chordMap = {
+                'C': ['C4', 'E4', 'G4'],
+                'G': ['G4', 'B4', 'D5'],
+                'Am': ['A4', 'C5', 'E5'],
+                'F': ['F4', 'A4', 'C5']
+            };
+            return chordMap[chordName] || ['C4', 'E4', 'G4'];
+        }
+
+        function updateStatusDisplay() {
+            const bpmController = document.getElementById('demo-bpm-controller');
+            const pianoRoll = document.getElementById('demo-piano-roll');
+            
+            const currentBpm = bpmController ? bpmController.getBpm() : 'N/A';
+            const pianoRollTempo = pianoRoll ? pianoRoll.getTempo() : 'N/A';
+            const transportBpm = window.Tone && window.Tone.Transport ? 
+                Math.round(window.Tone.Transport.bpm.value) : 'N/A';
+            
+            document.getElementById('current-bpm').textContent = currentBpm;
+            document.getElementById('piano-roll-tempo').textContent = pianoRollTempo;
+            document.getElementById('transport-bpm').textContent = transportBpm;
+            
+            // Update playing status
+            const isPlaying = pianoRoll ? pianoRoll.isPlaying : false;
+            document.getElementById('is-playing').textContent = isPlaying;
+        }
+
+        // Make functions globally available
+        window.setBpm = setBpm;
+        window.playPianoRoll = playPianoRoll;
+        window.pausePianoRoll = pausePianoRoll;
+        window.stopPianoRoll = stopPianoRoll;
+        window.addTestChord = addTestChord;
+        window.updateStatusDisplay = updateStatusDisplay;
+    </script>
+</body>
+</html>

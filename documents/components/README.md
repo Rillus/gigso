@@ -45,6 +45,9 @@ Stops playback and resets to beginning.
 ### [LoopButton](./loop-button.md)
 Toggles loop playback mode.
 
+### [BpmController](./bpm-controller.md)
+Controls tempo (BPM) with plus/minus buttons and text input.
+
 ## Song Management
 
 ### [RecordCollection](./record-collection.md)
@@ -70,6 +73,7 @@ Toggle interface for showing/hiding components.
 - **PlayButton**: Start playback
 - **StopButton**: Stop playback
 - **LoopButton**: Toggle loop mode
+- **BpmController**: Control tempo (BPM)
 
 ### Visual Feedback
 - **CurrentChord**: Display current chord
