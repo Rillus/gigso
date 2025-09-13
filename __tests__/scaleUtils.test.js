@@ -49,29 +49,29 @@ describe('Scale Utilities', () => {
             test('should generate C major scale correctly', () => {
                 const notes = generateScaleNotes('C', 'major');
                 expect(notes).toHaveLength(8);
-                // C major: C, D, E, F, G, A, B, C# (9th) - ascending from root
-                expect(notes).toEqual(['C4', 'D4', 'E4', 'F4', 'G4', 'A4', 'B4', 'D5']);
+                // C major: C, D, E, F, G, A, B, C (octave) - ascending from root
+                expect(notes).toEqual(['C4', 'D4', 'E4', 'F4', 'G4', 'A4', 'B4', 'C5']);
             });
 
             test('should generate D major scale correctly', () => {
                 const notes = generateScaleNotes('D', 'major');
                 expect(notes).toHaveLength(8);
-                // D major: D, E, F#, G, A, B, C#, D# (9th) - ascending from root
-                expect(notes).toEqual(['D4', 'E4', 'F#4', 'G4', 'A4', 'B4', 'C#4', 'E5']);
+                // D major: D, E, F#, G, A, B, C#, D (octave) - ascending from root
+                expect(notes).toEqual(['D4', 'E4', 'F#4', 'G4', 'A4', 'B4', 'C#4', 'D5']);
             });
 
             test('should generate F major scale correctly', () => {
                 const notes = generateScaleNotes('F', 'major');
                 expect(notes).toHaveLength(8);
-                // F major: F, G, A, Bb, C, D, E, F# (9th) - ascending from root
-                expect(notes).toEqual(['F4', 'G4', 'A4', 'A#4', 'C4', 'D4', 'E4', 'G5']);
+                // F major: F, G, A, Bb, C, D, E, F (octave) - ascending from root
+                expect(notes).toEqual(['F4', 'G4', 'A4', 'A#4', 'C4', 'D4', 'E4', 'F5']);
             });
 
             test('should generate G major scale correctly', () => {
                 const notes = generateScaleNotes('G', 'major');
                 expect(notes).toHaveLength(8);
-                // G major: G, A, B, C, D, E, F#, G# (9th) - ascending from root
-                expect(notes).toEqual(['G4', 'A4', 'B4', 'C4', 'D4', 'E4', 'F#4', 'A5']);
+                // G major: G, A, B, C, D, E, F#, G (octave) - ascending from root
+                expect(notes).toEqual(['G4', 'A4', 'B4', 'C4', 'D4', 'E4', 'F#4', 'G5']);
             });
         });
 
@@ -79,29 +79,29 @@ describe('Scale Utilities', () => {
             test('should generate C minor scale correctly', () => {
                 const notes = generateScaleNotes('C', 'minor');
                 expect(notes).toHaveLength(8);
-                // C minor: C, D, Eb, F, G, Ab, Bb, C# (9th) - ascending from root
-                expect(notes).toEqual(['C4', 'D4', 'D#4', 'F4', 'G4', 'G#4', 'A#4', 'D5']);
+                // C minor: C, D, Eb, F, G, Ab, Bb, C (octave) - ascending from root
+                expect(notes).toEqual(['C4', 'D4', 'D#4', 'F4', 'G4', 'G#4', 'A#4', 'C5']);
             });
 
             test('should generate D minor scale correctly', () => {
                 const notes = generateScaleNotes('D', 'minor');
                 expect(notes).toHaveLength(8);
-                // D minor: D, E, F, G, A, Bb, C, D# (9th) - ascending from root
-                expect(notes).toEqual(['D4', 'E4', 'F4', 'G4', 'A4', 'A#4', 'C4', 'E5']);
+                // D minor: D, E, F, G, A, Bb, C, D (octave) - ascending from root
+                expect(notes).toEqual(['D4', 'E4', 'F4', 'G4', 'A4', 'A#4', 'C4', 'D5']);
             });
 
             test('should generate F minor scale correctly', () => {
                 const notes = generateScaleNotes('F', 'minor');
                 expect(notes).toHaveLength(8);
-                // F minor: F, G, Ab, Bb, C, Db, Eb, F# (9th) - ascending from root
-                expect(notes).toEqual(['F4', 'G4', 'G#4', 'A#4', 'C4', 'C#4', 'D#4', 'G5']);
+                // F minor: F, G, Ab, Bb, C, Db, Eb, F (octave) - ascending from root
+                expect(notes).toEqual(['F4', 'G4', 'G#4', 'A#4', 'C4', 'C#4', 'D#4', 'F5']);
             });
 
             test('should generate G minor scale correctly', () => {
                 const notes = generateScaleNotes('G', 'minor');
                 expect(notes).toHaveLength(8);
-                // G minor: G, A, Bb, C, D, Eb, F, G# (9th) - ascending from root
-                expect(notes).toEqual(['G4', 'A4', 'A#4', 'C4', 'D4', 'D#4', 'F4', 'A5']);
+                // G minor: G, A, Bb, C, D, Eb, F, G (octave) - ascending from root
+                expect(notes).toEqual(['G4', 'A4', 'A#4', 'C4', 'D4', 'D#4', 'F4', 'G5']);
             });
         });
 
@@ -109,22 +109,22 @@ describe('Scale Utilities', () => {
             test('should generate F# major scale correctly', () => {
                 const notes = generateScaleNotes('F#', 'major');
                 expect(notes).toHaveLength(8);
-                // F# major: F#, G#, A#, B, C#, D#, E#, F# (9th) - ascending from root
-                expect(notes).toEqual(['F#4', 'G#4', 'A#4', 'B4', 'C#4', 'D#4', 'F4', 'G#5']);
+                // F# major: F#, G#, A#, B, C#, D#, E#, F# (octave) - ascending from root
+                expect(notes).toEqual(['F#4', 'G#4', 'A#4', 'B4', 'C#4', 'D#4', 'F4', 'F#5']);
             });
 
             test('should generate Bb major scale correctly', () => {
                 const notes = generateScaleNotes('Bb', 'major');
                 expect(notes).toHaveLength(8);
-                // Bb major: Bb, C, D, Eb, F, G, A, Bb (9th) - ascending from root
-                expect(notes).toEqual(['D4', 'E4', 'F#4', 'G4', 'A4', 'B4', 'C#4', 'E5']);
+                // Bb major: Bb, C, D, Eb, F, G, A, Bb (octave) - ascending from root
+                expect(notes).toEqual(['D4', 'E4', 'F#4', 'G4', 'A4', 'B4', 'C#4', 'D5']);
             });
 
             test('should generate C# minor scale correctly', () => {
                 const notes = generateScaleNotes('C#', 'minor');
                 expect(notes).toHaveLength(8);
-                // C# minor: C#, D#, E, F#, G#, A, B, C# (9th) - ascending from root
-                expect(notes).toEqual(['C#4', 'D#4', 'E4', 'F#4', 'G#4', 'A4', 'B4', 'D#5']);
+                // C# minor: C#, D#, E, F#, G#, A, B, C# (octave) - ascending from root
+                expect(notes).toEqual(['C#4', 'D#4', 'E4', 'F#4', 'G#4', 'A4', 'B4', 'C#5']);
             });
         });
 
@@ -135,7 +135,7 @@ describe('Scale Utilities', () => {
                     const notes = generateScaleNotes(key, 'major');
                     const noteNames = notes.map(note => note.slice(0, -1)); // Remove octave
                     const uniqueNotes = new Set(noteNames);
-                    // 7 unique notes because the 9th note is the same as the 2nd note (octave higher)
+                    // 7 unique notes because the 8th note is the octave (same note name as root)
                     expect(uniqueNotes.size).toBe(7);
                 });
             });
@@ -146,7 +146,7 @@ describe('Scale Utilities', () => {
                     const notes = generateScaleNotes(key, 'minor');
                     const noteNames = notes.map(note => note.slice(0, -1)); // Remove octave
                     const uniqueNotes = new Set(noteNames);
-                    // 7 unique notes because the 9th note is the same as the 2nd note (octave higher)
+                    // 7 unique notes because the 8th note is the octave (same note name as root)
                     expect(uniqueNotes.size).toBe(7);
                 });
             });

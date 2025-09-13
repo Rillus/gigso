@@ -8,8 +8,8 @@ const CHROMATIC_SCALE = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', '
 
 // Scale patterns (intervals from root) - 8 unique notes for hand pan
 const SCALE_PATTERNS = {
-    major: [0, 2, 4, 5, 7, 9, 11, 14], // Root, Major 2nd, Major 3rd, Perfect 4th, Perfect 5th, Major 6th, Major 7th, Major 9th
-    minor: [0, 2, 3, 5, 7, 8, 10, 14]  // Root, Major 2nd, Minor 3rd, Perfect 4th, Perfect 5th, Minor 6th, Minor 7th, Major 9th
+    major: [0, 2, 4, 5, 7, 9, 11, 12], // Root, Major 2nd, Major 3rd, Perfect 4th, Perfect 5th, Major 6th, Major 7th, Octave
+    minor: [0, 2, 3, 5, 7, 8, 10, 12]  // Root, Major 2nd, Minor 3rd, Perfect 4th, Perfect 5th, Minor 6th, Minor 7th, Octave
 };
 
 /**
