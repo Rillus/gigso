@@ -11,10 +11,11 @@ export default class ChordDiagram extends BaseComponent {
         const styles = `
             .chord-diagram {
                 display: grid;
-                grid-template-columns: repeat(4, 20%);
+                grid-template-columns: repeat(4, 25%);
                 grid-template-rows: repeat(5, 25px);
                 gap: 0;
                 max-width: 80px;
+                border-top: 5px solid #fff;
             }
             .chord-diagram--guitar {
                 grid-template-columns: repeat(6, 15%);

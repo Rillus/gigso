@@ -240,7 +240,6 @@ export default class PresentationSlide extends BaseComponent {
                 content.innerHTML = `
                     <h1 class="slide-title fade-in">From Code to Chords</h1>
                     <p class="slide-subtitle fade-in">Building a Web-Based Music Maker Without Frameworks</p>
-                    <p class="slide-subtitle fade-in">How Web Components Enable Professional Music Applications</p>
                     <div class="author-info fade-in">
                         <div>Riley Ramone</div>
                         <div class="date-info">September 16th, 2025</div>

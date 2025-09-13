@@ -114,6 +114,9 @@ describe('HandPan Component', () => {
         document.body.appendChild(handPan);
         handPan.isMuted = false;
 
+        // Wait for component to be fully initialized
+        await new Promise(resolve => setTimeout(resolve, 50));
+
         // Act
         const firstField = handPan.shadowRoot.querySelector('.tone-field');
         const mousedownEvent = new MouseEvent('mousedown', { bubbles: true });

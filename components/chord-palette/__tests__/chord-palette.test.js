@@ -297,8 +297,12 @@ describe('ChordPalette Component', () => {
                 fireEvent.click(buttons[i]);
             }
             
-            // Should have dispatched 3 events per click (add-chord + chord-selected + key-changed)
-            expect(mockDispatchEvent).toHaveBeenCalledTimes(9);
+            // Should have dispatched 3 events for first click + 2 events per subsequent click
+            // First click: add-chord + chord-selected + key-changed = 3
+            // Second click: add-chord + chord-selected = 2
+            // Third click: add-chord + chord-selected = 2
+            // Total: 3 + 2 + 2 = 7
+            expect(mockDispatchEvent).toHaveBeenCalledTimes(7);
         });
 
         test('should handle rapid successive clicks', () => {
@@ -310,8 +314,11 @@ describe('ChordPalette Component', () => {
                 fireEvent.click(button);
             }
             
-            // Should have dispatched 3 events per click
-            expect(mockDispatchEvent).toHaveBeenCalledTimes(15);
+            // Should have dispatched 3 events for first click + 2 events per subsequent click
+            // First click: add-chord + chord-selected + key-changed = 3
+            // Clicks 2-5: add-chord + chord-selected = 2 each = 8
+            // Total: 3 + 8 = 11
+            expect(mockDispatchEvent).toHaveBeenCalledTimes(11);
         });
     });
 

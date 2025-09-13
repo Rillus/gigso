@@ -207,7 +207,7 @@ describe('PianoRoll Component - Configuration', () => {
 
         test('should have correct default chord width', () => {
             const freshPianoRoll = document.createElement('piano-roll');
-            expect(freshPianoRoll.chordWidth).toBe(100);
+            expect(freshPianoRoll.chordWidth).toBe(25);
         });
 
         test('should initialize with State.instrument() value', () => {

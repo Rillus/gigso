@@ -254,25 +254,35 @@ export default class PianoRoll extends HTMLElement {
     renderChords() {
         this.reel.innerHTML = '';
         this.chords.forEach((chord, chordIndex) => {
+            // Validate chord object
+            if (!chord || typeof chord !== 'object') {
+                console.warn('PianoRoll: Invalid chord object at index', chordIndex);
+                return;
+            }
+
             const chordBox = document.createElement('div');
             chordBox.classList.add('chord-box');
             
             const chordText = document.createElement('p');
             chordText.setAttribute('class', 'chordName')
-            chordText.textContent = chord.name;
+            chordText.textContent = chord.name || 'Unknown';
             chordBox.appendChild(chordText);
             
             try {
                 const chordDiagram = document.createElement('chord-diagram');
-                chordDiagram.setAttribute('chord', chord.name);
-                chordDiagram.setAttribute('instrument', this.instrument);
-                chordBox.appendChild(chordDiagram);
-                console.log('PianoRoll: Created chord-diagram for', chord.name);
+                if (chordDiagram && typeof chordDiagram.setAttribute === 'function') {
+                    chordDiagram.setAttribute('chord', chord.name || 'Unknown');
+                    chordDiagram.setAttribute('instrument', this.instrument || 'piano');
+                    chordBox.appendChild(chordDiagram);
+                    console.log('PianoRoll: Created chord-diagram for', chord.name);
+                } else {
+                    throw new Error('chord-diagram element not properly created');
+                }
             } catch (error) {
                 console.error('PianoRoll: Error creating chord-diagram:', error);
                 // Fallback: just show the chord name
                 const fallbackText = document.createElement('div');
-                fallbackText.textContent = `[${chord.name}]`;
+                fallbackText.textContent = `[${chord.name || 'Unknown'}]`;
                 fallbackText.style.cssText = 'font-size: 12px; color: #666; text-align: center;';
                 chordBox.appendChild(fallbackText);
             }
@@ -304,9 +314,22 @@ export default class PianoRoll extends HTMLElement {
     }
 
     removeChord(chordIndex) {
-        this.chords.splice(chordIndex, 1);
-        this.renderChords();
-        this.updateChordDisplay();
+        try {
+            this.chords.splice(chordIndex, 1);
+            this.renderChords();
+            this.updateChordDisplay();
+        } catch (error) {
+            console.error('PianoRoll: Error removing chord:', error);
+            // Alternative approach if splice fails
+            try {
+                const newChords = this.chords.filter((_, index) => index !== chordIndex);
+                this.chords = newChords;
+                this.renderChords();
+                this.updateChordDisplay();
+            } catch (fallbackError) {
+                console.error('PianoRoll: Fallback chord removal also failed:', fallbackError);
+            }
+        }
     }
 
     initDrag(e, chordIndex) {
@@ -499,10 +522,21 @@ export default class PianoRoll extends HTMLElement {
         console.log('PianoRoll: Tempo set to', tempo, 'BPM');
     }
 
+    get tempo() {
+        return this.currentBpm;
+    }
+
     setTimeSignature(timeSignature) {
         this.timeSignature = timeSignature;
-        this.beatsPerBar = timeSignature.split('/')[0];
-        this.noteValue = timeSignature.split('/')[1];
+        if (timeSignature && typeof timeSignature === 'string') {
+            const parts = timeSignature.split('/');
+            if (parts.length >= 2) {
+                this.beatsPerBar = parts[0];
+                this.noteValue = parts[1];
+            }
+        } else if (timeSignature !== null && timeSignature !== undefined) {
+            console.warn('PianoRoll: Invalid time signature:', timeSignature);
+        }
         console.log('PianoRoll: Time signature set to', timeSignature);
     }
 

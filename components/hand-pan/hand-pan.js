@@ -755,7 +755,7 @@ export default class HandPan extends HTMLElement {
         if (this.isMuted) return;
 
         const note = this.sortedNotes[index];
-        const noteId = `keyboard-${index}`;
+        const noteId = `keyboard-${index + 1}-${index}`; // Use key number (index + 1) for consistency
         
         console.log('HandPan: Keyboard interaction - Playing note', note, 'at index', index);
         
@@ -797,7 +797,7 @@ export default class HandPan extends HTMLElement {
     }
 
     handleKeyboardRelease(event, index) {
-        const noteId = `keyboard-${index}`;
+        const noteId = `keyboard-${index + 1}-${index}`; // Use key number (index + 1) for consistency
         
         // Remove from active notes
         this.activeNotes.delete(noteId);

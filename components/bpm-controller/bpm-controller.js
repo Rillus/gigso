@@ -57,12 +57,14 @@ export default class BpmController extends HTMLElement {
                 <button 
                     class="bpm-button bpm-minus" 
                     data-testid="minus-button"
+                    role="button"
                     aria-label="Decrement BPM by ${this.stepSize}"
                     title="Decrease BPM by ${this.stepSize}">
                     −
                 </button>
                 
                 <input 
+                    id="bpm-input"
                     type="number" 
                     class="bpm-input" 
                     data-testid="bpm-input"
@@ -77,6 +79,7 @@ export default class BpmController extends HTMLElement {
                 <button 
                     class="bpm-button bpm-plus" 
                     data-testid="plus-button"
+                    role="button"
                     aria-label="Increment BPM by ${this.stepSize}"
                     title="Increase BPM by ${this.stepSize}">
                     +
@@ -222,6 +225,20 @@ export default class BpmController extends HTMLElement {
         // Button click handlers
         this.minusButton.addEventListener('click', () => this.decrementBpm());
         this.plusButton.addEventListener('click', () => this.incrementBpm());
+        
+        // Button keyboard handlers
+        this.minusButton.addEventListener('keydown', (e) => {
+            if (e.key === ' ' || e.key === 'Enter') {
+                e.preventDefault();
+                this.decrementBpm();
+            }
+        });
+        this.plusButton.addEventListener('keydown', (e) => {
+            if (e.key === ' ' || e.key === 'Enter') {
+                e.preventDefault();
+                this.incrementBpm();
+            }
+        });
 
         // Input handlers
         this.bpmInput.addEventListener('click', () => this.enterEditMode());
