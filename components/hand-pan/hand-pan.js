@@ -1160,20 +1160,8 @@ export default class HandPan extends HTMLElement {
             }
             this.lastPlayTime = now;
             
-            // Limit simultaneous notes to prevent audio dropouts
-            if (this.activeNotes.size >= this.maxSimultaneousNotes) {
-                // Remove oldest note (just from tracking, audio will decay naturally)
-                const firstNote = this.activeNotes.values().next().value;
-                this.activeNotes.delete(firstNote);
-            }
-            
-            // Add to active notes tracking
-            this.activeNotes.add(note);
-            
-            // Auto-remove from active notes after duration (8n ≈ 500ms)
-            setTimeout(() => {
-                this.activeNotes.delete(note);
-            }, 500);
+            // Note: activeNotes tracking is handled by the calling interaction methods
+            // This avoids mixing interaction IDs with note names in the same Set
             
             // Validate note before playing
             if (!note || typeof note !== 'string') {

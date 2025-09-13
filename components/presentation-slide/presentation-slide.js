@@ -97,6 +97,7 @@ export default class PresentationSlide extends BaseComponent {
                 max-width: 600px;
                 margin: 20px auto;
                 overflow-x: auto;
+                white-space: pre;
             }
             
             .demo-area {

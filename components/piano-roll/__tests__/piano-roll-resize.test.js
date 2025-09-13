@@ -85,16 +85,16 @@ describe('PianoRoll Component - Chord Resizing', () => {
 
         test('should calculate duration correctly based on chord width', () => {
             const resizeHandle = pianoRollElement.shadowRoot.querySelector('.resize-handle');
-            const chordWidth = pianoRollElement.chordWidth; // 100px
+            const chordWidth = pianoRollElement.chordWidth; // 25px
             
             // Start resize
             fireEvent.mouseDown(resizeHandle, { clientX: 100 });
             
-            // Increase width by exactly one chord width (100px)
+            // Increase width by 100px
             fireEvent(window, new MouseEvent('mousemove', { clientX: 200 }));
             
-            // Duration should increase by 1 (100px / 100px chordWidth = 1 beat)
-            expect(pianoRollElement.chords[0].duration).toBe(2);
+            // Duration should increase by 4 (100px / 25px chordWidth = 4 beats)
+            expect(pianoRollElement.chords[0].duration).toBe(5); // 1 + 4 = 5
         });
 
         test('should enforce minimum duration', () => {
@@ -244,8 +244,9 @@ describe('PianoRoll Component - Chord Resizing', () => {
             fireEvent(window, new MouseEvent('mousemove', { clientX: 1000 }));
             
             // Should handle large durations without error
-            expect(pianoRollElement.chords[0].duration).toBeGreaterThan(5);
-            expect(pianoRollElement.chords[0].duration).toBeLessThan(20); // Reasonable upper bound
+            // 900px movement / 25px chordWidth = 36 beats + initial 1 = 37 beats
+            expect(pianoRollElement.chords[0].duration).toBeGreaterThan(30);
+            expect(pianoRollElement.chords[0].duration).toBeLessThan(40); // Reasonable upper bound
         });
     });
 

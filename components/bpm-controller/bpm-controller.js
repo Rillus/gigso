@@ -1,4 +1,3 @@
-import BaseComponent from '../base-component.js';
 import State from '../../state/state.js';
 
 export default class BpmController extends HTMLElement {

@@ -252,6 +252,10 @@ export default class PianoRoll extends HTMLElement {
     }
 
     renderChords() {
+        // Only render if component is still connected to DOM
+        if (!this.isConnected || !this.reel) {
+            return;
+        }
         this.reel.innerHTML = '';
         this.chords.forEach((chord, chordIndex) => {
             // Validate chord object
@@ -505,7 +509,10 @@ export default class PianoRoll extends HTMLElement {
 
     setInstrument(instrument) {
         this.instrument = instrument;
-        this.renderChords();
+        // Only render if component is still connected to DOM
+        if (this.isConnected) {
+            this.renderChords();
+        }
     }
 
     handleBpmChange(newBpm) {

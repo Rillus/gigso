@@ -256,7 +256,7 @@ describe('BpmController Integration Tests', () => {
         Transport: {
           bpm: {
             get value() { throw new Error('Transport error'); },
-            set value() { throw new Error('Transport error'); }
+            set value(val) { throw new Error('Transport error'); }
           }
         }
       };

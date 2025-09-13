@@ -23,7 +23,10 @@ describe('PianoRoll Component - Configuration', () => {
     });
 
     afterEach(() => {
-        document.body.removeChild(pianoRollElement);
+        // Only remove if still in the DOM
+        if (pianoRollElement.parentNode) {
+            document.body.removeChild(pianoRollElement);
+        }
         console.log = originalLog;
     });
 
@@ -272,7 +275,7 @@ describe('PianoRoll Component - Configuration', () => {
             }
             
             expect(pianoRollElement.getTempo()).toBe(109);
-            expect(pianoRollElement.getTimeSignature()).toBe('5/4');
+            expect(pianoRollElement.getTimeSignature()).toBe('3/4'); // i=9: 9%4+2=3 → "3/4"
             expect(pianoRollElement.instrument).toBe('instrument9');
         });
     });
