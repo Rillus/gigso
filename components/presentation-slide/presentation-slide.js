@@ -232,10 +232,66 @@ export default class PresentationSlide extends BaseComponent {
         }
     }
     
+    // Handle property changes (when set directly as properties)
+    set slideIndex(value) {
+        this._slideIndex = value;
+    }
+    
+    get slideIndex() {
+        return this._slideIndex || 0;
+    }
+    
+    set slideType(value) {
+        this._slideType = value;
+        if (value) {
+            this.loadSlideContent();
+        }
+    }
+    
+    get slideType() {
+        return this._slideType || '';
+    }
+    
+    set title(value) {
+        this._title = value;
+    }
+    
+    get title() {
+        return this._title || '';
+    }
+    
+    set slideData(value) {
+        this._slideData = value;
+        if (value && value.content) {
+            this.loadSlideContent();
+        }
+    }
+    
+    get slideData() {
+        return this._slideData;
+    }
+    
     loadSlideContent() {
         const content = this.shadowRoot.getElementById('slide-content');
         
-        switch (this.slideType) {
+        if (!content) {
+            // Content element not ready yet, skip
+            return;
+        }
+        
+        // Try to use JSON data first if available
+        if (this.slideData && this.slideData.content) {
+            this.renderSlideFromData(content, this.slideData.content);
+            return;
+        }
+        
+        // Fallback to hardcoded content
+        const slideType = this.slideType;
+        if (!slideType) {
+            return;
+        }
+        
+        switch (slideType) {
             case 'title-slide':
                 content.innerHTML = `
                     <h1 class="slide-title fade-in">From Code to Chords</h1>
@@ -382,6 +438,110 @@ this.dispatchEvent(new CustomEvent('chord-selected', {
         }
     }
     
+    renderSlideFromData(content, slideContent) {
+        switch (slideContent.type) {
+            case 'title':
+                content.innerHTML = `
+                    <h1 class="slide-title fade-in">${slideContent.mainTitle}</h1>
+                    <p class="slide-subtitle fade-in">${slideContent.subtitle}</p>
+                    <div class="author-info fade-in">
+                        <div>${slideContent.author}</div>
+                        <div class="date-info">${slideContent.date}</div>
+                    </div>
+                `;
+                break;
+                
+            case 'bullets':
+                let bulletsHtml = `<h2 class="slide-in-left">${slideContent.mainTitle}</h2><ul class="slide-bullets slide-in-right">`;
+                slideContent.bullets.forEach(bullet => {
+                    bulletsHtml += `<li><span class="highlight">${bullet.highlight}</span>: ${bullet.text.replace(bullet.highlight + ': ', '')}</li>`;
+                });
+                bulletsHtml += '</ul>';
+                content.innerHTML = bulletsHtml;
+                break;
+                
+            case 'code':
+                content.innerHTML = `
+                    <h2 class="slide-in-left">${slideContent.mainTitle}</h2>
+                    <div class="code-block slide-in-right">
+${slideContent.codeBlock}
+                    </div>
+                    ${slideContent.question ? `<p class="slide-subtitle">${slideContent.question}</p>` : ''}
+                `;
+                break;
+                
+            case 'grid':
+                let gridHtml = `<h2 class="slide-in-left">${slideContent.mainTitle}</h2><div class="component-grid slide-in-right">`;
+                slideContent.categories.forEach(category => {
+                    gridHtml += `
+                        <div class="component-card">
+                            <span class="component-icon">${category.icon}</span>
+                            <h3>${category.title}</h3>
+                            <p>${category.description}</p>
+                        </div>
+                    `;
+                });
+                gridHtml += '</div>';
+                content.innerHTML = gridHtml;
+                break;
+                
+            case 'bullets-with-code':
+                let bulletsCodeHtml = `<h2 class="slide-in-left">${slideContent.mainTitle}</h2><ul class="slide-bullets slide-in-right">`;
+                slideContent.bullets.forEach(bullet => {
+                    bulletsCodeHtml += `<li><span class="highlight">${bullet.highlight}</span>: ${bullet.text.replace(bullet.highlight + ': ', '')}</li>`;
+                });
+                bulletsCodeHtml += '</ul>';
+                if (slideContent.codeBlock) {
+                    bulletsCodeHtml += `<div class="code-block">${slideContent.codeBlock}</div>`;
+                }
+                content.innerHTML = bulletsCodeHtml;
+                break;
+                
+            case 'demo':
+                content.innerHTML = `
+                    <h2 class="slide-in-left">${slideContent.mainTitle}</h2>
+                    <div class="demo-area" id="live-demo-area">
+                        <p>${slideContent.loadingMessage}</p>
+                        <live-demo demo-type="${slideContent.demoType}"></live-demo>
+                    </div>
+                `;
+                break;
+                
+            case 'two-column':
+                let leftColumnHtml = `<h3>${slideContent.leftColumn.title}</h3><ul class="slide-bullets">`;
+                slideContent.leftColumn.bullets.forEach(bullet => {
+                    leftColumnHtml += `<li><span class="highlight">${bullet.highlight}</span>: ${bullet.text.replace(bullet.highlight + ': ', '')}</li>`;
+                });
+                leftColumnHtml += '</ul>';
+                
+                let rightColumnHtml = `<h3>${slideContent.rightColumn.title}</h3><ul class="slide-bullets">`;
+                slideContent.rightColumn.bullets.forEach(bullet => {
+                    rightColumnHtml += `<li><span class="highlight">${bullet.highlight}</span>: ${bullet.text.replace(bullet.highlight + ': ', '')}</li>`;
+                });
+                rightColumnHtml += '</ul>';
+                
+                content.innerHTML = `
+                    <h2 class="slide-in-left">${slideContent.mainTitle}</h2>
+                    <div style="display: flex; justify-content: space-between; gap: 40px; align-items: flex-start;">
+                        <div style="flex: 1;">
+                            ${leftColumnHtml}
+                        </div>
+                        <div style="flex: 1;">
+                            ${rightColumnHtml}
+                        </div>
+                    </div>
+                `;
+                break;
+                
+            default:
+                content.innerHTML = `
+                    <h2>Slide Content</h2>
+                    <p>Slide type: ${slideContent.type}</p>
+                    <p>Title: ${this.title}</p>
+                `;
+        }
+    }
+    
     show() {
         this.isVisible = true;
         this.classList.add('active');
@@ -517,10 +677,8 @@ this.dispatchEvent(new CustomEvent('chord-selected', {
     }
     
     connectedCallback() {
-        super.connectedCallback();
-        
-        // Load content if attributes are already set
-        if (this.slideType) {
+        // Load content if properties are already set
+        if (this.slideType || (this.slideData && this.slideData.content)) {
             this.loadSlideContent();
         }
     }

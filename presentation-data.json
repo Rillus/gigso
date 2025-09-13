@@ -1,0 +1,244 @@
+{
+  "slides": [
+    {
+      "id": "title-slide",
+      "title": "From Code to Chords",
+      "content": {
+        "type": "title",
+        "mainTitle": "From Code to Chords",
+        "subtitle": "Building a Web-Based Music Maker Without Frameworks",
+        "author": "Riley Ramone",
+        "date": "September 16th, 2025"
+      },
+      "speakerNotes": {
+        "opening": "From Code to Chords - imagine building a professional music application using only web standards. No React, no Vue, no Angular - just pure web technologies.",
+        "keyPoint": "Introduce the concept of framework-free development",
+        "timing": "2-3 minutes for introduction and context setting"
+      }
+    },
+    {
+      "id": "web-components-overview",
+      "title": "What Are Web Components?",
+      "content": {
+        "type": "bullets",
+        "mainTitle": "What Are Web Components?",
+        "bullets": [
+          {
+            "text": "Encapsulation: Shadow DOM isolates styles and markup",
+            "highlight": "Encapsulation"
+          },
+          {
+            "text": "Reusability: Custom elements work across any framework",
+            "highlight": "Reusability"
+          },
+          {
+            "text": "Standards-based: Built on web standards, no external dependencies",
+            "highlight": "Standards-based"
+          },
+          {
+            "text": "Composability: Components combine to build complex applications",
+            "highlight": "Composability"
+          }
+        ]
+      },
+      "speakerNotes": {
+        "focus": "Explain the three main Web Components technologies",
+        "emphasize": "Standards-based, browser-native technology",
+        "analogy": "Like building blocks that work everywhere",
+        "timing": "3-4 minutes to explain each concept with examples"
+      }
+    },
+    {
+      "id": "web-components-benefits",
+      "title": "Why Web Components for Music?",
+      "content": {
+        "type": "bullets",
+        "mainTitle": "Why Web Components for Music?",
+        "bullets": [
+          {
+            "text": "Modularity: Each instrument/control is a separate component",
+            "highlight": "Modularity"
+          },
+          {
+            "text": "Interoperability: Components communicate via standard events",
+            "highlight": "Interoperability"
+          },
+          {
+            "text": "Performance: Native browser APIs, no framework overhead",
+            "highlight": "Performance"
+          },
+          {
+            "text": "Audio-First: Direct access to Web Audio API for real-time audio",
+            "highlight": "Audio-First"
+          }
+        ]
+      },
+      "speakerNotes": {
+        "focus": "Music-Specific Benefits: Why Web Components are perfect for audio applications",
+        "keyPoints": "No framework overhead, native performance, modular architecture",
+        "timing": "4-5 minutes with audio examples if possible"
+      }
+    },
+    {
+      "id": "architecture-overview",
+      "title": "Component Architecture",
+      "content": {
+        "type": "code",
+        "mainTitle": "BaseComponent Architecture",
+        "codeBlock": "export default class BaseComponent extends HTMLElement {\n  constructor(template, styles, isolatedStyles = true) {\n    super();\n    this.attachShadow({ mode: 'open' });\n    this.render(template, styles, isolatedStyles);\n  }\n  \n  dispatchComponentEvent(target, eventName, data) {\n    // Centralized event handling\n  }\n}",
+        "question": "🤔 Is BaseComponent a good idea?"
+      },
+      "speakerNotes": {
+        "focus": "BaseComponent Pattern: Explain the inheritance hierarchy",
+        "question": "Is BaseComponent a good idea? - encourage discussion",
+        "timing": "3-4 minutes with audience interaction"
+      }
+    },
+    {
+      "id": "component-categories",
+      "title": "Component Categories",
+      "content": {
+        "type": "grid",
+        "mainTitle": "Component Categories",
+        "categories": [
+          {
+            "icon": "🎹",
+            "title": "Music Creation",
+            "description": "PianoRoll, ChordPalette, AddChord"
+          },
+          {
+            "icon": "🎸",
+            "title": "Instruments",
+            "description": "HandPan, GigsoKeyboard, Fretboard"
+          },
+          {
+            "icon": "⏯️",
+            "title": "Playback Controls",
+            "description": "TransportControls, PlayButton, LoopButton"
+          },
+          {
+            "icon": "📊",
+            "title": "Visual Feedback",
+            "description": "CurrentChord, VUMeter, EQDisplay"
+          }
+        ]
+      },
+      "speakerNotes": {
+        "focus": "Visual Organization: Show how components are categorized by function",
+        "highlight": "Each category serves a specific musical purpose",
+        "timing": "2-3 minutes to walk through each category"
+      }
+    },
+    {
+      "id": "event-architecture",
+      "title": "Event-Driven Architecture",
+      "content": {
+        "type": "bullets-with-code",
+        "mainTitle": "Event-Driven Architecture",
+        "bullets": [
+          {
+            "text": "CustomEvent: Components communicate via standard events",
+            "highlight": "CustomEvent"
+          },
+          {
+            "text": "Centralized State: Single source of truth for application state",
+            "highlight": "Centralized State"
+          },
+          {
+            "text": "Real-time Updates: Changes propagate across all components",
+            "highlight": "Real-time Updates"
+          },
+          {
+            "text": "Example: Chord selection updates multiple components simultaneously",
+            "highlight": "Example"
+          }
+        ],
+        "codeBlock": "// Component communication example\nthis.dispatchEvent(new CustomEvent('chord-selected', {\n  detail: { chord: 'Cmaj7', notes: ['C', 'E', 'G', 'B'] }\n}));"
+      },
+      "speakerNotes": {
+        "focus": "Communication Pattern: CustomEvent-based messaging",
+        "example": "Chord selection updating multiple components",
+        "timing": "4-5 minutes with live demonstration if possible"
+      }
+    },
+    {
+      "id": "live-demo",
+      "title": "Live Demo: Building a Song",
+      "content": {
+        "type": "demo",
+        "mainTitle": "Live Demo: Building a Song",
+        "demoType": "song-building",
+        "loadingMessage": "🎵 Interactive Demo Loading..."
+      },
+      "speakerNotes": {
+        "focus": "Demo Flow: Start simple, build complexity",
+        "interaction": "Encourage audience participation",
+        "fallback": "Have backup if audio doesn't work",
+        "timing": "8-10 minutes for interactive demonstration"
+      }
+    },
+    {
+      "id": "technical-future",
+      "title": "Technical Innovation & Future",
+      "content": {
+        "type": "two-column",
+        "mainTitle": "Technical Innovation & Future",
+        "leftColumn": {
+          "title": "Advanced Features",
+          "bullets": [
+            {
+              "text": "Audio Engine: Tone.js integration",
+              "highlight": "Audio Engine"
+            },
+            {
+              "text": "Touch Support: Multi-touch instruments",
+              "highlight": "Touch Support"
+            },
+            {
+              "text": "Performance: 60fps, <50ms latency",
+              "highlight": "Performance"
+            },
+            {
+              "text": "Responsive: Desktop, tablet, mobile",
+              "highlight": "Responsive"
+            }
+          ]
+        },
+        "rightColumn": {
+          "title": "What's Next",
+          "bullets": [
+            {
+              "text": "MIDI: Import/export capabilities",
+              "highlight": "MIDI"
+            },
+            {
+              "text": "AI: Assisted composition",
+              "highlight": "AI"
+            },
+            {
+              "text": "Collaboration: Real-time editing",
+              "highlight": "Collaboration"
+            },
+            {
+              "text": "Mobile: Native app development",
+              "highlight": "Mobile"
+            }
+          ]
+        }
+      },
+      "speakerNotes": {
+        "focus": "Closing: From Code to Chords - we've seen how Web Components enable sophisticated applications",
+        "futureVision": "Standards-based, modular web development",
+        "timing": "3-4 minutes to wrap up and inspire"
+      }
+    }
+  ],
+  "metadata": {
+    "totalSlides": 8,
+    "presentationTitle": "From Code to Chords: Building a Web-Based Music Maker Without Frameworks",
+    "author": "Riley Ramone",
+    "date": "September 16th, 2025",
+    "version": "1.0.0",
+    "lastUpdated": "2025-01-27"
+  }
+}

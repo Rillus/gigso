@@ -267,6 +267,14 @@ export default class GigsoPresentation extends BaseComponent {
         nextBtn.addEventListener('click', () => this.nextSlide());
         fullscreenBtn.addEventListener('click', () => this.toggleFullscreen());
         exitBtn.addEventListener('click', () => this.exitPresentation());
+
+        document.addEventListener('fullscreenchange', () => {
+            this.isFullscreen = !!document.fullscreenElement;
+            const container = this.shadowRoot.querySelector('.presentation-container');
+            if (container) {
+                container.classList.toggle('fullscreen', this.isFullscreen);
+            }
+        });
     }
     
     setupKeyboardNavigation() {
@@ -294,8 +302,7 @@ export default class GigsoPresentation extends BaseComponent {
                         this.toggleFullscreen();
                     }
                     break;
-                case 'n':
-                case 'N':
+                case '0':
                     if (event.ctrlKey || event.metaKey) {
                         event.preventDefault();
                         this.toggleSpeakerNotes();
@@ -306,6 +313,56 @@ export default class GigsoPresentation extends BaseComponent {
     }
     
     async loadSlides() {
+        try {
+            // Load presentation data from JSON file
+            const response = await fetch('./presentation-data.json');
+            if (!response.ok) {
+                throw new Error(`Failed to load presentation data: ${response.status}`);
+            }
+            const presentationData = await response.json();
+            
+            this.presentationData = presentationData;
+            this.totalSlides = presentationData.slides.length;
+            
+            const container = this.shadowRoot.getElementById('slides-container');
+            
+            // Create slides from JSON data
+            for (let i = 0; i < presentationData.slides.length; i++) {
+                const slideConfig = presentationData.slides[i];
+                const slide = document.createElement('presentation-slide');
+                
+                // Set properties first (before adding to DOM)
+                slide.slideIndex = i;
+                slide.slideType = slideConfig.id;
+                slide.title = slideConfig.title;
+                slide.slideData = slideConfig;
+                
+                // Add to DOM
+                container.appendChild(slide);
+                
+                // Add CSS classes after DOM insertion
+                slide.classList.add('slide');
+                if (i === 0) {
+                    slide.classList.add('active');
+                }
+                
+                this.slides.push(slide);
+            }
+            
+            this.updateSlideCounter();
+            this.updateProgress();
+            
+            // Load speaker notes for the first slide
+            this.loadSlideNotes();
+            
+        } catch (error) {
+            console.error('Error loading presentation slides:', error);
+            // Fallback to hardcoded data if JSON loading fails
+            this.loadFallbackSlides();
+        }
+    }
+    
+    loadFallbackSlides() {
         const slideData = [
             { component: 'title-slide', title: 'From Code to Chords' },
             { component: 'web-components-overview', title: 'What Are Web Components?' },
@@ -321,21 +378,29 @@ export default class GigsoPresentation extends BaseComponent {
         
         for (let i = 0; i < slideData.length; i++) {
             const slide = document.createElement('presentation-slide');
-            slide.setAttribute('slide-index', i);
-            slide.setAttribute('slide-type', slideData[i].component);
-            slide.setAttribute('title', slideData[i].title);
-            slide.classList.add('slide');
             
+            // Set properties first (before adding to DOM)
+            slide.slideIndex = i;
+            slide.slideType = slideData[i].component;
+            slide.title = slideData[i].title;
+            
+            // Add to DOM
+            container.appendChild(slide);
+            
+            // Add CSS classes after DOM insertion
+            slide.classList.add('slide');
             if (i === 0) {
                 slide.classList.add('active');
             }
             
-            container.appendChild(slide);
             this.slides.push(slide);
         }
         
         this.updateSlideCounter();
         this.updateProgress();
+        
+        // Load speaker notes for the first slide
+        this.loadSlideNotes();
     }
     
     nextSlide() {
@@ -406,14 +471,28 @@ export default class GigsoPresentation extends BaseComponent {
     
     loadSlideNotes() {
         const currentSlideElement = this.slides[this.currentSlide];
-        const slideType = currentSlideElement.getAttribute('slide-type');
+        if (!currentSlideElement) return;
+        
+        // Try to get slide type from property first, then fallback to attribute
+        const slideType = currentSlideElement.slideType || currentSlideElement.getAttribute('slide-type');
         const notesContent = this.shadowRoot.getElementById('notes-content');
+        
+        if (!slideType || !notesContent) return;
         
         const speakerNotes = this.getSpeakerNotes(slideType);
         notesContent.innerHTML = speakerNotes;
     }
     
     getSpeakerNotes(slideType) {
+        // Try to get notes from JSON data first
+        if (this.presentationData && this.presentationData.slides) {
+            const slideData = this.presentationData.slides.find(slide => slide.id === slideType);
+            if (slideData && slideData.speakerNotes) {
+                return this.formatSpeakerNotes(slideData.speakerNotes);
+            }
+        }
+        
+        // Fallback to hardcoded notes
         const notes = {
             'title-slide': `
                 <p><strong>Opening Hook:</strong> "From Code to Chords - imagine building a professional music application using only web standards. No React, no Vue, no Angular - just pure web technologies."</p>
@@ -454,6 +533,82 @@ export default class GigsoPresentation extends BaseComponent {
         return notes[slideType] || '<p>No notes available for this slide.</p>';
     }
     
+    formatSpeakerNotes(notes) {
+        let html = '';
+        
+        // Add opening hook if present
+        if (notes.opening) {
+            html += `<p><strong>Opening Hook:</strong> "${notes.opening}"</p>`;
+        }
+        
+        // Add focus points
+        if (notes.focus) {
+            html += `<p><strong>Focus:</strong> ${notes.focus}</p>`;
+        }
+        
+        // Add key points
+        if (notes.keyPoints) {
+            html += `<p><strong>Key Points:</strong> ${notes.keyPoints}</p>`;
+        }
+        
+        // Add key point (singular)
+        if (notes.keyPoint) {
+            html += `<p><strong>Key Point:</strong> ${notes.keyPoint}</p>`;
+        }
+        
+        // Add emphasis
+        if (notes.emphasize) {
+            html += `<p><strong>Emphasize:</strong> ${notes.emphasize}</p>`;
+        }
+        
+        // Add analogy
+        if (notes.analogy) {
+            html += `<p><strong>Analogy:</strong> ${notes.analogy}</p>`;
+        }
+        
+        // Add question
+        if (notes.question) {
+            html += `<p><strong>Question:</strong> ${notes.question}</p>`;
+        }
+        
+        // Add example
+        if (notes.example) {
+            html += `<p><strong>Example:</strong> ${notes.example}</p>`;
+        }
+        
+        // Add interaction notes
+        if (notes.interaction) {
+            html += `<p><strong>Interaction:</strong> ${notes.interaction}</p>`;
+        }
+        
+        // Add fallback notes
+        if (notes.fallback) {
+            html += `<p><strong>Fallback:</strong> ${notes.fallback}</p>`;
+        }
+        
+        // Add closing notes
+        if (notes.closing) {
+            html += `<p><strong>Closing:</strong> ${notes.closing}</p>`;
+        }
+        
+        // Add future vision
+        if (notes.futureVision) {
+            html += `<p><strong>Future Vision:</strong> ${notes.futureVision}</p>`;
+        }
+        
+        // Add timing information
+        if (notes.timing) {
+            html += `<p><strong>Timing:</strong> ${notes.timing}</p>`;
+        }
+        
+        // Add highlight
+        if (notes.highlight) {
+            html += `<p><strong>Highlight:</strong> ${notes.highlight}</p>`;
+        }
+        
+        return html || '<p>No notes available for this slide.</p>';
+    }
+    
     startTimer() {
         this.startTime = Date.now();
         this.timerInterval = setInterval(() => {
@@ -467,7 +622,8 @@ export default class GigsoPresentation extends BaseComponent {
     }
     
     toggleFullscreen() {
-        if (!this.isFullscreen) {
+        // Check actual fullscreen state instead of tracking our own
+        if (!document.fullscreenElement) {
             this.requestFullscreen().then(() => {
                 this.isFullscreen = true;
                 this.shadowRoot.querySelector('.presentation-container').classList.add('fullscreen');
