@@ -11,9 +11,59 @@
         "date": "September 16th, 2025"
       },
       "speakerNotes": {
-        "opening": "From Code to Chords - imagine building a professional music application using only web standards. No React, no Vue, no Angular - just pure web technologies.",
-        "keyPoint": "Introduce the concept of framework-free development",
-        "timing": "2-3 minutes for introduction and context setting"
+        "opening": "From Code to Chords - imagine building a music application using only web standards.<br><br>No React, no Vue, no Angular - just pure web technologies.",
+        "keyPoint": "Introduce the concept of framework-free development<br>• Show the audience what's possible<br>• Build credibility",
+        "timing": "2-3 minutes for introduction and context setting",
+        "focus": "1",
+        "keyPoints": "2",
+        "emphasize": "3",
+        "analogy": "",
+        "question": "",
+        "example": "",
+        "interaction": "",
+        "fallback": "",
+        "closing": "",
+        "futureVision": "",
+        "highlight": ""
+      }
+    },
+    {
+      "id": "the-noisy-web",
+      "title": "The Noisy Web",
+      "content": {
+        "type": "bullets",
+        "mainTitle": "The Noisy Web",
+        "bullets": [
+          {
+            "text": "CD-ROMs were introduced",
+            "highlight": "1985"
+          },
+          {
+            "text": "Adobe Flash launched",
+            "highlight": "1996"
+          },
+          {
+            "text": "Safari implements the HTML5 Audio element",
+            "highlight": "2008"
+          },
+          {
+            "text": "Chrome implements the Web Audio API",
+            "highlight": "2011"
+          },
+          {
+            "text": "The first web-based DAW was created",
+            "highlight": "2013"
+          },
+          {
+            "text": "Adobe Flash discontinued",
+            "highlight": "2020"
+          }
+        ]
+      },
+      "speakerNotes": {
+        "focus": "The Web used to be a very loud place",
+        "keyPoints": "- The Web used to be a very loud place, and although we have audio and video, it tends to be within the context of audio and video players now.<br>The history of audio on the web to me can be traced back to the launch of the CD-ROM. This ushered in the age of what we then called Multimedia.<br><br>Although there was an arms race of who and how we could play audio and video on the web (and there were many potential contenders in this race), the launch of Flash in 1996 marked a turning point, allowing for more complex audio and video content to be created and played back on the web.<br><br>This was a golden age of unsolicited musical and animated intros to websites that made the web both a joy and a hazard to navigate for around 10 years, before the Internet started to grow up and be these interludes became blockers to search engine optimisation and to users being able to complete tasks.<br><br>Around 2008, we got the first release of HTML5, which included the audio element tag, allowing us to embed audio files into web pages.<br><br>And then it wasn't until 2011 that we got the Web Audio API, which allowed for more complex audio to be created and played back on the web. At the time, this passed me by: I was probably building more ads and games in Flash, and sound was only used very judiciously, as no one really wanted their computer to shout at them anymore.<br><br>This led to the launch of the first web-based DAW (digital audio workstation - which is to a certain extent what we're talking about in this talk), Soundtrap.<br><br>Finally, in 2020, Adobe Flash was discontinued, in part because of the ability to navtively embed multimedia elements into the web, and also in part because Apple wouldn't allow Flash to be used on iOS devices.",
+        "timing": "2-3 minutes to explain each concept with examples"
       }
     },
     {
@@ -42,9 +92,9 @@
         ]
       },
       "speakerNotes": {
-        "focus": "Explain the three main Web Components technologies",
-        "emphasize": "Standards-based, browser-native technology",
-        "analogy": "Like building blocks that work everywhere",
+        "focus": "Explain the three main Web Components technologies:<br>• Custom Elements<br>• Shadow DOM<br>• HTML Templates",
+        "emphasize": "Standards-based, browser-native technology<br><br>No frameworks needed!",
+        "analogy": "Like building blocks that work everywhere<br><br>Think LEGO bricks - same pieces, infinite combinations",
         "timing": "3-4 minutes to explain each concept with examples"
       }
     },
@@ -80,18 +130,34 @@
       }
     },
     {
-      "id": "architecture-overview",
-      "title": "Component Architecture",
+      "id": "web-audio-api",
+      "title": "Web Audio API",
       "content": {
         "type": "code",
-        "mainTitle": "BaseComponent Architecture",
-        "codeBlock": "export default class BaseComponent extends HTMLElement {\n  constructor(template, styles, isolatedStyles = true) {\n    super();\n    this.attachShadow({ mode: 'open' });\n    this.render(template, styles, isolatedStyles);\n  }\n  \n  dispatchComponentEvent(target, eventName, data) {\n    // Centralized event handling\n  }\n}",
-        "question": "🤔 Is BaseComponent a good idea?"
+        "mainTitle": "Web Audio API",
+        "codeBlock": "const context = new window.AudioContext();\n\nconst successNoise = context.createOscillator();\nsuccessNoise.frequency = \"600\";\nsuccessNoise.type = \"sine\";\n  successNoise.frequency.exponentialRampToValueAtTime(\n  800,\n  context.currentTime + 0.05\n);\nsuccessNoise.frequency.exponentialRampToValueAtTime(\n  1000,\n  context.currentTime + 0.15\n);\n\nsuccessGain = context.createGain();\nsuccessGain.gain.exponentialRampToValueAtTime(\n  0.01,\n  context.currentTime + 0.3\n);\n\nsuccessFilter = context.createBiquadFilter(\"bandpass\");\nsuccessFilter.Q = 0.01;\n\nsuccessNoise\n  .connect(successFilter)\n  .connect(successGain)\n  .connect(context.destination);\nsuccessNoise.start();\nsuccessNoise.stop(context.currentTime + 0.2);",
+        "question": "🤔 Is there a more developer-friendly option?"
       },
       "speakerNotes": {
-        "focus": "BaseComponent Pattern: Explain the inheritance hierarchy",
-        "question": "Is BaseComponent a good idea? - encourage discussion",
-        "timing": "3-4 minutes with audience interaction"
+        "focus": "Web Audio API: Explain the Web Audio API",
+        "keyPoints": "Talk through code line by line. You can see what it's doing through... I got this from a tutorial, so I've not fully assimilated it myself.",
+        "example": "Playing a success noise",
+        "timing": "3-4 minutes with live demonstration if possible"
+      }
+    },
+    {
+      "id": "tone-js",
+      "title": "Tone.js",
+      "content": {
+        "type": "code",
+        "mainTitle": "Tone.js",
+        "codeBlock": "const synth = new Tone.Synth({\n  oscillator: { type: \"sine\" },\n  envelope: {\n    attack: 0.01,\n    decay: 0.1,\n    sustain: 0.1,\n    release: 0.15,\n  },\n}).toDestination();\n\nconst now = Tone.now();\n\n// You can also use note names like \"C4\"\nsynth.triggerAttack(600, now);\nsynth.frequency.exponentialRampTo(1000, 0.15, now);\nsynth.triggerRelease(now + 0.2);"
+      },
+      "speakerNotes": {
+        "focus": "Tone.js: Show the simplified version",
+        "example": "Same sound, much cleaner code",
+        "keyPoints": "This is a lot easier to read, and although the implementation and results are slightly different, it sounds a bit nicer to me. Also note the comment, where I mention you can use note names. If we wanted to play a middle C (C4) in native code, we'd need to use its frequency in Hz, which is 261.626 Hz.",
+        "timing": "2-3 minutes to show the comparison"
       }
     },
     {

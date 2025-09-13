@@ -9,6 +9,7 @@ export default class GigsoPresentation extends BaseComponent {
                         <span id="current-slide">1</span> / <span id="total-slides">8</span>
                     </div>
                     <div class="presentation-controls">
+                        <button id="speaker-notes-btn" class="control-btn">📝 Speaker Notes</button>
                         <button id="fullscreen-btn" class="control-btn">⛶ Fullscreen</button>
                         <button id="exit-btn" class="control-btn">✕ Exit</button>
                     </div>
@@ -195,12 +196,12 @@ export default class GigsoPresentation extends BaseComponent {
                 justify-content: center;
                 align-items: center;
                 text-align: center;
-                pointer-events: none;
             }
             
             .slide.active {
                 opacity: 1;
                 transform: translateX(0);
+                z-index: 10;
             }
             
             .slide.exiting {
@@ -250,6 +251,8 @@ export default class GigsoPresentation extends BaseComponent {
         this.startTime = null;
         this.timerInterval = null;
         this.slides = [];
+        this.speakerNotesWindow = null;
+        this.isSpeakerNotesOpen = false;
         
         this.setupEventListeners();
         this.setupKeyboardNavigation();
@@ -260,11 +263,13 @@ export default class GigsoPresentation extends BaseComponent {
     setupEventListeners() {
         const prevBtn = this.shadowRoot.getElementById('prev-btn');
         const nextBtn = this.shadowRoot.getElementById('next-btn');
+        const speakerNotesBtn = this.shadowRoot.getElementById('speaker-notes-btn');
         const fullscreenBtn = this.shadowRoot.getElementById('fullscreen-btn');
         const exitBtn = this.shadowRoot.getElementById('exit-btn');
         
         prevBtn.addEventListener('click', () => this.previousSlide());
         nextBtn.addEventListener('click', () => this.nextSlide());
+        speakerNotesBtn.addEventListener('click', () => this.toggleSpeakerNotesWindow());
         fullscreenBtn.addEventListener('click', () => this.toggleFullscreen());
         exitBtn.addEventListener('click', () => this.exitPresentation());
 
@@ -273,6 +278,22 @@ export default class GigsoPresentation extends BaseComponent {
             const container = this.shadowRoot.querySelector('.presentation-container');
             if (container) {
                 container.classList.toggle('fullscreen', this.isFullscreen);
+            }
+        });
+        
+        // Listen for messages from speaker notes window
+        window.addEventListener('message', (event) => {
+            if (event.origin !== window.location.origin) {
+                return; // Security check
+            }
+            
+            switch (event.data.type) {
+                case 'speaker-notes-ready':
+                    this.handleSpeakerNotesReady();
+                    break;
+                case 'speaker-notes-closed':
+                    this.handleSpeakerNotesClosed();
+                    break;
             }
         });
     }
@@ -305,7 +326,7 @@ export default class GigsoPresentation extends BaseComponent {
                 case '0':
                     if (event.ctrlKey || event.metaKey) {
                         event.preventDefault();
-                        this.toggleSpeakerNotes();
+                        this.toggleSpeakerNotesWindow();
                     }
                     break;
             }
@@ -444,6 +465,16 @@ export default class GigsoPresentation extends BaseComponent {
                     title: nextSlideElement.getAttribute('title')
                 }
             }));
+            
+            // Notify speaker notes window
+            this.notifySpeakerNotesWindow({
+                type: 'slide-changed',
+                detail: {
+                    currentSlide: this.currentSlide,
+                    slideType: nextSlideElement.slideType || nextSlideElement.getAttribute('slide-type'),
+                    title: nextSlideElement.title || nextSlideElement.getAttribute('title')
+                }
+            });
         }, 250);
     }
     
@@ -538,7 +569,7 @@ export default class GigsoPresentation extends BaseComponent {
         
         // Add opening hook if present
         if (notes.opening) {
-            html += `<p><strong>Opening Hook:</strong> "${notes.opening}"</p>`;
+            html += `<p><strong>Opening Hook:</strong> ${notes.opening}</p>`;
         }
         
         // Add focus points
@@ -636,12 +667,93 @@ export default class GigsoPresentation extends BaseComponent {
         }
     }
     
+    toggleSpeakerNotesWindow() {
+        if (this.speakerNotesWindow && !this.speakerNotesWindow.closed) {
+            // Window is open, focus it
+            this.speakerNotesWindow.focus();
+        } else {
+            // Open new speaker notes window
+            this.openSpeakerNotesWindow();
+        }
+    }
+    
+    openSpeakerNotesWindow() {
+        const width = Math.min(600, window.screen.width * 0.4);
+        const height = Math.min(800, window.screen.height * 0.8);
+        const left = window.screen.width - width - 50;
+        const top = 50;
+        
+        this.speakerNotesWindow = window.open(
+            './speaker-notes.html',
+            'SpeakerNotes',
+            `width=${width},height=${height},left=${left},top=${top},resizable=yes,scrollbars=yes,status=no,toolbar=no,menubar=no,location=no`
+        );
+        
+        if (this.speakerNotesWindow) {
+            this.isSpeakerNotesOpen = true;
+            this.updateSpeakerNotesButton();
+            
+            // Send initial data when window is ready
+            setTimeout(() => {
+                this.notifySpeakerNotesWindow({
+                    type: 'presentation-ready',
+                    detail: {
+                        currentSlide: this.currentSlide,
+                        slideType: this.slides[this.currentSlide]?.slideType,
+                        title: this.slides[this.currentSlide]?.title
+                    }
+                });
+            }, 1000);
+        }
+    }
+    
+    handleSpeakerNotesReady() {
+        // Send current slide data to the newly opened window
+        this.notifySpeakerNotesWindow({
+            type: 'slide-changed',
+            detail: {
+                currentSlide: this.currentSlide,
+                slideType: this.slides[this.currentSlide]?.slideType,
+                title: this.slides[this.currentSlide]?.title
+            }
+        });
+    }
+    
+    handleSpeakerNotesClosed() {
+        this.speakerNotesWindow = null;
+        this.isSpeakerNotesOpen = false;
+        this.updateSpeakerNotesButton();
+    }
+    
+    notifySpeakerNotesWindow(message) {
+        if (this.speakerNotesWindow && !this.speakerNotesWindow.closed) {
+            try {
+                this.speakerNotesWindow.postMessage(message, window.location.origin);
+            } catch (error) {
+                console.warn('Could not send message to speaker notes window:', error);
+                this.handleSpeakerNotesClosed();
+            }
+        }
+    }
+    
+    updateSpeakerNotesButton() {
+        const btn = this.shadowRoot.getElementById('speaker-notes-btn');
+        if (btn) {
+            btn.textContent = this.isSpeakerNotesOpen ? '📝 Focus Notes' : '📝 Speaker Notes';
+        }
+    }
+    
     toggleSpeakerNotes() {
         const notes = this.shadowRoot.getElementById('speaker-notes');
         notes.classList.toggle('visible');
     }
     
     exitPresentation() {
+        // Notify speaker notes window to close
+        this.notifySpeakerNotesWindow({
+            type: 'presentation-exit'
+        });
+        
         this.dispatchEvent(new CustomEvent('presentation-exit', {
             detail: { currentSlide: this.currentSlide, duration: Date.now() - this.startTime }
         }));

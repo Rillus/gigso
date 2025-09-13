@@ -155,6 +155,36 @@ export default class PresentationSlide extends BaseComponent {
                 margin-top: 10px;
             }
             
+            .execute-btn {
+                background: linear-gradient(135deg, #667eea, #764ba2);
+                border: none;
+                color: white;
+                padding: 12px 24px;
+                border-radius: 8px;
+                cursor: pointer;
+                font-size: 16px;
+                font-weight: 600;
+                transition: all 0.3s ease;
+                box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+                margin: 10px 0;
+            }
+            
+            .execute-btn:hover {
+                transform: translateY(-2px);
+                box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+                background: linear-gradient(135deg, #5a6fd8, #6a4190);
+            }
+            
+            .execute-btn:active {
+                transform: translateY(0);
+            }
+            
+            .execute-btn:disabled {
+                opacity: 0.6;
+                cursor: not-allowed;
+                transform: none;
+            }
+            
             /* Animation classes */
             .fade-in {
                 animation: fadeIn 0.8s ease-in;
@@ -283,6 +313,8 @@ export default class PresentationSlide extends BaseComponent {
         // Try to use JSON data first if available
         if (this.slideData && this.slideData.content) {
             this.renderSlideFromData(content, this.slideData.content);
+            // Set up execute button if needed
+            setTimeout(() => this.setupExecuteButton(), 100);
             return;
         }
         
@@ -468,6 +500,7 @@ this.dispatchEvent(new CustomEvent('chord-selected', {
 ${slideContent.codeBlock}
                     </div>
                     ${slideContent.question ? `<p class="slide-subtitle">${slideContent.question}</p>` : ''}
+                    ${this.shouldShowExecuteButton(slideContent) ? this.createExecuteButton(slideContent) : ''}
                 `;
                 break;
                 
@@ -541,6 +574,9 @@ ${slideContent.codeBlock}
                     <p>Title: ${this.title}</p>
                 `;
         }
+        
+        // Set up execute button if needed
+        setTimeout(() => this.setupExecuteButton(), 100);
     }
     
     show() {
@@ -674,6 +710,204 @@ ${slideContent.codeBlock}
                 }
             });
             demoArea.innerHTML = '<p>🎵 Demo Complete</p>';
+        }
+    }
+    
+    shouldShowExecuteButton(slideContent) {
+        // Show execute button for Web Audio API code or Tone.js examples
+        return slideContent.mainTitle && (
+            slideContent.mainTitle.toLowerCase().includes('audio') || 
+            slideContent.mainTitle.toLowerCase().includes('tone')
+        );
+    }
+    
+    createExecuteButton(slideContent) {
+        const buttonId = `execute-btn-${this.slideIndex}`;
+        const isToneJs = slideContent.mainTitle.toLowerCase().includes('tone');
+        const buttonText = isToneJs ? '🎵 Play Tone.js Sound' : '🔊 Play Web Audio Sound';
+        const descriptionText = isToneJs ? 'Click to hear Tone.js in action' : 'Click to hear the Web Audio API in action';
+        
+        return `
+            <div class="execute-button-container" style="margin-top: 20px;">
+                <button id="${buttonId}" class="execute-btn">
+                    ${buttonText}
+                </button>
+                <p class="execute-note" style="font-size: 14px; color: rgba(255,255,255,0.7); margin-top: 10px;">
+                    ${descriptionText}
+                </p>
+            </div>
+        `;
+    }
+    
+    setupExecuteButton() {
+        const executeBtn = this.shadowRoot.querySelector('.execute-btn');
+        if (executeBtn) {
+            executeBtn.addEventListener('click', () => {
+                // Check if this is a Tone.js slide
+                const slideContent = this.slideData?.content;
+                const isToneJs = slideContent?.mainTitle?.toLowerCase().includes('tone');
+                
+                if (isToneJs) {
+                    this.executeToneJsCode();
+                } else {
+                    this.executeWebAudioCode();
+                }
+            });
+        }
+    }
+    
+    executeToneJsCode() {
+        try {
+            // Check if Tone.js is available
+            if (typeof Tone === 'undefined') {
+                this.showAudioError('Tone.js not loaded');
+                return;
+            }
+            
+            // Start Tone.js context if needed
+            if (Tone.context.state !== 'running') {
+                Tone.start().then(() => {
+                    this.playToneJsSuccessSound();
+                });
+            } else {
+                this.playToneJsSuccessSound();
+            }
+        } catch (error) {
+            console.error('Error executing Tone.js code:', error);
+            this.showAudioError('Tone.js error');
+        }
+    }
+    
+    playToneJsSuccessSound() {
+        try { 
+            // Create a simple synth with a sine oscillator and a short attack/release envelope
+            const synth = new Tone.Synth({
+              oscillator: { type: "sine" },
+              envelope: {
+                attack: 0.01,
+                decay: 0.1,
+                sustain: 0.1,
+                release: 0.15,
+              },
+            }).toDestination();
+            
+            const now = Tone.now();
+            
+            // You can also use note names like "C4"
+            synth.triggerAttack(600, now);
+            synth.frequency.exponentialRampTo(1000, 0.15, now);
+            synth.triggerRelease(now + 0.2);
+            
+            const btn = this.shadowRoot.querySelector('.execute-btn');
+            if (btn) {
+                const originalText = btn.textContent;
+                btn.textContent = '🎵 Playing...';
+                btn.disabled = true;
+                
+                setTimeout(() => {
+                    btn.textContent = originalText;
+                    btn.disabled = false;
+                }, 300);
+            }
+            
+        } catch (error) {
+            console.error('Error playing Tone.js sound:', error);
+            this.showAudioError('Tone.js playback error');
+        }
+    }
+    
+    executeWebAudioCode() {
+        try {
+            // Create audio context if it doesn't exist
+            if (!window.audioContext) {
+                window.audioContext = new (window.AudioContext || window.webkitAudioContext)();
+            }
+            
+            const context = window.audioContext;
+            
+            // Resume context if suspended (required for user interaction)
+            if (context.state === 'suspended') {
+                context.resume().then(() => {
+                    this.playSuccessSound(context);
+                });
+            } else {
+                this.playSuccessSound(context);
+            }
+        } catch (error) {
+            console.error('Error executing Web Audio code:', error);
+            this.showAudioError();
+        }
+    }
+    
+    playSuccessSound(context) {
+        try {
+            // Create oscillator for the success sound
+            const successNoise = context.createOscillator();
+            successNoise.frequency.setValueAtTime(600, context.currentTime);
+            successNoise.type = "sine";
+            
+            // Create frequency ramps
+            successNoise.frequency.exponentialRampToValueAtTime(
+                800,
+                context.currentTime + 0.05
+            );
+            successNoise.frequency.exponentialRampToValueAtTime(
+                1000,
+                context.currentTime + 0.15
+            );
+            
+            // Create gain node
+            const successGain = context.createGain();
+            successGain.gain.setValueAtTime(0.3, context.currentTime);
+            successGain.gain.exponentialRampToValueAtTime(
+                0.01,
+                context.currentTime + 0.3
+            );
+            
+            // Create filter
+            const successFilter = context.createBiquadFilter();
+            successFilter.type = "bandpass";
+            successFilter.Q.setValueAtTime(0.01, context.currentTime);
+            
+            // Connect the audio graph
+            successNoise.connect(successFilter);
+            successFilter.connect(successGain);
+            successGain.connect(context.destination);
+            
+            // Start and stop the sound
+            successNoise.start();
+            successNoise.stop(context.currentTime + 0.2);
+            
+            // Update button text temporarily
+            const btn = this.shadowRoot.querySelector('.execute-btn');
+            if (btn) {
+                const originalText = btn.textContent;
+                btn.textContent = '🎵 Playing...';
+                btn.disabled = true;
+                
+                setTimeout(() => {
+                    btn.textContent = originalText;
+                    btn.disabled = false;
+                }, 300);
+            }
+            
+        } catch (error) {
+            console.error('Error playing success sound:', error);
+            this.showAudioError();
+        }
+    }
+    
+    showAudioError(customMessage = 'Audio Error') {
+        const btn = this.shadowRoot.querySelector('.execute-btn');
+        if (btn) {
+            const originalText = btn.textContent;
+            btn.textContent = `❌ ${customMessage}`;
+            btn.disabled = true;
+            
+            setTimeout(() => {
+                btn.textContent = originalText;
+                btn.disabled = false;
+            }, 2000);
         }
     }
     
