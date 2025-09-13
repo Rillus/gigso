@@ -249,21 +249,53 @@ export default class BpmController extends HTMLElement {
         this.addEventListener('set-bpm', (e) => this.setBpmFromEvent(e.detail.bpm));
         this.addEventListener('reset-bpm', () => this.resetBpm());
         this.addEventListener('transport-bpm-changed', (e) => this.syncWithTransport(e.detail.bpm));
+        
+        // Listen for BPM changes from other components (for multi-component sync)
+        document.addEventListener('bpm-changed', (e) => {
+            // Only sync if the event didn't come from this component
+            if (e.target !== this) {
+                this.syncBpmDisplay(e.detail.bpm);
+            }
+        });
     }
 
     initialiseBpm() {
-        // Use the component's default BPM (which may have been set from attributes)
-        // Only use state BPM if no custom initial BPM was specified
+        // Priority order:
+        // 1. Custom initial BPM from attributes
+        // 2. Tone.js Transport BPM (if available)
+        // 3. State BPM
+        // 4. Default BPM
+        
         const hasCustomInitialBpm = this.hasAttribute('initial-bpm');
-        const stateBpm = State.bpm();
-        const initialBpm = hasCustomInitialBpm ? this.defaultBpm : (stateBpm || this.defaultBpm);
+        let initialBpm = this.defaultBpm;
+        
+        if (hasCustomInitialBpm) {
+            // Use attribute value
+            initialBpm = this.defaultBpm;
+        } else {
+            // Try to sync with Transport BPM
+            let transportBpm = null;
+            try {
+                if (window.Tone && window.Tone.Transport) {
+                    transportBpm = window.Tone.Transport.bpm.value;
+                }
+            } catch (error) {
+                console.warn('Failed to read Tone.js Transport BPM:', error);
+            }
+            
+            const stateBpm = State.bpm();
+            
+            // Use Transport BPM if available, otherwise state BPM, otherwise default
+            initialBpm = transportBpm || stateBpm || this.defaultBpm;
+        }
         
         // Set the input value directly first
         this.bpmInput.value = initialBpm.toString();
         this.bpmInput.setAttribute('aria-valuenow', initialBpm);
         
         // Update state if it's different
-        if (stateBpm !== initialBpm) {
+        const currentStateBpm = State.bpm();
+        if (currentStateBpm !== initialBpm) {
             State.setBpm(initialBpm);
         }
         
@@ -464,6 +496,16 @@ export default class BpmController extends HTMLElement {
 
     syncWithTransport(bpm) {
         this.setBpmValue(bpm, false);
+    }
+    
+    syncBpmDisplay(bpm) {
+        // Update display only, don't update state or trigger events
+        const validatedBpm = this.validateAndClampBpm(bpm);
+        if (validatedBpm !== null) {
+            this.bpmInput.value = validatedBpm.toString();
+            this.bpmInput.setAttribute('aria-valuenow', validatedBpm);
+            this.updateButtonStates();
+        }
     }
 
     getCurrentBpm() {

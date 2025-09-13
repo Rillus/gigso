@@ -247,6 +247,10 @@ export default class PianoRoll extends HTMLElement {
     }
 
     loadSong(song) {
+      if (!song || !Array.isArray(song.chords)) {
+        console.warn('PianoRoll: Invalid song object', song);
+        return;
+      }
       this.chords = song.chords;
       this.renderChords();
     }
@@ -485,8 +489,10 @@ export default class PianoRoll extends HTMLElement {
         const event = new CustomEvent('play-chord', { 
             detail: { 
                 chord, 
-                duration: durationMs // Send duration in milliseconds
-            } 
+                duration: durationMs
+            },
+            bubbles: true,
+            composed: true
         });
         this.dispatchEvent(event);
     }
@@ -533,6 +539,22 @@ export default class PianoRoll extends HTMLElement {
 
     get tempo() {
         return this.currentBpm;
+    }
+
+    nextChord() {
+        if (this.chords.length === 0) return;
+        const currentIndex = this.chordPlaying !== null ? this.chordPlaying : -1;
+        const nextIndex = (currentIndex + 1) % this.chords.length;
+        this.playChord(this.chords[nextIndex], this.chords[nextIndex].duration);
+        this.chordPlaying = nextIndex;
+    }
+
+    previousChord() {
+        if (this.chords.length === 0) return;
+        const currentIndex = this.chordPlaying !== null ? this.chordPlaying : 0;
+        const prevIndex = currentIndex === 0 ? this.chords.length - 1 : currentIndex - 1;
+        this.playChord(this.chords[prevIndex], this.chords[prevIndex].duration);
+        this.chordPlaying = prevIndex;
     }
 
     setTimeSignature(timeSignature) {

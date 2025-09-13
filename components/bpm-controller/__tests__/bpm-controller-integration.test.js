@@ -28,7 +28,7 @@ describe('BpmController Integration Tests', () => {
       bpmController = document.querySelector('bpm-controller');
       bpmInput = getByTestId(bpmController, 'bpm-input');
       
-      expect(bpmInput).toHaveValue('140');
+      expect(bpmInput).toHaveValue(140);
     });
 
     test('should update state when BPM changes', () => {
@@ -56,8 +56,8 @@ describe('BpmController Integration Tests', () => {
       fireEvent.click(plusButton1);
       
       // Both should reflect the same BPM
-      expect(input1).toHaveValue('125');
-      expect(input2).toHaveValue('125');
+      expect(input1).toHaveValue(125);
+      expect(input2).toHaveValue(125);
       expect(State.bpm()).toBe(125);
     });
   });
@@ -93,7 +93,7 @@ describe('BpmController Integration Tests', () => {
       bpmController = document.querySelector('bpm-controller');
       bpmInput = getByTestId(bpmController, 'bpm-input');
       
-      expect(bpmInput).toHaveValue('140');
+      expect(bpmInput).toHaveValue(140);
     });
 
     test('should handle Transport BPM changes from external sources', () => {
@@ -106,7 +106,7 @@ describe('BpmController Integration Tests', () => {
       });
       bpmController.dispatchEvent(syncEvent);
       
-      expect(bpmInput).toHaveValue('160');
+      expect(bpmInput).toHaveValue(160);
     });
   });
 
@@ -118,7 +118,7 @@ describe('BpmController Integration Tests', () => {
       
       bpmController.dispatchEvent(externalBpmEvent);
       
-      expect(bpmInput).toHaveValue('150');
+      expect(bpmInput).toHaveValue(150);
       expect(State.bpm()).toBe(150);
     });
 

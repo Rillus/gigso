@@ -16,6 +16,7 @@ export default class ChordDiagram extends BaseComponent {
                 gap: 0;
                 max-width: 80px;
                 border-top: 5px solid #fff;
+                box-shadow: 0px 1px 2px 2px rgba(0,0,0, 0.2);
             }
             .chord-diagram--guitar {
                 grid-template-columns: repeat(6, 15%);
