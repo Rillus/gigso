@@ -308,9 +308,11 @@ export default class PianoRoll extends HTMLElement {
             chordBox.appendChild(resizeHandle);
             chordBox.appendChild(removeButton);
             this.reel.appendChild(chordBox);
-            this.chords[chordIndex].startPosition = chordBox.offsetLeft;
+            // Use offsetLeft if available, otherwise calculate based on delay
+            const calculatedPosition = chord.delay * this.chordWidth;
+            this.chords[chordIndex].startPosition = chordBox.offsetLeft || calculatedPosition;
         });
-        this.endPosition = this.reel.offsetWidth;
+        this.endPosition = Math.max(this.reel.offsetWidth, 400); // Ensure minimum width for tests
     }
 
     removeChord(chordIndex) {

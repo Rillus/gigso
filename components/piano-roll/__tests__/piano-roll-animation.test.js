@@ -24,9 +24,12 @@ describe('PianoRoll Component - Animation and Playback', () => {
     let pianoRollElement;
     const { setLoopActive } = State;
 
-    beforeEach(() => {
+    beforeEach(async () => {
         pianoRollElement = document.createElement('piano-roll');
         document.body.appendChild(pianoRollElement);
+        
+        // Wait for component to be fully connected
+        await new Promise(resolve => setTimeout(resolve, 0));
         
         // Add test chords with different positions and durations
         const chord1 = { name: 'C Major', notes: ['C4', 'E4', 'G4'], duration: 1, delay: 0 };
@@ -72,6 +75,7 @@ describe('PianoRoll Component - Animation and Playback', () => {
             const playChordSpy = jest.spyOn(pianoRollElement, 'playChord');
             
             pianoRollElement.play();
+            triggerAnimationFrame(); // Trigger the first animation frame
             
             expect(playChordSpy).toHaveBeenCalledWith(
                 pianoRollElement.chords[0], 

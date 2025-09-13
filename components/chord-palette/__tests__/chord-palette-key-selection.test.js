@@ -9,28 +9,33 @@ const mockState = {
     isKeySet: false
 };
 
-const mockStateSetters = {
-    setSongKey: jest.fn((key) => {
+// Mock the state module with functions defined inline
+jest.mock('../../../state/state.js', () => {
+    const mockSetSongKey = jest.fn((key) => {
         mockState.songKey = key;
         mockState.isKeySet = true;
-    }),
-    setSongScale: jest.fn((scale) => {
-        mockState.songScale = scale;
-    }),
-    setSongKey: jest.fn((key) => {
-        mockState.songKey = key;
-        mockState.isKeySet = true;
-    })
-};
+    });
 
-// Mock the state module
-jest.mock('../../../state/state.js', () => ({
-    songKey: () => mockState.songKey,
-    songScale: () => mockState.songScale,
-    isKeySet: () => mockState.isKeySet,
-    setSongKey: mockStateSetters.setSongKey,
-    setSongScale: mockStateSetters.setSongScale
-}));
+    const mockSetSongScale = jest.fn((scale) => {
+        mockState.songScale = scale;
+    });
+
+    const mockSetIsKeySet = jest.fn((value) => {
+        mockState.isKeySet = value;
+    });
+
+    return {
+        songKey: () => mockState.songKey,
+        songScale: () => mockState.songScale,
+        isKeySet: () => mockState.isKeySet,
+        setSongKey: mockSetSongKey,
+        setSongScale: mockSetSongScale,
+        setIsKeySet: mockSetIsKeySet
+    };
+});
+
+// Access the mocked functions for testing
+const mockStateSetters = require('../../../state/state.js');
 
 describe('ChordPalette Key Selection Feature', () => {
     let chordPaletteElement;
