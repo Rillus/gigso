@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mixer Component Demo</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: white;
+        }
+
+        .demo-container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            text-align: center;
+            margin-bottom: 30px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .demo-controls {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+            backdrop-filter: blur(10px);
+        }
+
+        .demo-controls h3 {
+            margin-top: 0;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        button {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.2s ease;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        button:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        button:active {
+            transform: translateY(0);
+        }
+
+        .mixer-container {
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 12px;
+            padding: 20px;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        }
+
+        .status {
+            margin-top: 15px;
+            padding: 10px;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 5px;
+            font-family: monospace;
+            font-size: 12px;
+            max-height: 150px;
+            overflow-y: auto;
+        }
+
+        .event-log {
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 8px;
+            padding: 15px;
+            margin-top: 20px;
+        }
+
+        .event-log h3 {
+            margin-top: 0;
+        }
+
+        .event-log pre {
+            font-size: 11px;
+            line-height: 1.4;
+            margin: 0;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+    </style>
+</head>
+<body>
+    <div class="demo-container">
+        <h1>🎛️ Mixer Component Demo</h1>
+
+        <div class="demo-controls">
+            <h3>Test Instruments</h3>
+            <div class="button-group">
+                <button id="add-piano">Add Piano Roll</button>
+                <button id="add-handpan">Add Hand Pan</button>
+                <button id="add-keyboard">Add Gigso Keyboard</button>
+                <button id="add-bass">Add Bass</button>
+                <button id="remove-all">Remove All</button>
+            </div>
+
+            <h3>Level Simulation</h3>
+            <div class="button-group">
+                <button id="simulate-levels">Start Level Simulation</button>
+                <button id="stop-simulation">Stop Simulation</button>
+                <button id="test-audio-event">Test Audio Event</button>
+            </div>
+        </div>
+
+        <div class="mixer-container">
+            <gigso-mixer id="mixer"></gigso-mixer>
+        </div>
+
+        <div class="event-log">
+            <h3>Event Log</h3>
+            <pre id="event-log"></pre>
+        </div>
+    </div>
+
+    <script type="module">
+        import Mixer from '../components/mixer/mixer.js';
+
+        const mixer = document.getElementById('mixer');
+        const eventLog = document.getElementById('event-log');
+        let simulationInterval = null;
+
+        // Event logging
+        function logEvent(event) {
+            const timestamp = new Date().toLocaleTimeString();
+            const logEntry = `[${timestamp}] ${event.type}: ${JSON.stringify(event.detail, null, 2)}\n`;
+            eventLog.textContent += logEntry;
+            eventLog.scrollTop = eventLog.scrollHeight;
+        }
+
+        // Listen to mixer events
+        mixer.addEventListener('mixer-volume-change', logEvent);
+        mixer.addEventListener('mixer-master-volume-change', logEvent);
+        mixer.addEventListener('mixer-master-mute-toggle', logEvent);
+        mixer.addEventListener('mixer-mute-toggle', logEvent);
+        mixer.addEventListener('mixer-solo-toggle', logEvent);
+
+        // Demo instruments data
+        const instruments = {
+            'piano-roll': { id: 'piano-roll', name: 'Piano Roll', icon: '🎹', volume: 0.6 },
+            'hand-pan': { id: 'hand-pan', name: 'Hand Pan', icon: '🥁', volume: 0.8 },
+            'gigso-keyboard': { id: 'gigso-keyboard', name: 'Gigso Keyboard', icon: '🎸', volume: 0.45 },
+            'bass': { id: 'bass', name: 'Bass', icon: '🎸', volume: 0.7 }
+        };
+
+        // Button event handlers
+        document.getElementById('add-piano').addEventListener('click', () => {
+            mixer.addInstrument(instruments['piano-roll']);
+        });
+
+        document.getElementById('add-handpan').addEventListener('click', () => {
+            mixer.addInstrument(instruments['hand-pan']);
+        });
+
+        document.getElementById('add-keyboard').addEventListener('click', () => {
+            mixer.addInstrument(instruments['gigso-keyboard']);
+        });
+
+        document.getElementById('add-bass').addEventListener('click', () => {
+            mixer.addInstrument(instruments['bass']);
+        });
+
+        document.getElementById('remove-all').addEventListener('click', () => {
+            Object.keys(instruments).forEach(id => {
+                mixer.removeInstrument(id);
+            });
+        });
+
+        document.getElementById('simulate-levels').addEventListener('click', () => {
+            if (simulationInterval) return;
+
+            simulationInterval = setInterval(() => {
+                // Simulate audio levels for all instruments
+                Object.keys(mixer.mixerState.instruments).forEach(instrumentId => {
+                    const level = Math.random() * 0.8; // Random level up to 80%
+                    mixer.updateLevel(instrumentId, level);
+                });
+
+                // Simulate master level
+                const masterLevel = Math.random() * 0.7;
+                mixer.updateMasterLevel(masterLevel);
+            }, 100); // Update every 100ms
+        });
+
+        document.getElementById('stop-simulation').addEventListener('click', () => {
+            if (simulationInterval) {
+                clearInterval(simulationInterval);
+                simulationInterval = null;
+
+                // Reset all levels to 0
+                Object.keys(mixer.mixerState.instruments).forEach(instrumentId => {
+                    mixer.updateLevel(instrumentId, 0);
+                });
+                mixer.updateMasterLevel(0);
+            }
+        });
+
+        document.getElementById('test-audio-event').addEventListener('click', () => {
+            // Simulate an instrument registering
+            const testInstrument = {
+                id: 'test-synth',
+                name: 'Test Synth',
+                icon: '🎹',
+                volume: 0.5
+            };
+
+            mixer.addInstrument(testInstrument);
+
+            // Simulate some audio activity
+            let level = 0;
+            const testInterval = setInterval(() => {
+                level = Math.sin(Date.now() / 500) * 0.5 + 0.5; // Sine wave level
+                mixer.updateLevel('test-synth', level);
+            }, 50);
+
+            // Remove test instrument after 3 seconds
+            setTimeout(() => {
+                clearInterval(testInterval);
+                mixer.removeInstrument('test-synth');
+            }, 3000);
+        });
+
+        // Add some initial instruments for demo
+        setTimeout(() => {
+            mixer.addInstrument(instruments['piano-roll']);
+            mixer.addInstrument(instruments['hand-pan']);
+        }, 500);
+
+        // Log initial state
+        eventLog.textContent = `Mixer Demo Started\nInitial State: ${JSON.stringify(mixer.getMixerState(), null, 2)}\n\n`;
+    </script>
+</body>
+</html>

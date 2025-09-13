@@ -161,6 +161,38 @@
       }
     },
     {
+      "id": "event-architecture",
+      "title": "Event-Driven Architecture",
+      "content": {
+        "type": "bullets-with-code",
+        "mainTitle": "Event-Driven Architecture",
+        "bullets": [
+          {
+            "text": "CustomEvent: Components communicate via standard events",
+            "highlight": "CustomEvent"
+          },
+          {
+            "text": "Centralised State: Single source of truth for application state",
+            "highlight": "Centralized State"
+          },
+          {
+            "text": "Real-time Updates: Changes propagate across all components",
+            "highlight": "Real-time Updates"
+          },
+          {
+            "text": "Example: Chord selection updates multiple components simultaneously",
+            "highlight": "Example"
+          }
+        ],
+        "codeBlock": "this.dispatchEvent(new CustomEvent('chord-selected', {\n  detail: { chord: 'Cmaj7', notes: ['C', 'E', 'G', 'B'] }\n}));"
+      },
+      "speakerNotes": {
+        "focus": "Communication Pattern: CustomEvent-based messaging",
+        "example": "Chord selection updating multiple components",
+        "timing": "4-5 minutes with live demonstration if possible"
+      }
+    },
+    {
       "id": "component-categories",
       "title": "Component Categories",
       "content": {
@@ -193,38 +225,6 @@
         "focus": "Visual Organization: Show how components are categorized by function",
         "highlight": "Each category serves a specific musical purpose",
         "timing": "2-3 minutes to walk through each category"
-      }
-    },
-    {
-      "id": "event-architecture",
-      "title": "Event-Driven Architecture",
-      "content": {
-        "type": "bullets-with-code",
-        "mainTitle": "Event-Driven Architecture",
-        "bullets": [
-          {
-            "text": "CustomEvent: Components communicate via standard events",
-            "highlight": "CustomEvent"
-          },
-          {
-            "text": "Centralized State: Single source of truth for application state",
-            "highlight": "Centralized State"
-          },
-          {
-            "text": "Real-time Updates: Changes propagate across all components",
-            "highlight": "Real-time Updates"
-          },
-          {
-            "text": "Example: Chord selection updates multiple components simultaneously",
-            "highlight": "Example"
-          }
-        ],
-        "codeBlock": "// Component communication example\nthis.dispatchEvent(new CustomEvent('chord-selected', {\n  detail: { chord: 'Cmaj7', notes: ['C', 'E', 'G', 'B'] }\n}));"
-      },
-      "speakerNotes": {
-        "focus": "Communication Pattern: CustomEvent-based messaging",
-        "example": "Chord selection updating multiple components",
-        "timing": "4-5 minutes with live demonstration if possible"
       }
     },
     {
@@ -286,7 +286,7 @@
               "highlight": "Collaboration"
             },
             {
-              "text": "Mobile: Native app development",
+              "text": "Native app?",
               "highlight": "Mobile"
             }
           ]
