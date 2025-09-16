@@ -1,5 +1,12 @@
 # Serve demo files directly without redirecting
 /demos/*    /demos/:splat    200
 
-# Serve the main index.html for the root
+# Serve JSON files directly
+/*.json     /:splat    200
+
+# Serve specific HTML files directly
+/presentation.html    /presentation.html    200
+/speaker-notes.html   /speaker-notes.html    200
+
+# Serve the main index.html for the root only
 /    /index.html    200

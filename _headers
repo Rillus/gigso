@@ -1,7 +1,19 @@
+# Specific file headers first
+/presentation-data.json
+  Content-Type: application/json
+  Cache-Control: public, max-age=31536000, immutable
+  Access-Control-Allow-Origin: *
+
+# Global headers
 /*
   X-Frame-Options: DENY
   X-Content-Type-Options: nosniff
   Referrer-Policy: strict-origin-when-cross-origin
+
+# File type headers
+/*.json
+  Content-Type: application/json
+  Cache-Control: public, max-age=31536000, immutable
 
 /*.js
   Cache-Control: public, max-age=31536000, immutable
@@ -17,10 +29,7 @@
 /*.png
   Cache-Control: public, max-age=31536000, immutable
 
-/*.json
-  Content-Type: application/json
-  Cache-Control: public, max-age=31536000, immutable
-
+# Specific JS files
 /chord-library.js
   Content-Type: application/javascript
   Cache-Control: public, max-age=31536000, immutable
@@ -28,11 +37,6 @@
 /song-library.js
   Content-Type: application/javascript
   Cache-Control: public, max-age=31536000, immutable
-
-/presentation-data.json
-  Content-Type: application/json
-  Cache-Control: public, max-age=31536000, immutable
-  Access-Control-Allow-Origin: *
 
 /components/*
   X-Frame-Options: DENY
