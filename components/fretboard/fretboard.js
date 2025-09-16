@@ -5,7 +5,7 @@ import chordLibrary from "../../chord-library.js";
 import State from "../../state/state.js";
 import ScaleKey from "../scale-key/scale-key.js";
 
-const { instrument: instrumentState, currentChord } = State;
+const { instrument: instrumentState, currentChord, songKey, songScale, isKeySet } = State;
 
 export default class Fretboard extends BaseComponent {
   constructor(options = {}) {
@@ -79,9 +79,9 @@ export default class Fretboard extends BaseComponent {
     console.log('Fretboard: Component connected to DOM');
     
     // Check if there's a current key set in state
-    if (State.isKeySet && State.isKeySet()) {
-      const currentKey = State.songKey();
-      const currentScale = State.songScale();
+    if (isKeySet && isKeySet()) {
+      const currentKey = songKey();
+      const currentScale = songScale();
       console.log('Fretboard: Initializing with state key:', currentKey, currentScale);
       
       // Display the scale based on the current state

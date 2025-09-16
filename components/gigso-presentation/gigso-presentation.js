@@ -366,7 +366,7 @@ export default class GigsoPresentation extends BaseComponent {
     async loadSlides() {
         try {
             // Load presentation data from JSON file
-            const response = await fetch('./presentation-data.json');
+            const response = await fetch('/presentation-data.json');
             if (!response.ok) {
                 throw new Error(`Failed to load presentation data: ${response.status}`);
             }
