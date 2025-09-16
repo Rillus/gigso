@@ -6,19 +6,28 @@ const { instrument: instrumentState } = State;
 
 export default class ChordDiagram extends BaseComponent {
     constructor() {
-        const template = `<div class="chord-diagram"></div>`;
+        const template = `
+            <div class="chord-diagram">
+                <div class="nut"></div>
+                <div class="frets"></div>
+            </div>
+        `;
 
         const styles = `
             .chord-diagram {
+                display: flex;
+                flex-direction: column;
+                max-width: 80px;
+                box-shadow: 0px 1px 2px 2px rgba(0,0,0, 0.2);
+            }
+            .frets {
                 display: grid;
                 grid-template-columns: repeat(4, 25%);
                 grid-template-rows: repeat(5, 25px);
                 gap: 0;
-                max-width: 80px;
                 border-top: 5px solid #fff;
-                box-shadow: 0px 1px 2px 2px rgba(0,0,0, 0.2);
             }
-            .chord-diagram--guitar {
+            .chord-diagram--guitar .frets {
                 grid-template-columns: repeat(6, 15%);
             }
             .string {
@@ -70,6 +79,26 @@ export default class ChordDiagram extends BaseComponent {
                 position: relative;
                 z-index: 1;
             }
+            .nut {
+                display: flex;
+                justify-content: space-around;
+                align-items: center;
+                height: 20px;
+                background: #8B4513;
+                border-radius: 3px 3px 0 0;
+                position: relative;
+                z-index: 2;
+            }
+            .nut-marker {
+                color: #fff;
+                font-size: 14px;
+                text-align: center;
+                width: 20px;
+                height: 20px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            }
             
             /* Print Styles for Chord Diagrams */
             @media print {
@@ -81,12 +110,11 @@ export default class ChordDiagram extends BaseComponent {
                     gap: 0;
                 }
                 
-                .chord-diagram--guitar {
-                    max-width: 72pt;
+                .chord-diagram--guitar .frets {
                     grid-template-columns: repeat(6, 16.66%);
                 }
                 
-                .chord-diagram--ukulele {
+                .chord-diagram--ukulele .frets {
                     grid-template-columns: repeat(4, 25%);
                 }
                 
@@ -132,7 +160,7 @@ export default class ChordDiagram extends BaseComponent {
         
         // Set up the initial fretboard
         if (this.shadowRoot) {
-            this.shadowRoot.querySelector('.chord-diagram').innerHTML = this.createFretboard();
+            this.shadowRoot.querySelector('.frets').innerHTML = this.createFretboard();
             this.initialised = true;
         }
         
@@ -170,10 +198,8 @@ export default class ChordDiagram extends BaseComponent {
     }
 
     createFretboard() {
-        if (this.instrument.toLowerCase() === 'mandolin' || this.instrument.toLowerCase() === 'ukulele') {
-            return Array(20).fill('<div class="fret"></div>').join('');
-        }
-        return Array(30).fill('<div class="fret"></div>').join('');
+        const numberOfFrets = (this.instrument.toLowerCase() === 'mandolin' || this.instrument.toLowerCase() === 'ukulele') ? 20 : 30;
+        return Array(numberOfFrets).fill('<div class="fret"></div>').join('');
     }
 
     renderChord(chord) {
@@ -183,6 +209,10 @@ export default class ChordDiagram extends BaseComponent {
         }
         const frets = this.shadowRoot.querySelectorAll('.fret');
         frets.forEach(fret => fret.classList.remove('active'));
+
+        // Clear existing nut markers
+        const existingMarkers = this.shadowRoot.querySelectorAll('.nut-marker');
+        existingMarkers.forEach(marker => marker.remove());
 
         if (this.chords[chord] === undefined) {
             console.error('chord undefined: ', chord);
@@ -203,7 +233,16 @@ export default class ChordDiagram extends BaseComponent {
         const numberOfStrings = positions.length;
 
         positions.forEach((fretNumber, stringIndex) => {
-            if (fretNumber > 0) {
+            const nut = this.shadowRoot.querySelector('.nut');
+            const marker = document.createElement('div');
+            marker.className = 'nut-marker';
+            marker.setAttribute('data-string', stringIndex);
+
+            if (fretNumber === null) {
+                // Add x marker on nut for null positions
+                marker.textContent = 'x';
+                nut.appendChild(marker);
+            } else if (fretNumber > 0) {
                 const fretPosition = stringIndex + (fretNumber - 1) * numberOfStrings;
                 
                 if (fretPosition >= 0 && fretPosition < frets.length) {
@@ -211,6 +250,11 @@ export default class ChordDiagram extends BaseComponent {
                 } else {
                     console.warn(`Calculated fretPosition ${fretPosition} is out of bounds (0-${frets.length - 1}) for string ${stringIndex}, fret ${fretNumber}`);
                 }
+                marker.textContent = '';
+                nut.appendChild(marker);
+            } else {
+                marker.textContent = 'o';
+                nut.appendChild(marker);
             }
         });
     }
@@ -227,7 +271,7 @@ export default class ChordDiagram extends BaseComponent {
             this.shadowRoot.querySelector('.chord-diagram').classList.add(`chord-diagram--${this.instrument}`);
         }
         
-        this.shadowRoot.querySelector('.chord-diagram').innerHTML = this.createFretboard();
+        this.shadowRoot.querySelector('.frets').innerHTML = this.createFretboard();
        
         if (this.chord) {
             this.renderChord(this.chord);

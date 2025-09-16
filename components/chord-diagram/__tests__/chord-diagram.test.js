@@ -245,4 +245,138 @@ describe('ChordDiagram Component', () => {
             expect(styles.textContent).toContain('background: white !important');
         });
     });
+
+    describe('Null Position Handling', () => {
+        test('should display x on nut above strings with null positions', () => {
+            // Mock a chord with null positions
+            const originalChords = chordDiagramElement.chords;
+            chordDiagramElement.chords = {
+                'TestChord': {
+                    guitar: {
+                        positions: [null, 3, 5, 5, 4, 3] // First string is null
+                    }
+                }
+            };
+            
+            chordDiagramElement.setAttribute('instrument', 'guitar');
+            chordDiagramElement.renderChord('TestChord');
+            
+            // Check that x markers are displayed on the nut
+            const xMarkers = chordDiagramElement.shadowRoot.querySelectorAll('.nut-marker');
+            expect(xMarkers.length).toBe(1); // One null position
+            
+            // Check that the x marker is on the correct string
+            const firstStringX = chordDiagramElement.shadowRoot.querySelector('.nut-marker[data-string="0"]');
+            expect(firstStringX).toBeTruthy();
+            expect(firstStringX.textContent).toBe('x');
+            
+            chordDiagramElement.chords = originalChords;
+        });
+
+        test('should display multiple x markers for multiple null positions', () => {
+            // Mock a chord with multiple null positions
+            const originalChords = chordDiagramElement.chords;
+            chordDiagramElement.chords = {
+                'TestChord': {
+                    guitar: {
+                        positions: [null, null, 0, 2, 3, 2] // First two strings are null
+                    }
+                }
+            };
+            
+            chordDiagramElement.setAttribute('instrument', 'guitar');
+            chordDiagramElement.renderChord('TestChord');
+            
+            // Check that x markers are displayed on the nut
+            const xMarkers = chordDiagramElement.shadowRoot.querySelectorAll('.nut-marker');
+            expect(xMarkers.length).toBe(2); // Two null positions
+            
+            // Check that x markers are on the correct strings
+            const firstStringX = chordDiagramElement.shadowRoot.querySelector('.nut-marker[data-string="0"]');
+            const secondStringX = chordDiagramElement.shadowRoot.querySelector('.nut-marker[data-string="1"]');
+            expect(firstStringX).toBeTruthy();
+            expect(secondStringX).toBeTruthy();
+            expect(firstStringX.textContent).toBe('x');
+            expect(secondStringX.textContent).toBe('x');
+            
+            chordDiagramElement.chords = originalChords;
+        });
+
+        test('should clear x markers when rendering new chord', () => {
+            // Mock a chord with null positions
+            const originalChords = chordDiagramElement.chords;
+            chordDiagramElement.chords = {
+                'TestChordWithNulls': {
+                    guitar: {
+                        positions: [null, 3, 5, 5, 4, 3]
+                    }
+                },
+                'TestChordNoNulls': {
+                    guitar: {
+                        positions: [1, 3, 5, 5, 4, 3]
+                    }
+                }
+            };
+            
+            chordDiagramElement.setAttribute('instrument', 'guitar');
+            
+            // Render chord with null positions
+            chordDiagramElement.renderChord('TestChordWithNulls');
+            let xMarkers = chordDiagramElement.shadowRoot.querySelectorAll('.nut-marker');
+            expect(xMarkers.length).toBe(1);
+            
+            // Render chord without null positions
+            chordDiagramElement.renderChord('TestChordNoNulls');
+            xMarkers = chordDiagramElement.shadowRoot.querySelectorAll('.nut-marker');
+            expect(xMarkers.length).toBe(0);
+            
+            chordDiagramElement.chords = originalChords;
+        });
+
+        test('should handle null positions on ukulele', () => {
+            // Mock a chord with null positions for ukulele
+            const originalChords = chordDiagramElement.chords;
+            chordDiagramElement.chords = {
+                'TestChord': {
+                    ukulele: {
+                        positions: [null, 2, 0, 0] // First string is null
+                    }
+                }
+            };
+            
+            chordDiagramElement.setAttribute('instrument', 'ukulele');
+            chordDiagramElement.renderChord('TestChord');
+            
+            // Check that x marker is displayed on the nut
+            const xMarkers = chordDiagramElement.shadowRoot.querySelectorAll('.nut-marker');
+            expect(xMarkers.length).toBe(1);
+            
+            const firstStringX = chordDiagramElement.shadowRoot.querySelector('.nut-marker[data-string="0"]');
+            expect(firstStringX).toBeTruthy();
+            expect(firstStringX.textContent).toBe('x');
+            
+            chordDiagramElement.chords = originalChords;
+        });
+
+        test('should not display x markers for zero positions', () => {
+            // Mock a chord with zero positions (open strings)
+            const originalChords = chordDiagramElement.chords;
+            chordDiagramElement.chords = {
+                'TestChord': {
+                    guitar: {
+                        positions: [0, 0, 2, 2, 2, 0] // Open strings, not null
+                    }
+                }
+            };
+            
+            chordDiagramElement.setAttribute('instrument', 'guitar');
+            chordDiagramElement.renderChord('TestChord');
+            
+            // Check that no x markers are displayed
+            const xMarkers = chordDiagramElement.shadowRoot.querySelectorAll('.nut-marker');
+            expect(xMarkers.length).toBe(0);
+            
+            chordDiagramElement.chords = originalChords;
+        });
+    });
 }); 

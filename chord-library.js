@@ -99,7 +99,7 @@ export default class chordLibrary {
         },
         'mandolin': {
             'positions': [
-                4, 4, 5, 7
+                4, 0, 2, 2
             ]
         }
     },
