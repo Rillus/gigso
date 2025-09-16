@@ -388,6 +388,8 @@ export default class GigsoPresentation extends BaseComponent {
                 slide.title = slideConfig.title;
                 slide.slideData = slideConfig;
                 
+                console.log('🎵 Main Presentation: Created slide', i, 'with slideType:', slideConfig.id, 'title:', slideConfig.title);
+                
                 // Add to DOM
                 container.appendChild(slide);
                 
@@ -508,6 +510,12 @@ export default class GigsoPresentation extends BaseComponent {
             }));
             
             // Notify speaker notes window
+            console.log('🎵 Main Presentation: nextSlideElement:', nextSlideElement);
+            console.log('🎵 Main Presentation: nextSlideElement.slideType:', nextSlideElement.slideType);
+            console.log('🎵 Main Presentation: nextSlideElement.getAttribute("slide-type"):', nextSlideElement.getAttribute('slide-type'));
+            console.log('🎵 Main Presentation: nextSlideElement.title:', nextSlideElement.title);
+            console.log('🎵 Main Presentation: nextSlideElement.getAttribute("title"):', nextSlideElement.getAttribute('title'));
+            
             this.notifySpeakerNotesWindow({
                 type: 'slide-changed',
                 detail: {
