@@ -21,7 +21,7 @@ export default class chordLibrary {
         'positions': [
             2, 2, 4, 5
         ],
-            'fingering': [2, 2, 4, 5],
+            'fingering': [1, 1, 3, 4],
             'difficulty': 'intermediate',
             'name': 'A Major'
       }
@@ -45,7 +45,7 @@ export default class chordLibrary {
         },
         'mandolin': {
             'positions': [
-                2, 2, 3, 5
+                2, 2, 3, 4
             ],
             'fingering': [2, 2, 3, 5],
             'difficulty': 'intermediate',
@@ -69,6 +69,23 @@ export default class chordLibrary {
             ]
         }
     },
+    'B': {
+        'ukulele': {
+            'positions': [
+                4, 3, 2, 2
+            ]
+        },
+        'guitar': {
+            'positions': [
+                0, 2, 4, 4, 4, 2
+            ]
+        },
+        'mandolin': {
+            'positions': [
+                4, 4, 6, 7
+            ]
+        }
+    },
     'Bm': {
         'ukulele': {
             'positions': [
@@ -82,7 +99,7 @@ export default class chordLibrary {
         },
         'mandolin': {
             'positions': [
-                null, 0, 2, 2
+                4, 4, 5, 7
             ]
         }
     },
@@ -120,6 +137,23 @@ export default class chordLibrary {
             ]
         }
     },
+    'D': {
+        'ukulele': {
+            'positions': [
+                2, 2, 2, 5
+            ]
+        },
+        'guitar': {
+            'positions': [
+                null, null, 0, 2, 3, 2
+            ]
+        },
+        'mandolin': {
+            'positions': [
+                2, 0, 0, 2
+            ]
+        }
+    },
     'Dm': {
         'ukulele': {
             'positions': [
@@ -128,12 +162,12 @@ export default class chordLibrary {
         },
         'guitar': {
             'positions': [
-                0, 0, 0, 2, 3, 1
+                null, null, 0, 2, 3, 1
             ]
         },
         'mandolin': {
             'positions': [
-                null, 0, 0, 1
+                2, 3, 5, 5
             ]
         }
     },
@@ -154,6 +188,23 @@ export default class chordLibrary {
             ]
         }
     },
+    'E': {
+        'ukulele': {
+            'positions': [
+                4, 4, 4, 2
+            ],
+        },
+        'guitar': {
+            'positions': [
+                0, 2, 2, 1, 0, 0
+            ]
+        },
+        'mandolin': {
+            'positions': [
+                1, 2, 2, 4
+            ]
+        }
+    },
     'Em': {
         'ukulele': {
             'positions': [
@@ -167,7 +218,7 @@ export default class chordLibrary {
         },
         'mandolin': {
             'positions': [
-                0, 2, 2, 0
+                0, 2, 2, 3
             ]
         }
     },
@@ -179,12 +230,29 @@ export default class chordLibrary {
         },
         'guitar': {
             'positions': [
-                0, 3, 3, 2, 1, 1
+                1, 3, 3, 2, 1, 1
             ]
         },
         'mandolin': {
             'positions': [
                 5, 3, 0, 1
+            ]
+        }
+    },
+    'Fm': {
+        'ukulele': {
+            'positions': [
+                1, 0, 1, 3
+            ],
+        },
+        'guitar': {
+            'positions': [
+                1, 3, 3, 1, 1, 1
+            ]
+        },
+        'mandolin': {
+            'positions': [
+                1, 3, 3, 4
             ]
         }
     },
@@ -202,6 +270,23 @@ export default class chordLibrary {
         'mandolin': {
             'positions': [
                 0, 0, 2, 3
+            ]
+        }
+    },
+    'Gm': {
+        'ukulele': {
+            'positions': [
+                0, 2, 3, 1
+            ],
+        },
+        'guitar': {
+            'positions': [
+                3, 5, 5, 3, 3, 3
+            ]
+        },
+        'mandolin': {
+            'positions': [
+                0, 0, 1, 3
             ]
         }
     },
