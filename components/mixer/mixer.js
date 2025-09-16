@@ -1,4 +1,5 @@
 import BaseComponent from '../base-component.js';
+import audioManager from '../../helpers/audioManager.js';
 
 const template = `
 <div class="mixer">
@@ -15,7 +16,7 @@ const template = `
     <div class="master-section">
       <div class="channel-strip master-channel">
         <div class="instrument-label">
-          <span class="instrument-icon">🎵</span>
+          <span class="instrument-icon">🎩</span>
           <span class="instrument-name">Master</span>
         </div>
 
@@ -153,7 +154,7 @@ const styles = `
 }
 
 .master-channel {
-  background: rgba(52, 152, 219, 0.1);
+  background: rgba(130, 190, 231, 0.2);
   border-color: #3498db;
 }
 
@@ -439,13 +440,13 @@ export default class Mixer extends BaseComponent {
     // Set up audio context if needed
     this.initializeAudio();
 
-    // Start level meter updates
-    this.startLevelMeterUpdates();
+    // Register for level updates from AudioManager
+    this.registerLevelCallbacks();
   }
 
   disconnectedCallback() {
-    // Clean up level meter updates
-    this.stopLevelMeterUpdates();
+    // Unregister level callbacks
+    this.unregisterLevelCallbacks();
   }
 
   initializeMixer() {
@@ -497,6 +498,11 @@ export default class Mixer extends BaseComponent {
 
     this.renderChannelStrip(id);
     this.attachChannelStripEvents(id);
+
+    // Register level callback for this new instrument
+    audioManager.registerLevelCallback(id, (level) => {
+      this.updateLevel(id, level);
+    });
   }
 
   removeInstrument(instrumentId) {
@@ -506,6 +512,9 @@ export default class Mixer extends BaseComponent {
     if (channelStrip) {
       channelStrip.remove();
     }
+
+    // Unregister level callback for this instrument
+    audioManager.unregisterLevelCallback(instrumentId);
   }
 
   renderChannelStrip(instrumentId) {
@@ -819,21 +828,32 @@ export default class Mixer extends BaseComponent {
     }
   }
 
-  startLevelMeterUpdates() {
-    // This would be connected to actual audio analysis
-    // For now, we'll just provide the interface
-    this.levelUpdateInterval = setInterval(() => {
-      // Real implementation would get actual audio levels here
-      // this.updateLevel(instrumentId, actualLevel);
-      // this.updateMasterLevel(actualMasterLevel);
-    }, 1000 / 60); // 60fps updates
+  registerLevelCallbacks() {
+    // Register master level callback
+    audioManager.registerLevelCallback('master', (level) => {
+      this.updateMasterLevel(level);
+    });
+
+    // Register callbacks for all instruments in the mixer
+    Object.keys(this.mixerState.instruments).forEach(instrumentId => {
+      audioManager.registerLevelCallback(instrumentId, (level) => {
+        this.updateLevel(instrumentId, level);
+      });
+    });
+
+    console.log('Mixer: Registered level callbacks with AudioManager');
   }
 
-  stopLevelMeterUpdates() {
-    if (this.levelUpdateInterval) {
-      clearInterval(this.levelUpdateInterval);
-      this.levelUpdateInterval = null;
-    }
+  unregisterLevelCallbacks() {
+    // Unregister master level callback
+    audioManager.unregisterLevelCallback('master');
+
+    // Unregister callbacks for all instruments
+    Object.keys(this.mixerState.instruments).forEach(instrumentId => {
+      audioManager.unregisterLevelCallback(instrumentId);
+    });
+
+    console.log('Mixer: Unregistered level callbacks from AudioManager');
   }
 
   // UI Controls

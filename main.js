@@ -31,6 +31,7 @@ import EQDisplay from './components/eq-display/eq-display.js';
 import Tuner from './components/chromatic-tuner/chromatic-tuner.js';
 import Fretboard from './components/fretboard/fretboard.js';
 import BpmController from './components/bpm-controller/bpm-controller.js';
+import Mixer from './components/mixer/mixer.js';
 import audioDebugger from './helpers/audioDebugger.js';
 
 const appContainer = document.getElementById('app');
@@ -174,6 +175,60 @@ const elementsToAdd = [
     },
     {
         tag: Fretboard,
+    },
+    {
+        tag: Mixer,
+        emittedEvents: [
+            {
+                name: 'mixer-volume-change',
+                function: (event) => {
+                    const { instrumentId, volume, muted } = event.detail;
+                    console.log(`Volume change for ${instrumentId}:`, { volume, muted });
+                    // Dispatch volume change to the specific instrument
+                    dispatchComponentEvent(instrumentId, 'volume-change', { volume, muted });
+                }
+            },
+            {
+                name: 'mixer-master-volume-change',
+                function: (event) => {
+                    const { volume } = event.detail;
+                    console.log('Master volume change:', volume);
+                    // Dispatch master volume change to all instruments
+                    dispatchComponentEvent('piano-roll', 'master-volume-change', { volume });
+                    dispatchComponentEvent('gigso-keyboard', 'master-volume-change', { volume });
+                    dispatchComponentEvent('hand-pan', 'master-volume-change', { volume });
+                }
+            },
+            {
+                name: 'mixer-master-mute-toggle',
+                function: (event) => {
+                    const { muted } = event.detail;
+                    console.log('Master mute toggle:', muted);
+                    // Dispatch master mute to all instruments
+                    dispatchComponentEvent('piano-roll', 'master-mute-toggle', { muted });
+                    dispatchComponentEvent('gigso-keyboard', 'master-mute-toggle', { muted });
+                    dispatchComponentEvent('hand-pan', 'master-mute-toggle', { muted });
+                }
+            },
+            {
+                name: 'mixer-mute-toggle',
+                function: (event) => {
+                    const { instrumentId, muted } = event.detail;
+                    console.log(`Mute toggle for ${instrumentId}:`, muted);
+                    // Dispatch mute toggle to the specific instrument
+                    dispatchComponentEvent(instrumentId, 'mute-toggle', { muted });
+                }
+            },
+            {
+                name: 'mixer-solo-toggle',
+                function: (event) => {
+                    const { instrumentId, soloed } = event.detail;
+                    console.log(`Solo toggle for ${instrumentId}:`, soloed);
+                    // Dispatch solo toggle to the specific instrument
+                    dispatchComponentEvent(instrumentId, 'solo-toggle', { soloed });
+                }
+            }
+        ]
     },
 ];
 

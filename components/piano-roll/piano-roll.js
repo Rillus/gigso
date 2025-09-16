@@ -1,5 +1,6 @@
 import EventHandlers from '../../helpers/eventHandlers.js';
 import State from '../../state/state.js';
+import audioManager from '../../helpers/audioManager.js';
 
 const { loopActive, bpm, setBpm } = State;
 
@@ -218,6 +219,12 @@ export default class PianoRoll extends HTMLElement {
         // Dispatch a "ready" event when the component is fully initialized
         const readyEvent = new CustomEvent('isReady');
         this.dispatchEvent(readyEvent);
+
+        // Register with mixer
+        this.registerWithMixer();
+
+        // Start level monitoring
+        this.startLevelMonitoring();
     }
 
     showPlaceholder() {
@@ -577,6 +584,101 @@ export default class PianoRoll extends HTMLElement {
 
     getTimeSignature() {
         return this.timeSignature;
+    }
+
+    /**
+     * Mixer Integration Methods
+     */
+    registerWithMixer() {
+        // Find mixer component and register this instrument
+        setTimeout(() => {
+            const mixer = document.querySelector('gigso-mixer');
+            if (mixer) {
+                mixer.addInstrument({
+                    id: 'piano-roll',
+                    name: 'Piano Roll',
+                    icon: '🧻',
+                    volume: 0.6
+                });
+                console.log('PianoRoll: Registered with mixer');
+            }
+        }, 100); // Small delay to ensure mixer is initialized
+
+        // Listen for mixer events
+        this.addEventListener('volume-change', this.handleVolumeChange.bind(this));
+        this.addEventListener('mute-toggle', this.handleMuteToggle.bind(this));
+        this.addEventListener('solo-toggle', this.handleSoloToggle.bind(this));
+        this.addEventListener('master-volume-change', this.handleMasterVolumeChange.bind(this));
+        this.addEventListener('master-mute-toggle', this.handleMasterMuteToggle.bind(this));
+    }
+
+    handleVolumeChange(event) {
+        const { volume } = event.detail;
+        console.log('PianoRoll: Volume change received:', volume);
+        this.instrumentVolume = volume;
+
+        // Update AudioManager volume for piano-roll
+        audioManager.setInstrumentVolume('piano-roll', volume);
+    }
+
+    handleMuteToggle(event) {
+        const { muted } = event.detail;
+        console.log('PianoRoll: Mute toggle received:', muted);
+        this.isMuted = muted;
+
+        // Update AudioManager mute for piano-roll
+        audioManager.setInstrumentMute('piano-roll', muted);
+    }
+
+    handleSoloToggle(event) {
+        const { soloed } = event.detail;
+        console.log('PianoRoll: Solo toggle received:', soloed);
+        this.isSoloed = soloed;
+    }
+
+    handleMasterVolumeChange(event) {
+        const { volume } = event.detail;
+        console.log('PianoRoll: Master volume change received:', volume);
+        this.masterVolume = volume;
+
+        // Update AudioManager global master volume
+        audioManager.setGlobalMasterVolume(volume);
+    }
+
+    /**
+     * Level Monitoring Methods
+     */
+    startLevelMonitoring() {
+        // Register with AudioManager for level updates
+        audioManager.registerLevelCallback('piano-roll', (level) => {
+            // Send level update directly to mixer
+            const mixer = document.querySelector('gigso-mixer');
+            if (mixer) {
+                mixer.updateInstrumentLevel('piano-roll', level);
+            }
+        });
+
+        console.log('PianoRoll: Level monitoring started via AudioManager');
+    }
+
+    stopLevelMonitoring() {
+        // Unregister from AudioManager
+        audioManager.unregisterLevelCallback('piano-roll');
+        console.log('PianoRoll: Level monitoring stopped');
+    }
+
+    handleMasterMuteToggle(event) {
+        const { muted } = event.detail;
+        console.log('PianoRoll: Master mute toggle received:', muted);
+        this.masterMuted = muted;
+
+        // Update AudioManager global master mute
+        audioManager.setGlobalMasterMute(muted);
+    }
+
+    // Check if audio is muted (individual or master)
+    isAudioMuted() {
+        return this.isMuted || this.masterMuted;
     }
 }
 

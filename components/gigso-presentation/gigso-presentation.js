@@ -318,19 +318,49 @@ export default class GigsoPresentation extends BaseComponent {
                     break;
                 case 'f':
                 case 'F':
-                    if (event.ctrlKey || event.metaKey) {
-                        event.preventDefault();
-                        this.toggleFullscreen();
-                    }
+                    event.preventDefault();
+                    this.toggleFullscreen();
                     break;
-                case '0':
-                    if (event.ctrlKey || event.metaKey) {
-                        event.preventDefault();
-                        this.toggleSpeakerNotesWindow();
-                    }
+                case 'n':
+                case 'N':
+                    event.preventDefault();
+                    this.toggleSpeakerNotesWindow();
                     break;
             }
         });
+    }
+    
+    setupUrlNavigation() {
+        // Listen for browser back/forward buttons
+        window.addEventListener('popstate', (event) => {
+            this.loadSlideFromUrl();
+        });
+        
+        // Check for slide parameter in URL after slides are loaded
+        this.loadSlideFromUrl();
+    }
+    
+    loadSlideFromUrl() {
+        const urlParams = new URLSearchParams(window.location.search);
+        const slideParam = urlParams.get('slide');
+        
+        if (slideParam) {
+            const slideIndex = parseInt(slideParam) - 1; // Convert to 0-based index
+            if (slideIndex >= 0 && slideIndex < this.totalSlides) {
+                // Use setTimeout to ensure slides are loaded first
+                setTimeout(() => {
+                    this.goToSlide(slideIndex);
+                }, 100);
+            }
+        }
+    }
+    
+    updateUrlForSlide(slideIndex) {
+        const newUrl = new URL(window.location);
+        newUrl.searchParams.set('slide', (slideIndex + 1).toString()); // Convert to 1-based for URL
+        
+        // Update URL without triggering page reload
+        window.history.pushState({ slideIndex }, '', newUrl);
     }
     
     async loadSlides() {
@@ -375,6 +405,9 @@ export default class GigsoPresentation extends BaseComponent {
             
             // Load speaker notes for the first slide
             this.loadSlideNotes();
+            
+            // Setup URL navigation after slides are loaded
+            this.setupUrlNavigation();
             
         } catch (error) {
             console.error('Error loading presentation slides:', error);
@@ -422,6 +455,9 @@ export default class GigsoPresentation extends BaseComponent {
         
         // Load speaker notes for the first slide
         this.loadSlideNotes();
+        
+        // Setup URL navigation after slides are loaded
+        this.setupUrlNavigation();
     }
     
     nextSlide() {
@@ -475,6 +511,9 @@ export default class GigsoPresentation extends BaseComponent {
                     title: nextSlideElement.title || nextSlideElement.getAttribute('title')
                 }
             });
+            
+            // Update URL to reflect current slide
+            this.updateUrlForSlide(this.currentSlide);
         }, 250);
     }
     

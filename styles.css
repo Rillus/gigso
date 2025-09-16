@@ -128,7 +128,13 @@ frequency-monitor {
 
 hand-pan {
   grid-row: 4 / 6;
-  grid-column: 2 / 4;
+  grid-column: 2 / 3;
+}
+
+gigso-mixer {
+  grid-row: 4 / 6;
+  grid-column: 3 / 4;
+  align-self: start;
 }
 
 /* Animations */

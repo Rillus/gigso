@@ -299,8 +299,8 @@ export default class LiveDemo extends BaseComponent {
 - [Individual Component Demos](./demos/)
 
 ### Code Repository
-- [GitHub Repository](https://github.com/your-username/gigso)
-- [Live Demo Site](https://gigso.pages.dev)
+- [GitHub Repository](https://github.com/rillus/gigso)
+- [Live Demo Site](https://gigso.net)
 
 ---
 

@@ -305,6 +305,7 @@
         .footer-content {
             max-width: 1200px;
             margin: 0 auto;
+            text-align: center;
         }
 
         .footer-links {
@@ -329,6 +330,40 @@
         .footer p {
             color: #888;
             margin-bottom: 10px;
+        }
+
+        .github-section {
+            margin-top: 2rem;
+            padding: 1.5rem;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+        }
+
+        .github-section p {
+            margin-bottom: 0.5rem;
+            font-size: 0.95rem;
+        }
+
+        .github-link {
+            color: #0DC9BB;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .github-link:hover {
+            color: #FFE448;
+            transform: translateY(-1px);
+        }
+
+        .github-link::before {
+            content: '🔗';
+            font-size: 1.1rem;
         }
 
         /* Responsive */
@@ -767,9 +802,15 @@
                 <a href="all-together-demo.html">Try Demo</a>
                 <a href="unclelele.html">Ukulele Workshop</a>
                 <a href="presentation.html">📊 Presentation</a>
+                <a href="https://github.com/rillus/gigso" target="_blank" rel="noopener noreferrer">🔗 GitHub Repository</a>
             </div>
             <p>🎵 Gigso - Browser-Based Music Creation Tools</p>
             <p>Built with modern web technologies for musicians everywhere</p>
+            <p style="margin-top: 1rem; font-size: 0.9rem; opacity: 0.8;">
+                <a href="https://github.com/rillus/gigso" target="_blank" rel="noopener noreferrer" style="color: #0DC9BB; text-decoration: none;">
+                    Fork and contribute on GitHub
+                </a> - Open source and community-driven
+            </p>
         </div>
     </footer>
 

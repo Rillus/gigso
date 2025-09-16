@@ -20,6 +20,10 @@ export default class HandPan extends HTMLElement {
         this.maxSimultaneousNotes = 6; // Limit simultaneous notes for performance
         this.minNoteInterval = 20; // Minimum time between notes (ms)
         
+        // Initialize volume properties
+        this.instrumentVolume = 0.8; // Default volume
+        this.masterVolume = 0.7; // Default master volume
+
         // Create synthesiser
         this.createHandPanSynth();
     }
@@ -92,9 +96,18 @@ export default class HandPan extends HTMLElement {
         this.initializeAccelerometer();
         
         console.log('HandPan: Component initialization complete');
+
+        // Register with mixer
+        this.registerWithMixer();
+
+        // Start level monitoring
+        this.startLevelMonitoring();
     }
 
     disconnectedCallback() {
+        // Stop level monitoring
+        this.stopLevelMonitoring();
+
         // Clean up when component is removed from DOM
         this.cleanup();
     }
@@ -145,11 +158,15 @@ export default class HandPan extends HTMLElement {
                 wet: 0.85
             });
 
-            // Create effects chain: synth → chorus → delay → reverb → destination
+            // Create analyser for level monitoring
+            this.analyser = new Tone.Analyser('waveform', 256);
+
+            // Create effects chain: synth → chorus → delay → reverb → analyser → destination
             this.synth.connect(this.chorus);
             this.chorus.connect(this.delay);
             this.delay.connect(this.reverb);
-            this.reverb.toDestination();
+            this.reverb.connect(this.analyser);
+            this.analyser.toDestination();
 
             // Expose effects for external control
             this.audioEffects = {
@@ -177,10 +194,18 @@ export default class HandPan extends HTMLElement {
                         release: 0.3
                     }
                 });
-                this.synth.toDestination();
-                
+                // Create analyser for level monitoring
+                this.analyser = new Tone.Analyser('waveform', 256);
+
+                // Connect: synth → analyser → destination
+                this.synth.connect(this.analyser);
+                this.analyser.toDestination();
+
                 // Set fallback audio effects
-                this.audioEffects = { synth: this.synth };
+                this.audioEffects = { synth: this.synth, analyser: this.analyser };
+
+                // Set initial volume
+                this.updateSynthVolume();
             } else {
                 // Create mock synthesiser for test environments
                 this.synth = {
@@ -1141,7 +1166,7 @@ export default class HandPan extends HTMLElement {
     }
     
     async playNote(note, duration) {
-        if (!this.synth || this.isMuted) {
+        if (!this.synth || this.isAudioMuted()) {
             return;
         }
 
@@ -1480,6 +1505,133 @@ export default class HandPan extends HTMLElement {
         if (this.requestAccelerometerPermission) {
             this.requestAccelerometerPermission();
         }
+    }
+
+    /**
+     * Mixer Integration Methods
+     */
+    registerWithMixer() {
+        // Find mixer component and register this instrument
+        setTimeout(() => {
+            const mixer = document.querySelector('gigso-mixer');
+            if (mixer) {
+                mixer.addInstrument({
+                    id: 'hand-pan',
+                    name: 'Hand Pan',
+                    icon: '🥘',
+                    volume: 0.8
+                });
+                console.log('HandPan: Registered with mixer');
+            }
+        }, 100); // Small delay to ensure mixer is initialized
+
+        // Listen for mixer events
+        this.addEventListener('volume-change', this.handleVolumeChange.bind(this));
+        this.addEventListener('mute-toggle', this.handleMuteToggle.bind(this));
+        this.addEventListener('solo-toggle', this.handleSoloToggle.bind(this));
+        this.addEventListener('master-volume-change', this.handleMasterVolumeChange.bind(this));
+        this.addEventListener('master-mute-toggle', this.handleMasterMuteToggle.bind(this));
+    }
+
+    handleVolumeChange(event) {
+        const { volume } = event.detail;
+        console.log('HandPan: Volume change received:', volume);
+
+        this.instrumentVolume = volume;
+        this.updateSynthVolume();
+    }
+
+    handleMuteToggle(event) {
+        const { muted } = event.detail;
+        console.log('HandPan: Mute toggle received:', muted);
+        this.isMuted = muted;
+    }
+
+    handleSoloToggle(event) {
+        const { soloed } = event.detail;
+        console.log('HandPan: Solo toggle received:', soloed);
+        // Solo logic is handled by the mixer muting other instruments
+    }
+
+    handleMasterVolumeChange(event) {
+        const { volume } = event.detail;
+        console.log('HandPan: Master volume change received:', volume);
+
+        this.masterVolume = volume;
+        this.updateSynthVolume();
+    }
+
+    handleMasterMuteToggle(event) {
+        const { muted } = event.detail;
+        console.log('HandPan: Master mute toggle received:', muted);
+        this.masterMuted = muted;
+        // Apply master mute in addition to individual mute
+    }
+
+    // Update synth volume based on instrument and master volume
+    updateSynthVolume() {
+        if (this.synth && this.synth.volume) {
+            // Multiply instrument and master volumes (0-1 range)
+            const combinedVolume = (this.instrumentVolume || 0.8) * (this.masterVolume || 0.7);
+
+            // Convert to decibels (-60dB to 0dB)
+            const volumeDb = combinedVolume === 0 ? -60 : Math.log10(combinedVolume) * 20;
+            this.synth.volume.value = volumeDb;
+
+            console.log('HandPan: Volume updated - Instrument:', this.instrumentVolume, 'Master:', this.masterVolume, 'Combined:', combinedVolume, 'dB:', volumeDb);
+        }
+    }
+
+    // Level monitoring methods
+    startLevelMonitoring() {
+        if (this.levelMonitoringInterval) return;
+
+        this.levelMonitoringInterval = setInterval(() => {
+            this.updateAudioLevel();
+        }, 1000 / 30); // 30fps for individual instruments to reduce load
+
+        console.log('HandPan: Level monitoring started');
+    }
+
+    stopLevelMonitoring() {
+        if (this.levelMonitoringInterval) {
+            clearInterval(this.levelMonitoringInterval);
+            this.levelMonitoringInterval = null;
+            console.log('HandPan: Level monitoring stopped');
+        }
+    }
+
+    updateAudioLevel() {
+        if (!this.analyser) return;
+
+        try {
+            const bufferLength = this.analyser.size;
+            const dataArray = this.analyser.getValue();
+
+            // Calculate RMS level
+            let sum = 0;
+            for (let i = 0; i < bufferLength; i++) {
+                const sample = Array.isArray(dataArray) ? dataArray[i] : dataArray[i] || 0;
+                sum += sample * sample;
+            }
+
+            const rms = Math.sqrt(sum / bufferLength);
+            const level = Math.min(rms * 8, 1.0); // Scale and clamp to 0-1
+
+            // Find mixer component and update level
+            const mixer = document.querySelector('gigso-mixer');
+            if (mixer && mixer.updateLevel) {
+                mixer.updateLevel('hand-pan', level);
+            }
+
+        } catch (error) {
+            console.warn('HandPan: Error updating audio level:', error);
+        }
+    }
+
+    // Override playNote to respect mute states
+    isAudioMuted() {
+        return this.isMuted || this.masterMuted;
     }
 
     // Cleanup method for memory management

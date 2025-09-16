@@ -101,9 +101,6 @@ export default class PresentationSlide extends BaseComponent {
             }
             
             .demo-area {
-                background: rgba(255, 255, 255, 0.1);
-                border: 2px solid #00ff87;
-                border-radius: 15px;
                 padding: 30px;
                 margin: 20px auto;
                 max-width: 900px;
@@ -430,7 +427,6 @@ this.dispatchEvent(new CustomEvent('chord-selected', {
                 content.innerHTML = `
                     <h2 class="slide-in-left">Live Demo: Building a Song</h2>
                     <div class="demo-area" id="live-demo-area">
-                        <p>🎵 Interactive Demo Loading...</p>
                         <live-demo demo-type="song-building"></live-demo>
                     </div>
                 `;
@@ -535,7 +531,6 @@ ${slideContent.codeBlock}
                 content.innerHTML = `
                     <h2 class="slide-in-left">${slideContent.mainTitle}</h2>
                     <div class="demo-area" id="live-demo-area">
-                        <p>${slideContent.loadingMessage}</p>
                         <live-demo demo-type="${slideContent.demoType}"></live-demo>
                     </div>
                 `;
@@ -592,7 +587,7 @@ ${slideContent.codeBlock}
         });
         
         // Load demo component if this is a demo slide
-        if (this.slideType === 'live-demo') {
+        if (this.slideType === 'live-demo' || (this.slideData && this.slideData.content && this.slideData.content.type === 'demo')) {
             this.loadDemoComponent();
         }
         
@@ -610,7 +605,7 @@ ${slideContent.codeBlock}
         this.classList.remove('active');
         
         // Clean up demo components
-        if (this.slideType === 'live-demo') {
+        if (this.slideType === 'live-demo' || (this.slideData && this.slideData.content && this.slideData.content.type === 'demo')) {
             this.cleanupDemo();
         }
         

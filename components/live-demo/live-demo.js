@@ -3,81 +3,99 @@ import BaseComponent from '../base-component.js';
 export default class LiveDemo extends BaseComponent {
     constructor() {
         const template = `
-            <div class="demo-container" id="demo-container">
-                <div class="demo-header">
-                    <h3 id="demo-title">Live Demo</h3>
-                    <div class="demo-controls">
-                        <button id="start-demo-btn" class="demo-btn">▶ Start Demo</button>
-                        <button id="reset-demo-btn" class="demo-btn">↻ Reset</button>
-                        <button id="focus-demo-btn" class="demo-btn">🔍 Focus</button>
-                    </div>
-                </div>
-                
-                <div class="demo-content" id="demo-content">
-                    <div class="demo-stage" id="demo-stage">
-                        <div class="demo-launch">
-                            <h3>🎵 Interactive Demo</h3>
-                            <p>Experience the full Gigso application with all components in action.</p>
-                            <button class="launch-demo-btn" id="launch-demo-btn" 
-                                    onclick="this.getRootNode().host.launchFullScreenDemo()"
-                                    type="button"
-                                    aria-label="Launch full-screen demo">
-                                🚀 Launch Full-Screen Demo
-                            </button>
-                            <p class="demo-hint">Opens in a new window for the best experience</p>
-                        </div>
-                    </div>
-                    
-                    <div class="demo-instructions" id="demo-instructions">
-                        <h4>Demo Instructions</h4>
-                        <ol id="instruction-steps">
-                            <!-- Instructions will be loaded based on demo type -->
-                        </ol>
-                    </div>
-                </div>
-                
-                <div class="demo-footer">
-                    <div class="audio-status" id="audio-status">
-                        <span class="audio-indicator" id="audio-indicator">🔇</span>
-                        <span>Audio: <span id="audio-state">Initializing</span></span>
-                    </div>
-                    <div class="demo-progress">
-                        <span>Step <span id="current-step">1</span> of <span id="total-steps">4</span></span>
-                    </div>
-                </div>
+            <div class="demo-stage" id="demo-stage">
+                <!-- add demo component here -->
             </div>
         `;
         
-        const styles = `
-            .demo-container {
+        const styles = `                                    
+            .demo-launch h3 {
+                font-size: 2rem;
+                font-weight: 700;
+                margin: 0 0 1rem 0;
+                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                -webkit-background-clip: text;
+                -webkit-text-fill-color: transparent;
+                background-clip: text;
+                text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+                letter-spacing: -0.02em;
+            }
+            
+            .demo-launch p {
+                font-size: 1.1rem;
+                color: rgba(255, 255, 255, 0.9);
+                margin: 0 0 2rem 0;
+                line-height: 1.6;
+                font-weight: 400;
+            }
+            
+            .launch-demo-btn {
+                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                border: none;
+                color: white;
+                padding: 1rem 2.5rem;
+                border-radius: 50px;
+                font-size: 1.1rem;
+                font-weight: 600;
+                cursor: pointer;
+                transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+                box-shadow: 
+                    0 8px 25px rgba(102, 126, 234, 0.4),
+                    0 4px 12px rgba(0, 0, 0, 0.15);
+                position: relative;
+                overflow: hidden;
+                text-transform: none;
+                letter-spacing: 0.5px;
+                min-width: 280px;
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
+                gap: 0.5rem;
+            }
+            
+            .launch-demo-btn::before {
+                content: '';
+                position: absolute;
+                top: 0;
+                left: -100%;
                 width: 100%;
                 height: 100%;
-                background: rgba(0, 0, 0, 0.3);
-                border: 2px solid #00ff87;
-                border-radius: 15px;
-                display: flex;
-                flex-direction: column;
-                overflow: hidden;
+                background: linear-gradient(90deg, 
+                    transparent, rgba(255, 255, 255, 0.3), transparent);
+                transition: left 0.6s ease;
             }
             
-            .demo-header {
-                display: flex;
-                justify-content: space-between;
-                align-items: center;
-                padding: 15px 20px;
-                background: rgba(0, 255, 135, 0.1);
-                border-bottom: 1px solid rgba(0, 255, 135, 0.3);
+            .launch-demo-btn:hover {
+                transform: translateY(-3px) scale(1.02);
+                box-shadow: 
+                    0 12px 35px rgba(102, 126, 234, 0.5),
+                    0 6px 20px rgba(0, 0, 0, 0.2);
+                background: linear-gradient(135deg, #5a6fd8 0%, #6a4190 100%);
             }
             
-            .demo-header h3 {
-                margin: 0;
-                color: #00ff87;
-                font-size: 1.4em;
+            .launch-demo-btn:hover::before {
+                left: 100%;
             }
             
-            .demo-controls {
-                display: flex;
-                gap: 10px;
+            .launch-demo-btn:active {
+                transform: translateY(-1px) scale(0.98);
+                transition: all 0.1s ease;
+            }
+            
+            .launch-demo-btn:focus {
+                outline: none;
+                box-shadow: 
+                    0 8px 25px rgba(102, 126, 234, 0.4),
+                    0 4px 12px rgba(0, 0, 0, 0.15),
+                    0 0 0 4px rgba(102, 126, 234, 0.2);
+            }
+            
+            .demo-hint {
+                font-size: 0.9rem !important;
+                color: rgba(255, 255, 255, 0.7) !important;
+                margin: 1.5rem 0 0 0 !important;
+                font-style: italic;
+                opacity: 0.8;
             }
             
             .demo-btn {
@@ -100,202 +118,24 @@ export default class LiveDemo extends BaseComponent {
                 transform: translateY(0);
             }
             
-            .demo-content {
-                flex: 1;
-                display: flex;
-                padding: 20px;
-                gap: 20px;
-                overflow: hidden;
-            }
-            
-            .demo-stage {
-                flex: 2;
-                background: rgba(255, 255, 255, 0.05);
-                border-radius: 10px;
-                padding: 20px;
-                display: flex;
-                flex-direction: column;
-                justify-content: center;
-                align-items: center;
-                text-align: center;
-                min-height: 300px;
-                overflow: hidden;
-            }
-            
-            .demo-launch {
-                max-width: 500px;
-                margin: 0 auto;
-                position: relative;
-                z-index: 10;
-            }
-            
-            .demo-launch h3 {
-                font-size: 2em;
-                margin: 0 0 20px 0;
-                background: linear-gradient(135deg, #00ff87, #60efff);
-                -webkit-background-clip: text;
-                -webkit-text-fill-color: transparent;
-                background-clip: text;
-            }
-            
-            .demo-launch p {
-                font-size: 1.1em;
-                margin: 0 0 30px 0;
-                opacity: 0.9;
-                line-height: 1.6;
-            }
-            
-            .launch-demo-btn {
-                background: linear-gradient(135deg, #00ff87, #60efff);
-                border: none;
-                color: #000;
-                padding: 15px 30px;
-                border-radius: 25px;
-                font-size: 1.2em;
-                font-weight: 600;
-                cursor: pointer;
-                transition: all 0.3s ease;
-                box-shadow: 0 4px 20px rgba(0, 255, 135, 0.3);
-                position: relative;
-                z-index: 100;
-            }
-            
-            .launch-demo-btn:hover {
-                transform: translateY(-3px);
-                box-shadow: 0 6px 25px rgba(0, 255, 135, 0.5);
-                filter: brightness(1.1);
-            }
-            
-            .launch-demo-btn:active {
-                transform: translateY(-1px);
-            }
-            
-            .demo-hint {
-                font-size: 0.9em;
-                opacity: 0.7;
-                margin: 20px 0 0 0;
-                font-style: italic;
-            }
-            
-            .demo-instructions {
-                flex: 1;
-                background: rgba(0, 0, 0, 0.3);
-                border-radius: 10px;
-                padding: 20px;
-                overflow-y: auto;
-            }
-            
-            .demo-instructions h4 {
-                margin: 0 0 15px 0;
-                color: #60efff;
-                font-size: 1.2em;
-            }
-            
-            .demo-instructions ol {
-                padding-left: 20px;
-                line-height: 1.6;
-            }
-            
-            .demo-instructions li {
-                margin-bottom: 10px;
-                color: rgba(255, 255, 255, 0.9);
-            }
-            
-            .demo-instructions li.completed {
-                color: #00ff87;
-                text-decoration: line-through;
-            }
-            
-            .demo-instructions li.current {
-                color: #60efff;
-                font-weight: 600;
-                background: rgba(96, 239, 255, 0.1);
-                padding: 5px 10px;
-                border-radius: 5px;
-            }
-            
-            .demo-footer {
-                display: flex;
-                justify-content: space-between;
-                align-items: center;
-                padding: 15px 20px;
-                background: rgba(0, 0, 0, 0.3);
-                border-top: 1px solid rgba(255, 255, 255, 0.1);
-            }
-            
-            .audio-status {
-                display: flex;
-                align-items: center;
-                gap: 10px;
-                font-size: 14px;
-            }
-            
-            .audio-indicator {
-                font-size: 16px;
-                animation: pulse 2s infinite;
-            }
-            
-            .audio-indicator.active {
-                animation: none;
-            }
-            
-            @keyframes pulse {
-                0%, 100% { opacity: 1; }
-                50% { opacity: 0.5; }
-            }
-            
-            .demo-progress {
-                font-size: 14px;
-                color: rgba(255, 255, 255, 0.7);
-            }
-            
-            .demo-component {
-                background: rgba(255, 255, 255, 0.1);
-                border: 1px solid rgba(255, 255, 255, 0.2);
-                border-radius: 8px;
-                padding: 15px;
-                margin-bottom: 15px;
-                transition: all 0.3s ease;
-                flex-shrink: 0;
-                max-width: 100%;
-                overflow: hidden;
-            }
-            
-            .demo-component:hover {
-                background: rgba(255, 255, 255, 0.15);
-                transform: translateY(-2px);
-            }
-            
-            .demo-component.highlight {
-                border-color: #00ff87;
-                box-shadow: 0 0 15px rgba(0, 255, 135, 0.3);
-            }
-            
-            /* Ensure child components fit within demo containers */
-            .demo-component > * {
-                max-width: 100%;
-                box-sizing: border-box;
-            }
-            
             /* Responsive design */
             @media (max-width: 768px) {
-                .demo-content {
-                    flex-direction: column;
-                    padding: 15px;
+                .demo-launch {
+                    padding: 1.5rem;
                 }
                 
-                .demo-header {
-                    padding: 10px 15px;
+                .demo-launch h3 {
+                    font-size: 1.5rem;
                 }
                 
-                .demo-controls {
-                    flex-wrap: wrap;
-                    gap: 5px;
+                .demo-launch p {
+                    font-size: 1rem;
                 }
                 
-                .demo-btn {
-                    padding: 6px 12px;
-                    font-size: 11px;
+                .launch-demo-btn {
+                    padding: 0.8rem 2rem;
+                    font-size: 1rem;
+                    min-width: 240px;
                 }
             }
         `;
@@ -325,16 +165,42 @@ export default class LiveDemo extends BaseComponent {
         }
     }
     
-    setupEventListeners() {
-        const startBtn = this.shadowRoot.getElementById('start-demo-btn');
-        const resetBtn = this.shadowRoot.getElementById('reset-demo-btn');
-        const focusBtn = this.shadowRoot.getElementById('focus-demo-btn');
-        const launchBtn = this.shadowRoot.getElementById('launch-demo-btn');
+    loadDemoConfiguration() {
+        if (!this.demoType) return;
         
-        startBtn.addEventListener('click', () => this.startDemo());
-        resetBtn.addEventListener('click', () => this.resetDemo());
-        focusBtn.addEventListener('click', () => this.focusDemo());
+        const demoStage = this.shadowRoot.getElementById('demo-stage');
+        if (!demoStage) return;
         
+        // Clear existing content
+        demoStage.innerHTML = '';
+        
+        // Configure demo based on type
+        switch (this.demoType) {
+            case 'gigso':
+                this.setupGigsoDemo(demoStage);
+                break;
+            case 'hand-pan':
+                this.setupHandPanDemo(demoStage);
+                break;
+            default:
+                demoStage.innerHTML = `<p>Demo type "${this.demoType}" not configured</p>`;
+        }
+    }
+    
+    setupGigsoDemo(demoStage) {
+        // Create interactive music components for the song building demo
+        demoStage.innerHTML = `
+            <div class="demo-launch">
+                <button class="launch-demo-btn" id="launch-demo-btn" 
+                        type="button"
+                        aria-label="Launch full-screen demo">
+                    🚀 Launch Full-Screen Demo
+                </button>
+            </div>
+        `;
+        
+        // Set up event listener for the launch button
+        const launchBtn = demoStage.querySelector('#launch-demo-btn');
         if (launchBtn) {
             launchBtn.addEventListener('click', (e) => {
                 e.preventDefault();
@@ -344,58 +210,18 @@ export default class LiveDemo extends BaseComponent {
         }
     }
     
-    loadDemoConfiguration() {
-        const configurations = {
-            'song-building': {
-                title: 'Building a Pop Progression',
-                steps: [
-                    'Start with C major chord from ChordPalette',
-                    'Add F, G, Am to create I-V-vi-IV progression',
-                    'Set 4/4 time signature and 120 BPM',
-                    'Enable loop and play the progression'
-                ],
-                components: ['chord-palette', 'current-chord', 'transport-controls', 'piano-roll']
-            },
-            'jazz-chord': {
-                title: 'Creating a Jazz Chord',
-                steps: [
-                    'Use AddChord component to create Cmaj7',
-                    'Show chord diagram with Fretboard component',
-                    'Demonstrate chord voicing variations',
-                    'Play with different inversions'
-                ],
-                components: ['add-chord', 'fretboard', 'chord-diagram']
-            },
-            'multi-component': {
-                title: 'Multi-Component Integration',
-                steps: [
-                    'Show chord selection updating multiple components',
-                    'Demonstrate real-time synchronization',
-                    'Highlight event-driven architecture',
-                    'Show responsive design across devices'
-                ],
-                components: ['chord-palette', 'current-chord', 'hand-pan', 'fretboard']
-            }
-        };
-        
-        const config = configurations[this.demoType] || configurations['song-building'];
-        this.totalSteps = config.steps.length;
-        
-        // Update demo title
-        const titleElement = this.shadowRoot.getElementById('demo-title');
-        titleElement.textContent = config.title;
-        
-        // Load instructions
-        const instructionsList = this.shadowRoot.getElementById('instruction-steps');
-        instructionsList.innerHTML = config.steps.map((step, index) => 
-            `<li id="step-${index}" class="${index === 0 ? 'current' : ''}">${step}</li>`
-        ).join('');
-        
-        // Update step counter
-        this.updateStepCounter();
-        
-        // Demo components will be loaded in the dedicated full-screen demo page
-        // this.loadDemoComponents(config.components);
+    setupHandPanDemo(demoStage) {
+        // Create handpan wrapper component for the handpan demo
+        demoStage.innerHTML = `
+            <div class="demo-launch">
+                <hand-pan id="demo-component" key="C" scale="major" size="large"></hand-pan-wrapper>
+            </div>
+        `;
+    }
+    
+    setupEventListeners() {
+        // Event listeners will be set up when demo content is loaded
+        // This method is called during construction, but elements are created later
     }
     
     loadDemoComponents(componentNames) {
@@ -430,6 +256,12 @@ export default class LiveDemo extends BaseComponent {
                 component.setAttribute('key', 'C');
                 component.setAttribute('scale', 'major');
                 component.setAttribute('size', 'small');
+                break;
+            case 'hand-pan-wrapper':
+                // Configure hand-pan wrapper for demo
+                component.setAttribute('key', 'C');
+                component.setAttribute('scale', 'major');
+                component.setAttribute('size', 'medium');
                 break;
             case 'fretboard':
                 component.setAttribute('instrument', 'guitar');
@@ -552,7 +384,7 @@ export default class LiveDemo extends BaseComponent {
     
     launchFullScreenDemo() {
         // Open the dedicated full-screen demo page
-        const newWindow = window.open('presentation-demo.html', '_blank', 'width=1200,height=800,toolbar=no,menubar=no,scrollbars=yes,resizable=yes');
+        const newWindow = window.open('all-together-demo.html', '_blank', 'width=1200,height=800,toolbar=no,menubar=no,scrollbars=yes,resizable=yes');
         
         if (!newWindow) {
             alert('Please allow popups to view the full-screen demo');

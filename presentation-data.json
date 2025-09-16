@@ -11,12 +11,12 @@
         "date": "September 16th, 2025"
       },
       "speakerNotes": {
-        "opening": "From Code to Chords - imagine building a music application using only web standards.<br><br>No React, no Vue, no Angular - just pure web technologies.",
+        "opening": "Good afternoon John Lewis! How are we doing out there? When I first started making websites, none of this would have been possible. This is a story about the web, music and how far we've come, and what's possible now.<br><br>I'm Riley and I've been making websites for over 20 years. I also love listening to and playing music when I'm not coding. While I'm not what most people would call a proper musician, I am in a band: the John Lewis Partnership Ukulele Band (Also known as The PUB), and they'll feature in this story a bit.",
         "keyPoint": "Introduce the concept of framework-free development<br>• Show the audience what's possible<br>• Build credibility",
-        "timing": "2-3 minutes for introduction and context setting",
-        "focus": "1",
-        "keyPoints": "2",
-        "emphasize": "3",
+        "timing": "1 minute for introduction and context setting",
+        "focus": "",
+        "keyPoints": "",
+        "emphasize": "",
         "analogy": "",
         "question": "",
         "example": "",
@@ -62,7 +62,7 @@
       },
       "speakerNotes": {
         "focus": "The Web used to be a very loud place",
-        "keyPoints": "- The Web used to be a very loud place, and although we have audio and video, it tends to be within the context of audio and video players now.<br>The history of audio on the web to me can be traced back to the launch of the CD-ROM. This ushered in the age of what we then called Multimedia.<br><br>Although there was an arms race of who and how we could play audio and video on the web (and there were many potential contenders in this race), the launch of Flash in 1996 marked a turning point, allowing for more complex audio and video content to be created and played back on the web.<br><br>This was a golden age of unsolicited musical and animated intros to websites that made the web both a joy and a hazard to navigate for around 10 years, before the Internet started to grow up and be these interludes became blockers to search engine optimisation and to users being able to complete tasks.<br><br>Around 2008, we got the first release of HTML5, which included the audio element tag, allowing us to embed audio files into web pages.<br><br>And then it wasn't until 2011 that we got the Web Audio API, which allowed for more complex audio to be created and played back on the web. At the time, this passed me by: I was probably building more ads and games in Flash, and sound was only used very judiciously, as no one really wanted their computer to shout at them anymore.<br><br>This led to the launch of the first web-based DAW (digital audio workstation - which is to a certain extent what we're talking about in this talk), Soundtrap.<br><br>Finally, in 2020, Adobe Flash was discontinued, in part because of the ability to navtively embed multimedia elements into the web, and also in part because Apple wouldn't allow Flash to be used on iOS devices.",
+        "keyPoints": "- The Web used to be a very loud place, and although we have audio and video, it tends to be within the context of audio and video players now.<br>The history of audio on the web to me can be traced back to the launch of the CD-ROM. Although the CD was launched in 1982, it wasn't until we could start reading that data in a computer that things got interesting. This ushered in the age of what we then called Multimedia.<br><br>Although there was an arms race of companies vying to provide options for playing audio and video on the web (and there were many potential contenders in this race), the launch of Flash in 1996 marked a turning point, allowing for more complex audio and video content to be created and played back on the web.<br><br>This was a golden age of unsolicited musical and animated intros to websites that made the web both a joy and a hazard to navigate for around 10 years, before the Internet started to grow up and be these interludes became blockers to search engine optimisation and to users being able to complete tasks.<br><br>Around 2008, we got the first release of HTML5, which included the audio element tag, allowing us to embed audio files into web pages.<br><br>And then it wasn't until 2011 that we got the Web Audio API, which allowed for more complex audio to be created and played back on the web. <br><br>This led to the launch of the first web-based DAW (digital audio workstation - which is to a certain extent what we're talking about in this talk), Soundtrap.<br><br>Finally, in 2020, Adobe Flash was discontinued, in part because of the ability to navtively embed multimedia elements into the web, and also in part because Apple wouldn't allow Flash to be used on iOS devices.",
         "timing": "2-3 minutes to explain each concept with examples"
       }
     },
@@ -93,6 +93,7 @@
       },
       "speakerNotes": {
         "focus": "Explain the three main Web Components technologies:<br>• Custom Elements<br>• Shadow DOM<br>• HTML Templates",
+        "keyPoints": "Custom Elements are the building blocks of Web Components. I mentioned that we got a lot of new elements as part of HTML5, each of which had a specific purpose. Web Components are a way to create new HTML elements. Shadow DOM is used to encapsulate the styles and markup of the component. HTML Templates are used to create the markup of the component.",
         "emphasize": "Standards-based, browser-native technology<br><br>No frameworks needed!",
         "analogy": "Like building blocks that work everywhere<br><br>Think LEGO bricks - same pieces, infinite combinations",
         "timing": "3-4 minutes to explain each concept with examples"
@@ -135,7 +136,7 @@
       "content": {
         "type": "code",
         "mainTitle": "Web Audio API",
-        "codeBlock": "const context = new window.AudioContext();\n\nconst successNoise = context.createOscillator();\nsuccessNoise.frequency = \"600\";\nsuccessNoise.type = \"sine\";\n  successNoise.frequency.exponentialRampToValueAtTime(\n  800,\n  context.currentTime + 0.05\n);\nsuccessNoise.frequency.exponentialRampToValueAtTime(\n  1000,\n  context.currentTime + 0.15\n);\n\nsuccessGain = context.createGain();\nsuccessGain.gain.exponentialRampToValueAtTime(\n  0.01,\n  context.currentTime + 0.3\n);\n\nsuccessFilter = context.createBiquadFilter(\"bandpass\");\nsuccessFilter.Q = 0.01;\n\nsuccessNoise\n  .connect(successFilter)\n  .connect(successGain)\n  .connect(context.destination);\nsuccessNoise.start();\nsuccessNoise.stop(context.currentTime + 0.2);",
+        "codeBlock": "const context = new window.AudioContext();\n\nconst successNoise = context.createOscillator();\nsuccessNoise.frequency = \"600\";\nsuccessNoise.type = \"sine\";\nsuccessNoise.frequency.exponentialRampToValueAtTime(\n  800,\n  context.currentTime + 0.05\n);\nsuccessNoise.frequency.exponentialRampToValueAtTime(\n  1000,\n  context.currentTime + 0.15\n);\n\nsuccessGain = context.createGain();\nsuccessGain.gain.exponentialRampToValueAtTime(\n  0.01,\n  context.currentTime + 0.3\n);\n\nsuccessFilter = context.createBiquadFilter(\"bandpass\");\nsuccessFilter.Q = 0.01;\n\nsuccessNoise\n  .connect(successFilter)\n  .connect(successGain)\n  .connect(context.destination);\nsuccessNoise.start();\nsuccessNoise.stop(context.currentTime + 0.2);",
         "question": "🤔 Is there a more developer-friendly option?"
       },
       "speakerNotes": {
@@ -193,109 +194,111 @@
       }
     },
     {
-      "id": "component-categories",
-      "title": "Component Categories",
+      "id": "hand-pan",
+      "title": "Hand Pan",
       "content": {
-        "type": "grid",
-        "mainTitle": "Component Categories",
-        "categories": [
+        "type": "demo",
+        "mainTitle": "Hand Pan",
+        "demoType": "hand-pan"
+      },
+      "speakerNotes": {
+        "focus": "Hand Pan: Show the Hand Pan component",
+        "interaction": "Encourage audience participation. Note the touch interaction, and the ability to mute and unmute the audio. Also note the key and scale selection, and the size selection.",
+        "fallback": "Have backup if audio doesn't work. Also note the event logging, and the ability to clear the event log.",
+        "timing": "2-3 minutes for interactive demonstration"
+      }
+    },
+    {
+      "id": "gigso-demo",
+      "title": "Gigso Demo",
+      "content": {
+        "type": "demo",
+        "mainTitle": "Gigso Demo",
+        "demoType": "gigso"
+      },
+      "speakerNotes": {
+        "interaction": "So, this is Gigso. It's a web-based application that allows users to compose and play music. It's a work in progress, but you can see the components in action.<br><br>- Start with the keyboard<br>- Add a couple of chords<br>- note the chord box, so we can see how to play the chords on guitar<br>- So here's a chord progression I saved earlier. Radiohed's Creep. Let's see how it sounds.<br>- play 4 chords and loop via loop pedal.<br>- So I thought this would be pretty useful for The Partner Ukulele Band: we could share songs via here and have a nice little library of songs to play. Let's update the instrument to ukulele and see how that sounds next. (play the four chords in to the looper on the uke)<br>- If you're anything like me, you have a mandolin that yougot one year for your birthday, and you don't play it very often because there aren't many mandolin tabs or chord sheets online. What if you could play the chords on the mandolin? (play the four chords on the mandolin)<br>- I'd got about this far when my sister asked if I wanted to support my neices and teach some ukulele lessons at a day festival called Priory Live in Orpington to raise money for the Orpington May Queen, and as I already had some of the framework and components, my alter ego Unclelele was born, which I was able to set up within about a day. What of we take the chords from here and put them into the Gigso Piano Roll?<br>- show moving chords around",
+        "timing": "2-3 minutes for interactive demonstration"
+      }
+    },
+    {
+      "id": "development-methodology",
+      "title": "Development Methodology",
+      "content": {
+        "type": "bullets",
+        "mainTitle": "Development Methodology",
+        "bullets": [
           {
-            "icon": "🎹",
-            "title": "Music Creation",
-            "description": "PianoRoll, ChordPalette, AddChord"
+            "text": "AI chat and auto-complete",
+            "highlight": "Phase 1"
           },
           {
-            "icon": "🎸",
-            "title": "Instruments",
-            "description": "HandPan, GigsoKeyboard, Fretboard"
+            "text": "Background agents",
+            "highlight": "Phase 2"
           },
           {
-            "icon": "⏯️",
-            "title": "Playback Controls",
-            "description": "TransportControls, PlayButton, LoopButton"
-          },
-          {
-            "icon": "📊",
-            "title": "Visual Feedback",
-            "description": "CurrentChord, VUMeter, EQDisplay"
+            "text": "Specification driven development",
+            "highlight": "Phase 3"
           }
         ]
       },
       "speakerNotes": {
-        "focus": "Visual Organization: Show how components are categorized by function",
-        "highlight": "Each category serves a specific musical purpose",
-        "timing": "2-3 minutes to walk through each category"
-      }
-    },
-    {
-      "id": "live-demo",
-      "title": "Live Demo: Building a Song",
-      "content": {
-        "type": "demo",
-        "mainTitle": "Live Demo: Building a Song",
-        "demoType": "song-building",
-        "loadingMessage": "🎵 Interactive Demo Loading..."
-      },
-      "speakerNotes": {
-        "focus": "Demo Flow: Start simple, build complexity",
-        "interaction": "Encourage audience participation",
-        "fallback": "Have backup if audio doesn't work",
-        "timing": "8-10 minutes for interactive demonstration"
+        "keyPoints": "- Starting in January, the first couple of components were built using AI chat and auto-complete. This allowed me to learn about Web Components, and set up event and state management.<br>- When Cursor released Background Agents around May/June of this year, I set up deployment from the main branch via cloudflare pages, so I could request changes via Background agents, and review, merge and deploy via the Github web interface. This was much more akin to vibe coding than traditional development, with less code oversight.<br>- More recently, I've been using specification driven development, writing the specifications first, and then the implementation. I've been broadly using Claude Code to write the specifications, and then let it auto-run the implementation, and making sure we have good test coverage in place. Then for more fine-grained tweaks and design changes, I've been jumping back into Cursor.",
+        "timing": "4-5 minutes with audio examples if possible"
       }
     },
     {
       "id": "technical-future",
-      "title": "Technical Innovation & Future",
+      "title": "Future Development",
       "content": {
-        "type": "two-column",
-        "mainTitle": "Technical Innovation & Future",
-        "leftColumn": {
-          "title": "Advanced Features",
-          "bullets": [
-            {
-              "text": "Audio Engine: Tone.js integration",
-              "highlight": "Audio Engine"
-            },
-            {
-              "text": "Touch Support: Multi-touch instruments",
-              "highlight": "Touch Support"
-            },
-            {
-              "text": "Performance: 60fps, <50ms latency",
-              "highlight": "Performance"
-            },
-            {
-              "text": "Responsive: Desktop, tablet, mobile",
-              "highlight": "Responsive"
-            }
-          ]
-        },
-        "rightColumn": {
-          "title": "What's Next",
-          "bullets": [
-            {
-              "text": "MIDI: Import/export capabilities",
-              "highlight": "MIDI"
-            },
-            {
-              "text": "AI: Assisted composition",
-              "highlight": "AI"
-            },
-            {
-              "text": "Collaboration: Real-time editing",
-              "highlight": "Collaboration"
-            },
-            {
-              "text": "Native app?",
-              "highlight": "Mobile"
-            }
-          ]
-        }
+        "type": "bullets",
+        "mainTitle": "Future Development",
+        "bullets": [
+          {
+            "text": "Play samples, create drum machine",
+            "highlight": "Samples"
+          },
+          {
+            "text": "Live input recording and looping for building up songs",
+            "highlight": "Looper"
+          },
+          {
+            "text": "Import/export MIDI files, MIDI controller support",
+            "highlight": "MIDI"
+          },
+          {
+            "text": "Assisted composition",
+            "highlight": "AI"
+          },
+          {
+            "text": "Real-time, multi-user",
+            "highlight": "Collaboration"
+          },
+          {
+            "text": "Native app?",
+            "highlight": "Mobile"
+          }
+        ]
       },
       "speakerNotes": {
-        "focus": "Closing: From Code to Chords - we've seen how Web Components enable sophisticated applications",
-        "futureVision": "Standards-based, modular web development",
+        "focus": "Future Development: What's next for the project",
+        "keyPoints": "MIDI import/export capabilities, AI-assisted composition features, collaborative real-time editing, mobile app development",
         "timing": "3-4 minutes to wrap up and inspire"
+      }
+    },
+    {
+      "id": "closing-slide",
+      "title": "Thank you, and good night!",
+      "content": {
+        "type": "title",
+        "mainTitle": "Thank you, and good night!",
+        "subtitle": "gigso.net",
+        "author": "Riley Ramone",
+        "date": "September 16th, 2025"
+      },
+      "speakerNotes": {
+        "closing": "Thank you for coming to my gig. I hope you've enjoyed it. If you have any questions, please feel free to ask on Slack, as we're out of time now. The website is Gogso.net if you'd like to play - there's a link at the bottom to the GitHub repository - please fork or contribute to it if you'd like to. Finally, please search for \"ukulele\" on Partner Choice to find out more about The Partner Ukulele Band. We're playing a gig on the 11th December at Drummond Base for the early lunch sitting, so come and say hi!",
+        "timing": "1 minute for closing"
       }
     }
   ],

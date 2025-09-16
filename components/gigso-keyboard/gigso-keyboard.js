@@ -22,9 +22,13 @@ export default class GigsoKeyboard extends HTMLElement {
             this.keysPerOctave = [
                 'C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'
             ];
-            
+
             this.currentOctave = 3;
             this.playingNotes = new Set();
+
+            // Initialize volume properties
+            this.instrumentVolume = 0.6; // Default volume
+            this.masterVolume = 0.7; // Default master volume
         } catch (error) {
             console.error('GigsoKeyboard: Constructor error:', error);
             // Re-throw to prevent silent failures
@@ -44,7 +48,17 @@ export default class GigsoKeyboard extends HTMLElement {
         
         if (!this.synth) {
             try {
-                this.synth = new window.Tone.Synth().toDestination();
+                this.synth = new window.Tone.Synth();
+
+                // Create analyser for level monitoring
+                this.analyser = new window.Tone.Analyser('waveform', 256);
+
+                // Connect: synth → analyser → destination
+                this.synth.connect(this.analyser);
+                this.analyser.toDestination();
+
+                // Set initial volume after synth creation
+                this.updateSynthVolume();
             } catch (error) {
                 console.warn('GigsoKeyboard: Failed to initialize Tone.js synth:', error);
                 this.synth = null;
@@ -78,6 +92,12 @@ export default class GigsoKeyboard extends HTMLElement {
         this.addEventListener('highlight-notes', (event) => {
             this.highlightNotes(event.detail);
         });
+
+        // Register with mixer
+        this.registerWithMixer();
+
+        // Start level monitoring
+        this.startLevelMonitoring();
     }
 
     addKeyboardListeners() {
@@ -188,24 +208,30 @@ export default class GigsoKeyboard extends HTMLElement {
     }
 
     playNote(index, useOctave) {
+        // Check if audio is muted
+        if (this.isAudioMuted()) {
+            return;
+        }
+
         const octave = useOctave ? this.currentOctave : Math.floor(index / 12);
         const noteIndex = index % 12;
         const noteNames = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'];
         const note = noteNames[noteIndex] + (octave);
-        
+
         // Add note to playing notes set
         this.playingNotes.add(note);
-        
+
         // Emit key-press event
         this.dispatchEvent(new CustomEvent('key-press', {
             detail: { note: note }
         }));
-        
+
         // Initialize synth if needed and play note
         const synth = this.initializeSynth();
         if (synth) {
             try {
                 synth.triggerAttackRelease(note, '8n');
+                console.log('GigsoKeyboard: Note played:', note, 'Analyser available:', !!this.analyser);
             } catch (error) {
                 console.warn('GigsoKeyboard: Failed to play note:', error);
             }
@@ -315,6 +341,154 @@ export default class GigsoKeyboard extends HTMLElement {
         this.shadowRoot.querySelectorAll('.key.active').forEach(key => {
             key.classList.remove('active');
         });
+    }
+
+    /**
+     * Mixer Integration Methods
+     */
+    registerWithMixer() {
+        // Find mixer component and register this instrument
+        setTimeout(() => {
+            const mixer = document.querySelector('gigso-mixer');
+            if (mixer) {
+                mixer.addInstrument({
+                    id: 'gigso-keyboard',
+                    name: 'Keyboard',
+                    icon: '🎹',
+                    volume: 0.6
+                });
+                console.log('GigsoKeyboard: Registered with mixer');
+            }
+        }, 100); // Small delay to ensure mixer is initialized
+
+        // Listen for mixer events
+        this.addEventListener('volume-change', this.handleVolumeChange.bind(this));
+        this.addEventListener('mute-toggle', this.handleMuteToggle.bind(this));
+        this.addEventListener('solo-toggle', this.handleSoloToggle.bind(this));
+        this.addEventListener('master-volume-change', this.handleMasterVolumeChange.bind(this));
+        this.addEventListener('master-mute-toggle', this.handleMasterMuteToggle.bind(this));
+    }
+
+    handleVolumeChange(event) {
+        const { volume } = event.detail;
+        console.log('GigsoKeyboard: Volume change received:', volume);
+
+        this.instrumentVolume = volume;
+        this.updateSynthVolume();
+    }
+
+    handleMuteToggle(event) {
+        const { muted } = event.detail;
+        console.log('GigsoKeyboard: Mute toggle received:', muted);
+        this.isMuted = muted;
+    }
+
+    handleSoloToggle(event) {
+        const { soloed } = event.detail;
+        console.log('GigsoKeyboard: Solo toggle received:', soloed);
+        // Solo logic is handled by the mixer muting other instruments
+    }
+
+    handleMasterVolumeChange(event) {
+        const { volume } = event.detail;
+        console.log('GigsoKeyboard: Master volume change received:', volume);
+
+        this.masterVolume = volume;
+        this.updateSynthVolume();
+    }
+
+    handleMasterMuteToggle(event) {
+        const { muted } = event.detail;
+        console.log('GigsoKeyboard: Master mute toggle received:', muted);
+        this.masterMuted = muted;
+        // Apply master mute in addition to individual mute
+    }
+
+    // Update synth volume based on instrument and master volume
+    updateSynthVolume() {
+        if (this.synth && this.synth.volume) {
+            // Multiply instrument and master volumes (0-1 range)
+            const combinedVolume = (this.instrumentVolume || 0.6) * (this.masterVolume || 0.7);
+
+            // Convert to decibels (-60dB to 0dB)
+            const volumeDb = combinedVolume === 0 ? -60 : Math.log10(combinedVolume) * 20;
+            this.synth.volume.value = volumeDb;
+
+            console.log('GigsoKeyboard: Volume updated - Instrument:', this.instrumentVolume, 'Master:', this.masterVolume, 'Combined:', combinedVolume, 'dB:', volumeDb);
+        }
+    }
+
+    // Check if audio is muted (individual or master)
+    isAudioMuted() {
+        return this.isMuted || this.masterMuted;
+    }
+
+    /**
+     * Level Monitoring Methods
+     */
+    startLevelMonitoring() {
+        if (this.levelMonitoringInterval) return;
+
+        // Initialize synth and analyser first
+        this.initializeSynth();
+
+        this.levelMonitoringInterval = setInterval(() => {
+            this.updateAudioLevel();
+        }, 1000 / 30); // 30fps for level updates
+
+        console.log('GigsoKeyboard: Level monitoring started');
+    }
+
+    stopLevelMonitoring() {
+        if (this.levelMonitoringInterval) {
+            clearInterval(this.levelMonitoringInterval);
+            this.levelMonitoringInterval = null;
+            console.log('GigsoKeyboard: Level monitoring stopped');
+        }
+    }
+
+    updateAudioLevel() {
+        if (!this.analyser) {
+            console.warn('GigsoKeyboard: No analyser available for level monitoring');
+            return;
+        }
+
+        try {
+            // Get level from analyser
+            const level = this.getAudioLevel(this.analyser);
+
+            // Send level update directly to mixer
+            const mixer = document.querySelector('gigso-mixer');
+            if (mixer) {
+                mixer.updateInstrumentLevel('gigso-keyboard', level);
+
+                // Debug log significant levels
+                if (level > 0.1) {
+                    console.log('GigsoKeyboard: Level detected:', level.toFixed(3));
+                }
+            }
+        } catch (error) {
+            console.warn('GigsoKeyboard: Error updating audio level:', error);
+        }
+    }
+
+    getAudioLevel(analyser) {
+        const bufferLength = analyser.size;
+        const dataArray = analyser.getValue();
+
+        // Calculate RMS (Root Mean Square) for more accurate level representation
+        let sum = 0;
+        for (let i = 0; i < bufferLength; i++) {
+            const sample = Array.isArray(dataArray) ? dataArray[i] : dataArray[i] || 0;
+            sum += sample * sample;
+        }
+
+        const rms = Math.sqrt(sum / bufferLength);
+
+        // Convert to a 0-1 range with some scaling for better visual representation
+        const level = Math.min(rms * 8, 1.0); // Scale and clamp to 0-1
+
+        return level;
     }
 }
 

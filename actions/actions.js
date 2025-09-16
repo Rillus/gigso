@@ -7,16 +7,16 @@ import audioManager from '../helpers/audioManager.js';
 export default class Actions {
   static playChord({chord, duration}) {
     // Use the centralized audio manager instead of creating new synths
-    audioManager.playChord(chord, duration || '4n', 'poly');
-    
+    audioManager.playChord(chord, duration || '4n', 'poly', 'piano-roll');
+
     // Update UI components
     dispatchComponentEvent('current-chord', 'set-chord', chord.name);
     dispatchComponentEvent('chord-diagram', 'set-chord', chord.name );
     dispatchComponentEvent(
       'gigso-keyboard',
       'highlight-notes',
-      { 
-          notes: chord.notes, 
+      {
+          notes: chord.notes,
           duration: duration || '4n'
       }
     );

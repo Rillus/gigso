@@ -11,13 +11,33 @@ class AudioManager {
         this.maxPolyphony = 16; // Maximum simultaneous voices
         this.audioContext = null;
         this.masterVolume = null;
+        this.masterAnalyser = null;
         this.reverbBus = null;
         this.chorusBus = null;
+
+        // Level monitoring
+        this.instrumentAnalysers = new Map(); // Individual instrument analysers
+        this.levelMonitoringInterval = null;
+        this.levelUpdateCallbacks = new Map(); // Callbacks for level updates
         
         // Performance monitoring
         this.activeVoices = 0;
         this.lastCleanup = Date.now();
         this.cleanupInterval = 5000; // Cleanup every 5 seconds
+
+        // Volume controls for mixer integration
+        this.instrumentVolumes = {
+            'piano-roll': 0.6,
+            'gigso-keyboard': 0.6,
+            'hand-pan': 0.8
+        };
+        this.instrumentMuted = {
+            'piano-roll': false,
+            'gigso-keyboard': false,
+            'hand-pan': false
+        };
+        this.globalMasterVolume = 0.7;
+        this.globalMasterMuted = false;
     }
 
     /**
@@ -41,7 +61,14 @@ class AudioManager {
             this.audioContext = window.Tone.context;
 
             // Create master volume control
-            this.masterVolume = new window.Tone.Volume(-6).toDestination();
+            this.masterVolume = new window.Tone.Volume(-6);
+
+            // Create master analyser for overall level monitoring
+            this.masterAnalyser = new window.Tone.Analyser('waveform', 512);
+
+            // Chain: masterVolume → masterAnalyser → destination
+            this.masterVolume.connect(this.masterAnalyser);
+            this.masterAnalyser.toDestination();
 
             // Create shared effect buses to reduce resource usage
             this.reverbBus = new window.Tone.Reverb({
@@ -63,6 +90,9 @@ class AudioManager {
 
             // Set up periodic cleanup
             this.startCleanupInterval();
+
+            // Start level monitoring
+            this.startLevelMonitoring();
 
             this.initialized = true;
             console.log('AudioManager: Initialized successfully');
@@ -100,10 +130,18 @@ class AudioManager {
             // Create 4 synths of each type for polyphony
             for (let i = 0; i < 4; i++) {
                 const synth = factory();
-                synth.connect(this.chorusBus);
+
+                // Create individual analyser for this synth
+                const analyser = new window.Tone.Analyser('waveform', 256);
+
+                // Chain: synth → analyser → chorusBus
+                synth.connect(analyser);
+                analyser.connect(this.chorusBus);
+
                 synth._type = type;
                 synth._inUse = false;
                 synth._lastUsed = Date.now();
+                synth._analyser = analyser; // Store reference to analyser
                 synthArray.push(synth);
             }
             
@@ -174,7 +212,7 @@ class AudioManager {
     /**
      * Play a chord with automatic synth management
      */
-    playChord(chord, duration = '4n', synthType = 'poly') {
+    playChord(chord, duration = '4n', synthType = 'poly', instrumentId = 'piano-roll') {
         if (!chord || !chord.notes || chord.notes.length === 0) {
             console.warn('AudioManager: Invalid chord data');
             return null;
@@ -184,8 +222,22 @@ class AudioManager {
         if (!synth) return null;
 
         try {
+            // Check if instrument or master is muted
+            if (this.isInstrumentMuted(instrumentId) || this.globalMasterMuted) {
+                console.log(`AudioManager: Playback muted for ${instrumentId}`);
+                this.releaseSynth(synth);
+                return null;
+            }
+
+            // Apply individual instrument volume to this synth
+            const instrumentVolume = this.getInstrumentVolume(instrumentId);
+            if (synth.volume) {
+                const volumeDb = instrumentVolume === 0 ? -60 : Math.log10(instrumentVolume) * 20;
+                synth.volume.value = volumeDb;
+            }
+
             const time = window.Tone.now();
-            
+
             if (synth.triggerAttackRelease) {
                 synth.triggerAttackRelease(chord.notes, duration, time);
             } else {
@@ -333,6 +385,147 @@ class AudioManager {
         if (this.masterVolume) {
             this.masterVolume.volume.value = Math.max(-60, Math.min(6, volumeDb));
         }
+    }
+
+    /**
+     * Level Monitoring Methods
+     */
+    startLevelMonitoring() {
+        if (this.levelMonitoringInterval) return;
+
+        // Update levels at 60fps for smooth meter animation
+        this.levelMonitoringInterval = setInterval(() => {
+            this.updateAudioLevels();
+        }, 1000 / 60);
+
+        console.log('AudioManager: Level monitoring started');
+    }
+
+    stopLevelMonitoring() {
+        if (this.levelMonitoringInterval) {
+            clearInterval(this.levelMonitoringInterval);
+            this.levelMonitoringInterval = null;
+            console.log('AudioManager: Level monitoring stopped');
+        }
+    }
+
+    updateAudioLevels() {
+        try {
+            // Update master level
+            if (this.masterAnalyser) {
+                const masterLevel = this.getAudioLevel(this.masterAnalyser);
+                this.notifyLevelUpdate('master', masterLevel);
+            }
+
+            // Update individual instrument levels by tracking active synths
+            const instrumentLevels = { 'piano-roll': 0, 'gigso-keyboard': 0, 'hand-pan': 0 };
+
+            // Check all synths in all pools for activity
+            this.synthPool.forEach((synthArray, synthType) => {
+                synthArray.forEach(synth => {
+                    if (synth._inUse && synth._analyser) {
+                        const level = this.getAudioLevel(synth._analyser);
+
+                        // Map synth activity to instruments based on usage patterns
+                        if (synthType === 'poly') {
+                            instrumentLevels['piano-roll'] = Math.max(instrumentLevels['piano-roll'], level);
+                        } else if (synthType === 'mono') {
+                            instrumentLevels['gigso-keyboard'] = Math.max(instrumentLevels['gigso-keyboard'], level);
+                        } else if (synthType === 'handpan') {
+                            instrumentLevels['hand-pan'] = Math.max(instrumentLevels['hand-pan'], level);
+                        }
+                    }
+                });
+            });
+
+            // Notify for each instrument
+            Object.entries(instrumentLevels).forEach(([instrumentId, level]) => {
+                this.notifyLevelUpdate(instrumentId, level);
+            });
+
+        } catch (error) {
+            console.warn('AudioManager: Error updating audio levels:', error);
+        }
+    }
+
+    getAudioLevel(analyser) {
+        const bufferLength = analyser.size;
+        const dataArray = analyser.getValue();
+
+        // Calculate RMS (Root Mean Square) for more accurate level representation
+        let sum = 0;
+        for (let i = 0; i < bufferLength; i++) {
+            const sample = Array.isArray(dataArray) ? dataArray[i] : dataArray[i] || 0;
+            sum += sample * sample;
+        }
+
+        const rms = Math.sqrt(sum / bufferLength);
+
+        // Convert to a 0-1 range with some scaling for better visual representation
+        const level = Math.min(rms * 10, 1.0); // Scale and clamp to 0-1
+
+        return level;
+    }
+
+    registerLevelCallback(instrumentId, callback) {
+        this.levelUpdateCallbacks.set(instrumentId, callback);
+        console.log(`AudioManager: Registered level callback for ${instrumentId}`);
+    }
+
+    unregisterLevelCallback(instrumentId) {
+        this.levelUpdateCallbacks.delete(instrumentId);
+        console.log(`AudioManager: Unregistered level callback for ${instrumentId}`);
+    }
+
+    notifyLevelUpdate(instrumentId, level) {
+        const callback = this.levelUpdateCallbacks.get(instrumentId);
+        if (callback) {
+            callback(level);
+        }
+    }
+
+    /**
+     * Mixer Integration Methods
+     */
+    setInstrumentVolume(instrumentId, volume) {
+        this.instrumentVolumes[instrumentId] = Math.max(0, Math.min(1, volume));
+        this.updateMasterVolume();
+        console.log(`AudioManager: Set ${instrumentId} volume to ${volume}`);
+    }
+
+    setGlobalMasterVolume(volume) {
+        this.globalMasterVolume = Math.max(0, Math.min(1, volume));
+        this.updateMasterVolume();
+        console.log(`AudioManager: Set global master volume to ${volume}`);
+    }
+
+    updateMasterVolume() {
+        if (this.masterVolume) {
+            // Combine global master volume - affects the entire audio output
+            const finalVolume = this.globalMasterVolume;
+            const volumeDb = finalVolume === 0 ? -60 : Math.log10(finalVolume) * 20;
+            this.masterVolume.volume.value = Math.max(-60, Math.min(6, volumeDb));
+
+            console.log('AudioManager: Master volume updated - Global:', this.globalMasterVolume, 'dB:', volumeDb);
+        }
+    }
+
+    setInstrumentMute(instrumentId, muted) {
+        this.instrumentMuted[instrumentId] = muted;
+        console.log(`AudioManager: Set ${instrumentId} mute to ${muted}`);
+    }
+
+    setGlobalMasterMute(muted) {
+        this.globalMasterMuted = muted;
+        console.log(`AudioManager: Set global master mute to ${muted}`);
+    }
+
+    getInstrumentVolume(instrumentId) {
+        return this.instrumentVolumes[instrumentId] || 0.6;
+    }
+
+    isInstrumentMuted(instrumentId) {
+        return this.instrumentMuted[instrumentId] || false;
     }
 }
 
