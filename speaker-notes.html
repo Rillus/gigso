@@ -210,11 +210,8 @@
             
             async loadPresentationData() {
                 try {
-                    const response = await fetch('./presentation-data.json');
-                    if (!response.ok) {
-                        throw new Error(`Failed to load presentation data: ${response.status}`);
-                    }
-                    this.presentationData = await response.json();
+                    // Use embedded presentation data instead of loading from file
+                    this.presentationData = this.getPresentationData();
                     this.totalSlides = this.presentationData.slides.length;
                 } catch (error) {
                     console.error('Error loading presentation data:', error);
@@ -419,6 +416,230 @@
                 } catch (error) {
                     console.warn('Could not notify main window:', error);
                 }
+            }
+            
+            getPresentationData() {
+                // Embedded presentation data to avoid Cloudflare Pages static file serving issues
+                return {
+                    "slides": [
+                        {
+                            "id": "title-slide",
+                            "title": "From Code to Chords",
+                            "content": {
+                                "type": "title",
+                                "mainTitle": "From Code to Chords",
+                                "subtitle": "Building a Web-Based Music Maker Without Frameworks",
+                                "author": "Riley Ramone",
+                                "date": "September 16th, 2025"
+                            },
+                            "speakerNotes": {
+                                "opening": "Good afternoon John Lewis! How are we doing out there? When I first started making websites, none of this would have been possible. This is a story about the web, music and how far we've come, and what's possible now.<br><br>I'm Riley and I've been making websites for over 20 years. I also love listening to and playing music when I'm not coding. While I'm not what most people would call a proper musician, I am in a band: the John Lewis Partnership Ukulele Band (Also known as The PUB), and they'll feature in this story a bit.",
+                                "keyPoint": "Introduce the concept of framework-free development<br>• Show the audience what's possible<br>• Build credibility",
+                                "timing": "1 minute for introduction and context setting"
+                            }
+                        },
+                        {
+                            "id": "the-noisy-web",
+                            "title": "The Noisy Web",
+                            "content": {
+                                "type": "bullets",
+                                "mainTitle": "The Noisy Web",
+                                "bullets": [
+                                    {"text": "CD-ROMs were introduced", "highlight": "1985"},
+                                    {"text": "Adobe Flash launched", "highlight": "1996"},
+                                    {"text": "Safari implements the HTML5 Audio element", "highlight": "2008"},
+                                    {"text": "Chrome implements the Web Audio API", "highlight": "2011"},
+                                    {"text": "The first web-based DAW was created", "highlight": "2013"},
+                                    {"text": "Adobe Flash discontinued", "highlight": "2020"}
+                                ]
+                            },
+                            "speakerNotes": {
+                                "focus": "The Web used to be a very loud place",
+                                "keyPoints": "The Web used to be a very loud place, and although we have audio and video, it tends to be within the context of audio and video players now.",
+                                "timing": "2-3 minutes to explain each concept with examples"
+                            }
+                        },
+                        {
+                            "id": "web-components-overview",
+                            "title": "What Are Web Components?",
+                            "content": {
+                                "type": "bullets",
+                                "mainTitle": "What Are Web Components?",
+                                "bullets": [
+                                    {"text": "Encapsulation: Shadow DOM isolates styles and markup", "highlight": "Encapsulation"},
+                                    {"text": "Reusability: Custom elements work across any framework", "highlight": "Reusability"},
+                                    {"text": "Standards-based: Built on web standards, no external dependencies", "highlight": "Standards-based"},
+                                    {"text": "Composability: Components combine to build complex applications", "highlight": "Composability"}
+                                ]
+                            },
+                            "speakerNotes": {
+                                "focus": "Explain the three main Web Components technologies:<br>• Custom Elements<br>• Shadow DOM<br>• HTML Templates",
+                                "keyPoints": "Custom Elements are the building blocks of Web Components. Shadow DOM is used to encapsulate the styles and markup of the component. HTML Templates are used to create the markup of the component.",
+                                "emphasize": "Standards-based, browser-native technology<br><br>No frameworks needed!",
+                                "timing": "3-4 minutes to explain each concept with examples"
+                            }
+                        },
+                        {
+                            "id": "web-components-benefits",
+                            "title": "Why Web Components for Music?",
+                            "content": {
+                                "type": "bullets",
+                                "mainTitle": "Why Web Components for Music?",
+                                "bullets": [
+                                    {"text": "Modularity: Each instrument/control is a separate component", "highlight": "Modularity"},
+                                    {"text": "Interoperability: Components communicate via standard events", "highlight": "Interoperability"},
+                                    {"text": "Performance: Native browser APIs, no framework overhead", "highlight": "Performance"},
+                                    {"text": "Audio-First: Direct access to Web Audio API for real-time audio", "highlight": "Audio-First"}
+                                ]
+                            },
+                            "speakerNotes": {
+                                "focus": "Music-Specific Benefits: Why Web Components are perfect for audio applications",
+                                "keyPoints": "No framework overhead, native performance, modular architecture",
+                                "timing": "4-5 minutes with audio examples if possible"
+                            }
+                        },
+                        {
+                            "id": "web-audio-api",
+                            "title": "Web Audio API",
+                            "content": {
+                                "type": "code",
+                                "mainTitle": "Web Audio API",
+                                "codeBlock": "const context = new window.AudioContext();\n\nconst successNoise = context.createOscillator();\nsuccessNoise.frequency = \"600\";\nsuccessNoise.type = \"sine\";\nsuccessNoise.frequency.exponentialRampToValueAtTime(\n  800,\n  context.currentTime + 0.05\n);\nsuccessNoise.frequency.exponentialRampToValueAtTime(\n  1000,\n  context.currentTime + 0.15\n);\n\nsuccessGain = context.createGain();\nsuccessGain.gain.exponentialRampToValueAtTime(\n  0.01,\n  context.currentTime + 0.3\n);\n\nsuccessFilter = context.createBiquadFilter(\"bandpass\");\nsuccessFilter.Q = 0.01;\n\nsuccessNoise\n  .connect(successFilter)\n  .connect(successGain)\n  .connect(context.destination);\nsuccessNoise.start();\nsuccessNoise.stop(context.currentTime + 0.2);",
+                                "question": "🤔 Is there a more developer-friendly option?"
+                            },
+                            "speakerNotes": {
+                                "focus": "Web Audio API: Explain the Web Audio API",
+                                "keyPoints": "Talk through code line by line. You can see what it's doing through... I got this from a tutorial, so I've not fully assimilated it myself.",
+                                "example": "Playing a success noise",
+                                "timing": "3-4 minutes with live demonstration if possible"
+                            }
+                        },
+                        {
+                            "id": "tone-js",
+                            "title": "Tone.js",
+                            "content": {
+                                "type": "code",
+                                "mainTitle": "Tone.js",
+                                "codeBlock": "const synth = new Tone.Synth({\n  oscillator: { type: \"sine\" },\n  envelope: {\n    attack: 0.01,\n    decay: 0.1,\n    sustain: 0.1,\n    release: 0.15,\n  },\n}).toDestination();\n\nconst now = Tone.now();\n\n// You can also use note names like \"C4\"\nsynth.triggerAttack(600, now);\nsynth.frequency.exponentialRampTo(1000, 0.15, now);\nsynth.triggerRelease(now + 0.2);"
+                            },
+                            "speakerNotes": {
+                                "focus": "Tone.js: Show the simplified version",
+                                "example": "Same sound, much cleaner code",
+                                "keyPoints": "This is a lot easier to read, and although the implementation and results are slightly different, it sounds a bit nicer to me. Also note the comment, where I mention you can use note names. If we wanted to play a middle C (C4) in native code, we'd need to use its frequency in Hz, which is 261.626 Hz.",
+                                "timing": "2-3 minutes to show the comparison"
+                            }
+                        },
+                        {
+                            "id": "event-architecture",
+                            "title": "Event-Driven Architecture",
+                            "content": {
+                                "type": "bullets-with-code",
+                                "mainTitle": "Event-Driven Architecture",
+                                "bullets": [
+                                    {"text": "CustomEvent: Components communicate via standard events", "highlight": "CustomEvent"},
+                                    {"text": "Centralised State: Single source of truth for application state", "highlight": "Centralized State"},
+                                    {"text": "Real-time Updates: Changes propagate across all components", "highlight": "Real-time Updates"},
+                                    {"text": "Example: Chord selection updates multiple components simultaneously", "highlight": "Example"}
+                                ],
+                                "codeBlock": "this.dispatchEvent(new CustomEvent('chord-selected', {\n  detail: { chord: 'Cmaj7', notes: ['C', 'E', 'G', 'B'] }\n}));"
+                            },
+                            "speakerNotes": {
+                                "focus": "Communication Pattern: CustomEvent-based messaging",
+                                "example": "Chord selection updating multiple components",
+                                "timing": "4-5 minutes with live demonstration if possible"
+                            }
+                        },
+                        {
+                            "id": "hand-pan",
+                            "title": "Hand Pan",
+                            "content": {
+                                "type": "demo",
+                                "mainTitle": "Hand Pan",
+                                "demoType": "hand-pan"
+                            },
+                            "speakerNotes": {
+                                "focus": "Hand Pan: Show the Hand Pan component",
+                                "interaction": "Encourage audience participation. Note the touch interaction, and the ability to mute and unmute the audio. Also note the key and scale selection, and the size selection.",
+                                "fallback": "Have backup if audio doesn't work. Also note the event logging, and the ability to clear the event log.",
+                                "timing": "2-3 minutes for interactive demonstration"
+                            }
+                        },
+                        {
+                            "id": "gigso-demo",
+                            "title": "Gigso Demo",
+                            "content": {
+                                "type": "demo",
+                                "mainTitle": "Gigso Demo",
+                                "demoType": "gigso"
+                            },
+                            "speakerNotes": {
+                                "interaction": "So, this is Gigso. It's a web-based application that allows users to compose and play music. It's a work in progress, but you can see the components in action.<br><br>- Start with the keyboard<br>- Add a couple of chords<br>- note the chord box, so we can see how to play the chords on guitar<br>- So here's a chord progression I saved earlier. Radiohed's Creep. Let's see how it sounds.<br>- play 4 chords and loop via loop pedal.<br>- So I thought this would be pretty useful for The Partner Ukulele Band: we could share songs via here and have a nice little library of songs to play. Let's update the instrument to ukulele and see how that sounds next. (play the four chords in to the looper on the uke)<br>- If you're anything like me, you have a mandolin that yougot one year for your birthday, and you don't play it very often because there aren't many mandolin tabs or chord sheets online. What if you could play the chords on the mandolin? (play the four chords on the mandolin)<br>- I'd got about this far when my sister asked if I wanted to support my neices and teach some ukulele lessons at a day festival called Priory Live in Orpington to raise money for the Orpington May Queen, and as I already had some of the framework and components, my alter ego Unclelele was born, which I was able to set up within about a day. What of we take the chords from here and put them into the Gigso Piano Roll?<br>- show moving chords around",
+                                "timing": "2-3 minutes for interactive demonstration"
+                            }
+                        },
+                        {
+                            "id": "development-methodology",
+                            "title": "Development Methodology",
+                            "content": {
+                                "type": "bullets",
+                                "mainTitle": "Development Methodology",
+                                "bullets": [
+                                    {"text": "AI chat and auto-complete", "highlight": "Phase 1"},
+                                    {"text": "Background agents", "highlight": "Phase 2"},
+                                    {"text": "Specification driven development", "highlight": "Phase 3"}
+                                ]
+                            },
+                            "speakerNotes": {
+                                "keyPoints": "Starting in January, the first couple of components were built using AI chat and auto-complete. This allowed me to learn about Web Components, and set up event and state management.<br>When Cursor released Background Agents around May/June of this year, I set up deployment from the main branch via cloudflare pages, so I could request changes via Background agents, and review, merge and deploy via the Github web interface. This was much more akin to vibe coding than traditional development, with less code oversight.<br>More recently, I've been using specification driven development, writing the specifications first, and then the implementation. I've been broadly using Claude Code to write the specifications, and then let it auto-run the implementation, and making sure we have good test coverage in place. Then for more fine-grained tweaks and design changes, I've been jumping back into Cursor.",
+                                "timing": "4-5 minutes with audio examples if possible"
+                            }
+                        },
+                        {
+                            "id": "technical-future",
+                            "title": "Future Development",
+                            "content": {
+                                "type": "bullets",
+                                "mainTitle": "Future Development",
+                                "bullets": [
+                                    {"text": "Play samples, create drum machine", "highlight": "Samples"},
+                                    {"text": "Live input recording and looping for building up songs", "highlight": "Looper"},
+                                    {"text": "Import/export MIDI files, MIDI controller support", "highlight": "MIDI"},
+                                    {"text": "Assisted composition", "highlight": "AI"},
+                                    {"text": "Real-time, multi-user", "highlight": "Collaboration"},
+                                    {"text": "Native app?", "highlight": "Mobile"}
+                                ]
+                            },
+                            "speakerNotes": {
+                                "focus": "Future Development: What's next for the project",
+                                "keyPoints": "MIDI import/export capabilities, AI-assisted composition features, collaborative real-time editing, mobile app development, and also due to the modular nature of these components, we could remix it to support all sorts of workflows and use cases.",
+                                "timing": "3-4 minutes to wrap up and inspire"
+                            }
+                        },
+                        {
+                            "id": "closing-slide",
+                            "title": "Thank you, and good night!",
+                            "content": {
+                                "type": "title",
+                                "mainTitle": "Thank you, and good night!",
+                                "subtitle": "gigso.net",
+                                "author": "Riley Ramone",
+                                "date": "September 16th, 2025"
+                            },
+                            "speakerNotes": {
+                                "closing": "Thank you for coming to my gig. I hope you've enjoyed it. If you have any questions, please feel free to ask on Slack, as we're out of time now. The website is Gogso.net if you'd like to play - there's a link at the bottom to the GitHub repository - please fork or contribute to it if you'd like to. Finally, please search for \"ukulele\" on Partner Choice to find out more about The Partner Ukulele Band. We're playing a gig on the 11th December at Drummond Base for the early lunch sitting, so come and say hi!",
+                                "timing": "1 minute for closing"
+                            }
+                        }
+                    ],
+                    "metadata": {
+                        "totalSlides": 8,
+                        "presentationTitle": "From Code to Chords: Building a Web-Based Music Maker Without Frameworks",
+                        "author": "Riley Ramone",
+                        "date": "September 16th, 2025",
+                        "version": "1.0.0",
+                        "lastUpdated": "2025-01-27"
+                    }
+                };
             }
         }
         
