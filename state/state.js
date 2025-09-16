@@ -5,9 +5,9 @@ const state = {
     currentChord: null,
     song: null,
     instrument: 'guitar',
-    songKey: null,
+    songKey: 'C',
     songScale: 'major',
-    isKeySet: false,
+    isKeySet: true,
     bpm: 120
 }
 

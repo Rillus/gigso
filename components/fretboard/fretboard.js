@@ -75,6 +75,20 @@ export default class Fretboard extends BaseComponent {
     return ['instrument', 'chord', 'scale-root', 'scale-type', 'key', 'practice-mode', 'practice-level'];
   }
 
+  connectedCallback() {
+    console.log('Fretboard: Component connected to DOM');
+    
+    // Check if there's a current key set in state
+    if (State.isKeySet && State.isKeySet()) {
+      const currentKey = State.songKey();
+      const currentScale = State.songScale();
+      console.log('Fretboard: Initializing with state key:', currentKey, currentScale);
+      
+      // Display the scale based on the current state
+      this.displayScale(currentKey, currentScale);
+    }
+  }
+
   disconnectedCallback() {
     // Clean up when component is removed from DOM
     this.cleanup();

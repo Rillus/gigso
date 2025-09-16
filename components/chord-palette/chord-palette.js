@@ -118,21 +118,29 @@ export default class ChordPalette extends HTMLElement {
             font-weight: bold;
             color: var(--unclelele-accent, #F7931E);
             margin-bottom: 10px;
-            padding: 0px;
+            padding: 8px;
             top: -15px;
             left: -15px;
             background: rgba(247, 147, 30, 0.1);
             border-radius: 5px;
             position: absolute;
             font-size: 12px;
+            cursor: pointer;
+            transition: background-color 0.2s, transform 0.1s;
+            user-select: none;
+        }
+        
+        .key-indicator:hover {
+            background: rgba(247, 147, 30, 0.2);
+            transform: scale(1.02);
         }
         
         ${chordColours}
 
       </style>
       <div class="palette">
-          <div class="key-indicator" id="keyIndicator" style="display: none;">
-              Key: <span id="keyDisplay">Not Set</span>
+          <div class="key-indicator" id="keyIndicator">
+              Key: <span id="keyDisplay">C Major</span>
           </div>
           ${this.createChordButtons()}
       </div>
@@ -141,6 +149,24 @@ export default class ChordPalette extends HTMLElement {
     this.shadowRoot.querySelectorAll(".chord-button").forEach((button) => {
       button.addEventListener("click", (e) => this.addChord(e));
     });
+  }
+
+  connectedCallback() {
+    // Set up key indicator click handler
+    const keyIndicator = this.shadowRoot.getElementById('keyIndicator');
+    if (keyIndicator) {
+      keyIndicator.addEventListener('click', (e) => this.showKeySelection(e));
+      keyIndicator.style.cursor = 'pointer';
+    }
+    
+    // Initialize with default key if set
+    if (state.isKeySet()) {
+      this.updateKeyDisplay(state.songKey(), state.songScale());
+      this.highlightKeyChord(state.songKey(), state.songScale());
+      
+      // Dispatch initial key to notify other components
+      this.dispatchKeyChangeEvent(state.songKey(), state.songScale());
+    }
   }
 
   createChordButtons() {
@@ -230,10 +256,8 @@ export default class ChordPalette extends HTMLElement {
       })
     );
     
-    // Handle key selection if no key is set
-    if (!state.isKeySet()) {
-      this.setKeyFromChord(chord);
-    }
+    // Note: Key selection is now handled by clicking the key indicator
+    // The first chord no longer automatically sets the key
   }
 
   // Key detection methods
@@ -319,6 +343,118 @@ export default class ChordPalette extends HTMLElement {
         })
       );
     }
+  }
+
+  showKeySelection(event) {
+    event.preventDefault();
+    event.stopPropagation();
+    
+    // Create key selection modal
+    const modal = document.createElement('div');
+    modal.style.cssText = `
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.5);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 1000;
+    `;
+    
+    const modalContent = document.createElement('div');
+    modalContent.style.cssText = `
+      background: white;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+      max-width: 400px;
+      width: 90%;
+    `;
+    
+    modalContent.innerHTML = `
+      <h3 style="margin-top: 0; color: #333;">Select Key</h3>
+      <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin: 20px 0;">
+        ${this.createKeySelectionButtons()}
+      </div>
+      <div style="text-align: right;">
+        <button id="cancelKeySelection" style="padding: 8px 16px; margin-right: 10px; background: #ccc; border: none; border-radius: 4px; cursor: pointer;">Cancel</button>
+      </div>
+    `;
+    
+    modal.appendChild(modalContent);
+    document.body.appendChild(modal);
+    
+    // Add event listeners
+    modalContent.querySelectorAll('.key-selection-button').forEach(button => {
+      button.addEventListener('click', (e) => {
+        const key = e.target.dataset.key;
+        const scale = e.target.dataset.scale;
+        this.selectKey(key, scale);
+        document.body.removeChild(modal);
+      });
+    });
+    
+    modalContent.querySelector('#cancelKeySelection').addEventListener('click', () => {
+      document.body.removeChild(modal);
+    });
+    
+    // Close modal when clicking outside
+    modal.addEventListener('click', (e) => {
+      if (e.target === modal) {
+        document.body.removeChild(modal);
+      }
+    });
+  }
+
+  createKeySelectionButtons() {
+    const keys = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'];
+    const scales = ['major', 'minor'];
+    
+    let buttons = '';
+    scales.forEach(scale => {
+      keys.forEach(key => {
+        const isCurrent = state.songKey() === key && state.songScale() === scale;
+        const scaleLabel = scale === 'major' ? '' : 'm';
+        buttons += `
+          <button 
+            class="key-selection-button" 
+            data-key="${key}" 
+            data-scale="${scale}"
+            style="
+              padding: 10px;
+              border: 2px solid ${isCurrent ? '#F7931E' : '#ddd'};
+              background: ${isCurrent ? '#F7931E' : 'white'};
+              color: ${isCurrent ? 'white' : '#333'};
+              border-radius: 4px;
+              cursor: pointer;
+              font-size: 14px;
+              font-weight: ${isCurrent ? 'bold' : 'normal'};
+            "
+          >
+            ${key}${scaleLabel}
+          </button>
+        `;
+      });
+    });
+    
+    return buttons;
+  }
+
+  selectKey(key, scale) {
+    // Update state
+    state.setSongKey(key);
+    state.setSongScale(scale);
+    state.setIsKeySet(true);
+    
+    // Update visual feedback
+    this.updateKeyDisplay(key, scale);
+    this.highlightKeyChord(key, scale);
+    
+    // Dispatch key change events
+    this.dispatchKeyChangeEvent(key, scale);
   }
 }
 

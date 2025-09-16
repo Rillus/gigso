@@ -2,6 +2,7 @@ import { generateScaleNotes, getNoteFrequency } from '../../helpers/scaleUtils.j
 import { applyNoteColor, getBaseNote } from '../../helpers/noteColorUtils.js';
 import { checkToneJsStatus, getAudioErrorMessage, logAudioStatus } from '../../helpers/audioUtils.js';
 import audioManager from '../../helpers/audioManager.js';
+import state from '../../state/state.js';
 
 export default class HandPan extends HTMLElement {
     constructor() {
@@ -49,13 +50,23 @@ export default class HandPan extends HTMLElement {
         // Log audio status for debugging
         logAudioStatus('HandPan');
         
-        // Set default attributes if not provided
-        if (!this.hasAttribute('key')) {
-            this.setAttribute('key', 'D');
+        // Check if there's a current key set in state
+        if (typeof state !== 'undefined' && state.isKeySet && state.isKeySet()) {
+            const currentKey = state.songKey();
+            const currentScale = state.songScale();
+            console.log('HandPan: Initializing with state key:', currentKey, currentScale);
+            this.setAttribute('key', currentKey);
+            this.setAttribute('scale', currentScale);
+        } else {
+            // Set default attributes if not provided
+            if (!this.hasAttribute('key')) {
+                this.setAttribute('key', 'D');
+            }
+            if (!this.hasAttribute('scale')) {
+                this.setAttribute('scale', 'minor');
+            }
         }
-        if (!this.hasAttribute('scale')) {
-            this.setAttribute('scale', 'minor');
-        }
+        
         if (!this.hasAttribute('size')) {
             this.setAttribute('size', 'medium');
         }

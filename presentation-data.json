@@ -243,7 +243,7 @@
         ]
       },
       "speakerNotes": {
-        "keyPoints": "- Starting in January, the first couple of components were built using AI chat and auto-complete. This allowed me to learn about Web Components, and set up event and state management.<br>- When Cursor released Background Agents around May/June of this year, I set up deployment from the main branch via cloudflare pages, so I could request changes via Background agents, and review, merge and deploy via the Github web interface. This was much more akin to vibe coding than traditional development, with less code oversight.<br>- More recently, I've been using specification driven development, writing the specifications first, and then the implementation. I've been broadly using Claude Code to write the specifications, and then let it auto-run the implementation, and making sure we have good test coverage in place. Then for more fine-grained tweaks and design changes, I've been jumping back into Cursor.",
+        "keyPoints": "- Starting in January, the first couple of components were built using AI chat and auto-complete. This allowed me to learn about Web Components, and set up event and state management.<br>- When Cursor released Background Agents around May/June of this year, I set up deployment from the main branch via cloudflare pages, so I could request changes via Background agents, and review, merge and deploy via the Github web interface. This was much more akin to vibe coding than traditional development, with less code oversight.<br>- More recently, I've been using specification driven development, writing the specifications first, and then the implementation. I've been broadly using Claude Code to write the specifications, and then let it auto-run the implementation, and making sure we have good test coverage in place. Then for more fine-grained tweaks and design changes, I've been jumping back into Cursor. I'll be chatting a bit more about Specification Driven Development at the Engineering With Purpose external meetup on the 1st October.",
         "timing": "4-5 minutes with audio examples if possible"
       }
     },
@@ -282,7 +282,7 @@
       },
       "speakerNotes": {
         "focus": "Future Development: What's next for the project",
-        "keyPoints": "MIDI import/export capabilities, AI-assisted composition features, collaborative real-time editing, mobile app development",
+        "keyPoints": "MIDI import/export capabilities, AI-assisted composition features, collaborative real-time editing, mobile app development, and also due to the modular nature of these components, we could remix it to support all sorts of workflows and use cases.",
         "timing": "3-4 minutes to wrap up and inspire"
       }
     },

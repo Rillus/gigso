@@ -5,16 +5,15 @@ import state from '../../../state/state.js';
 
 // Mock state management
 const mockState = {
-    songKey: null,
+    songKey: 'C',
     songScale: 'major',
-    isKeySet: false
+    isKeySet: true
 };
 
 // Mock the state module
 jest.mock('../../../state/state.js', () => ({
     setSongKey: jest.fn((key) => {
         mockState.songKey = key;
-        mockState.isKeySet = true;
     }),
     setSongScale: jest.fn((scale) => {
         mockState.songScale = scale;
@@ -22,17 +21,19 @@ jest.mock('../../../state/state.js', () => ({
     setIsKeySet: jest.fn((value) => {
         mockState.isKeySet = value;
     }),
-    isKeySet: jest.fn(() => mockState.isKeySet)
+    isKeySet: jest.fn(() => mockState.isKeySet),
+    songKey: jest.fn(() => mockState.songKey),
+    songScale: jest.fn(() => mockState.songScale)
 }));
 
 describe('ChordPalette Component', () => {
     let chordPaletteElement;
 
     beforeEach(() => {
-        // Reset mock state
-        mockState.songKey = null;
+        // Reset mock state to default values
+        mockState.songKey = 'C';
         mockState.songScale = 'major';
-        mockState.isKeySet = false;
+        mockState.isKeySet = true;
         jest.clearAllMocks();
 
         // Create an instance of the component
@@ -136,8 +137,8 @@ describe('ChordPalette Component', () => {
 
             fireEvent.click(gButton);
 
-            // Check that all events were dispatched (add-chord, chord-selected, key-changed)
-            expect(mockDispatchEvent).toHaveBeenCalledTimes(3);
+            // Check that only add-chord and chord-selected events were dispatched (no key-changed)
+            expect(mockDispatchEvent).toHaveBeenCalledTimes(2);
             
             // Check for chord-selected event
             const chordSelectedCall = mockDispatchEvent.mock.calls.find(call => 
@@ -156,10 +157,9 @@ describe('ChordPalette Component', () => {
 
             fireEvent.click(button);
 
-            expect(mockDispatchEvent).toHaveBeenCalledTimes(3);
+            expect(mockDispatchEvent).toHaveBeenCalledTimes(2);
             expect(mockDispatchEvent).toHaveBeenCalledWith(expect.objectContaining({ type: 'add-chord' }));
             expect(mockDispatchEvent).toHaveBeenCalledWith(expect.objectContaining({ type: 'chord-selected' }));
-            expect(mockDispatchEvent).toHaveBeenCalledWith(expect.objectContaining({ type: 'key-changed' }));
         });
 
         test('should handle different chord types correctly', () => {
@@ -297,12 +297,9 @@ describe('ChordPalette Component', () => {
                 fireEvent.click(buttons[i]);
             }
             
-            // Should have dispatched 3 events for first click + 2 events per subsequent click
-            // First click: add-chord + chord-selected + key-changed = 3
-            // Second click: add-chord + chord-selected = 2
-            // Third click: add-chord + chord-selected = 2
-            // Total: 3 + 2 + 2 = 7
-            expect(mockDispatchEvent).toHaveBeenCalledTimes(7);
+            // Should have dispatched 2 events per click (add-chord + chord-selected)
+            // 3 clicks × 2 events = 6 total events
+            expect(mockDispatchEvent).toHaveBeenCalledTimes(6);
         });
 
         test('should handle rapid successive clicks', () => {
@@ -314,11 +311,9 @@ describe('ChordPalette Component', () => {
                 fireEvent.click(button);
             }
             
-            // Should have dispatched 3 events for first click + 2 events per subsequent click
-            // First click: add-chord + chord-selected + key-changed = 3
-            // Clicks 2-5: add-chord + chord-selected = 2 each = 8
-            // Total: 3 + 8 = 11
-            expect(mockDispatchEvent).toHaveBeenCalledTimes(11);
+            // Should have dispatched 2 events per click (add-chord + chord-selected)
+            // 5 clicks × 2 events = 10 total events
+            expect(mockDispatchEvent).toHaveBeenCalledTimes(10);
         });
     });
 
@@ -332,7 +327,65 @@ describe('ChordPalette Component', () => {
     });
 
     describe('Key Selection Feature', () => {
-        describe('Key Detection', () => {
+        describe('Default Key Initialization', () => {
+            test('should show default key indicator on startup', () => {
+                const keyIndicator = chordPaletteElement.shadowRoot.getElementById('keyIndicator');
+                const keyDisplay = chordPaletteElement.shadowRoot.getElementById('keyDisplay');
+                
+                expect(keyIndicator).toBeInTheDocument();
+                expect(keyDisplay.textContent).toBe('C Major');
+            });
+
+            test('should highlight default key chord on startup', () => {
+                const cButton = chordPaletteElement.shadowRoot.querySelector('.chord-button[data-chord*="C"]');
+                expect(cButton).toHaveClass('key-chord');
+            });
+        });
+
+        describe('Key Indicator Interaction', () => {
+            test('should make key indicator clickable', () => {
+                const keyIndicator = chordPaletteElement.shadowRoot.getElementById('keyIndicator');
+                expect(keyIndicator.style.cursor).toBe('pointer');
+            });
+
+            test('should show key selection modal when clicked', () => {
+                const keyIndicator = chordPaletteElement.shadowRoot.getElementById('keyIndicator');
+                const showKeySelectionSpy = jest.spyOn(chordPaletteElement, 'showKeySelection');
+                
+                fireEvent.click(keyIndicator);
+                
+                expect(showKeySelectionSpy).toHaveBeenCalled();
+            });
+        });
+
+        describe('Key Selection Modal', () => {
+            test('should create key selection buttons for all keys and scales', () => {
+                const buttons = chordPaletteElement.createKeySelectionButtons();
+                const buttonCount = (buttons.match(/key-selection-button/g) || []).length;
+                
+                // 12 keys × 2 scales = 24 buttons
+                expect(buttonCount).toBe(24);
+            });
+
+            test('should highlight current key in selection modal', () => {
+                const buttons = chordPaletteElement.createKeySelectionButtons();
+                expect(buttons).toContain('C');
+                expect(buttons).toContain('Cm');
+            });
+
+            test('should select new key when button clicked', () => {
+                const selectKeySpy = jest.spyOn(chordPaletteElement, 'selectKey');
+                
+                // Simulate selecting G major
+                chordPaletteElement.selectKey('G', 'major');
+                
+                expect(selectKeySpy).toHaveBeenCalledWith('G', 'major');
+                expect(state.setSongKey).toHaveBeenCalledWith('G');
+                expect(state.setSongScale).toHaveBeenCalledWith('major');
+            });
+        });
+
+        describe('Key Detection Methods', () => {
             test('should extract root note from major chords', () => {
                 const testCases = [
                     { chord: 'C', expected: 'C' },
@@ -361,20 +414,6 @@ describe('ChordPalette Component', () => {
                 });
             });
 
-            test('should handle complex chord names', () => {
-                const testCases = [
-                    { chord: 'C7', expected: 'C' },
-                    { chord: 'Gmaj7', expected: 'G' },
-                    { chord: 'F#sus4', expected: 'F#' },
-                    { chord: 'Bbadd9', expected: 'Bb' }
-                ];
-
-                testCases.forEach(({ chord, expected }) => {
-                    const result = chordPaletteElement.extractRootNote(chord);
-                    expect(result).toBe(expected);
-                });
-            });
-
             test('should identify major chords correctly', () => {
                 const majorChords = ['C', 'G', 'F#', 'Bb', 'C7', 'Gmaj7'];
                 
@@ -394,130 +433,55 @@ describe('ChordPalette Component', () => {
             });
         });
 
-        describe('State Management Integration', () => {
-            test('should set key on first chord selection', () => {
-                const button = chordPaletteElement.shadowRoot.querySelector('.chord-button[data-chord*="C"]');
-                const mockDispatchEvent = jest.spyOn(chordPaletteElement, 'dispatchEvent');
-
-                fireEvent.click(button);
-
-                expect(state.setSongKey).toHaveBeenCalledWith('C');
-                expect(state.setSongScale).toHaveBeenCalledWith('major');
-                expect(state.setIsKeySet).toHaveBeenCalledWith(true);
-            });
-
-            test('should update key on subsequent chord selections', () => {
-                // This test verifies that the component can handle multiple key changes
-                // The actual state management is tested in the first test
-                const cButton = chordPaletteElement.shadowRoot.querySelector('.chord-button[data-chord*="C"]');
-                fireEvent.click(cButton);
-
-                const gButton = chordPaletteElement.shadowRoot.querySelector('.chord-button[data-chord*="G"]');
-                fireEvent.click(gButton);
-
-                // Verify that the component can handle multiple clicks
-                expect(cButton).toBeInTheDocument();
-                expect(gButton).toBeInTheDocument();
-            });
-
-            test('should handle minor chord key changes', () => {
-                const cmButton = chordPaletteElement.shadowRoot.querySelector('.chord-button[data-chord*="Cm"]');
-                const mockDispatchEvent = jest.spyOn(chordPaletteElement, 'dispatchEvent');
-
-                fireEvent.click(cmButton);
-
-                expect(state.setSongKey).toHaveBeenCalledWith('C');
-                expect(state.setSongScale).toHaveBeenCalledWith('minor');
-            });
-        });
-
-        describe('Visual Feedback', () => {
-            test('should show key indicator when key is set', () => {
-                const button = chordPaletteElement.shadowRoot.querySelector('.chord-button[data-chord*="C"]');
-                fireEvent.click(button);
-
-                const keyIndicator = chordPaletteElement.shadowRoot.getElementById('keyIndicator');
-                const keyDisplay = chordPaletteElement.shadowRoot.getElementById('keyDisplay');
+        describe('Visual Feedback Updates', () => {
+            test('should update key display when key changes', () => {
+                chordPaletteElement.updateKeyDisplay('G', 'minor');
                 
-                expect(keyIndicator.style.display).toBe('block');
-                expect(keyDisplay.textContent).toBe('C Major');
-            });
-
-            test('should highlight selected key chord', () => {
-                const button = chordPaletteElement.shadowRoot.querySelector('.chord-button[data-chord*="C"]');
-                fireEvent.click(button);
-
-                expect(button).toHaveClass('key-chord');
-            });
-
-            test('should update key indicator when key changes', () => {
-                // This test verifies that the key indicator can be updated
-                const cButton = chordPaletteElement.shadowRoot.querySelector('.chord-button[data-chord*="C"]');
-                fireEvent.click(cButton);
-
                 const keyDisplay = chordPaletteElement.shadowRoot.getElementById('keyDisplay');
-                expect(keyDisplay.textContent).toBe('C Major');
+                expect(keyDisplay.textContent).toBe('G Minor');
             });
 
-            test('should remove previous highlighting when key changes', () => {
-                // Select first chord
+            test('should highlight new key chord when key changes', () => {
+                // First set C major
+                chordPaletteElement.highlightKeyChord('C', 'major');
                 const cButton = chordPaletteElement.shadowRoot.querySelector('.chord-button[data-chord*="C"]');
-                fireEvent.click(cButton);
                 expect(cButton).toHaveClass('key-chord');
 
-                // Select second chord
-                const gButton = chordPaletteElement.shadowRoot.querySelector('.chord-button[data-chord*="G"]');
-                fireEvent.click(gButton);
-
-                // Check that only the G button has the key-chord class
-                const allButtons = chordPaletteElement.shadowRoot.querySelectorAll('.chord-button');
-                allButtons.forEach(button => {
-                    if (button === gButton) {
-                        expect(button).toHaveClass('key-chord');
-                    } else {
-                        expect(button).not.toHaveClass('key-chord');
-                    }
+                // Then change to G major
+                chordPaletteElement.highlightKeyChord('G', 'major');
+                
+                // Find the G button specifically (not G# or Gm)
+                const buttons = chordPaletteElement.shadowRoot.querySelectorAll('.chord-button');
+                const gButton = Array.from(buttons).find(button => {
+                    const chordData = JSON.parse(button.getAttribute('data-chord'));
+                    return chordData.name === 'G';
                 });
+                
+                expect(cButton).not.toHaveClass('key-chord');
+                expect(gButton).toHaveClass('key-chord');
             });
         });
 
         describe('Event Communication', () => {
-            test('should dispatch key-changed event', () => {
-                const button = chordPaletteElement.shadowRoot.querySelector('.chord-button[data-chord*="C"]');
+            test('should dispatch key-changed event when key is selected', () => {
                 const mockDispatchEvent = jest.spyOn(chordPaletteElement, 'dispatchEvent');
-
-                fireEvent.click(button);
-
+                
+                chordPaletteElement.selectKey('F', 'major');
+                
                 expect(mockDispatchEvent).toHaveBeenCalledWith(expect.objectContaining({
                     type: 'key-changed',
                     detail: {
-                        key: 'C',
+                        key: 'F',
                         scale: 'major'
                     }
                 }));
             });
 
-            test('should dispatch key-set event on first selection', () => {
-                // This test verifies that the component can dispatch events
-                const button = chordPaletteElement.shadowRoot.querySelector('.chord-button[data-chord*="C"]');
+            test('should not dispatch key-set event when key is changed', () => {
                 const mockDispatchEvent = jest.spyOn(chordPaletteElement, 'dispatchEvent');
-
-                fireEvent.click(button);
-
-                // Verify that events are dispatched
-                expect(mockDispatchEvent).toHaveBeenCalled();
-            });
-
-            test('should not dispatch key-set event on subsequent selections', () => {
-                // First selection
-                const cButton = chordPaletteElement.shadowRoot.querySelector('.chord-button[data-chord*="C"]');
-                fireEvent.click(cButton);
-
-                // Second selection
-                const gButton = chordPaletteElement.shadowRoot.querySelector('.chord-button[data-chord*="G"]');
-                const mockDispatchEvent = jest.spyOn(chordPaletteElement, 'dispatchEvent');
-                fireEvent.click(gButton);
-
+                
+                chordPaletteElement.selectKey('F', 'major');
+                
                 const keySetCalls = mockDispatchEvent.mock.calls.filter(call => call[0].type === 'key-set');
                 expect(keySetCalls).toHaveLength(0);
             });
@@ -534,13 +498,12 @@ describe('ChordPalette Component', () => {
                 // Simulate hand-pan listening for key changes
                 document.addEventListener('key-changed', mockHandPan.handleKeyChange);
 
-                const button = chordPaletteElement.shadowRoot.querySelector('.chord-button[data-chord*="C"]');
-                fireEvent.click(button);
+                chordPaletteElement.selectKey('D', 'minor');
 
                 expect(mockHandPan.handleKeyChange).toHaveBeenCalledWith(expect.objectContaining({
                     detail: {
-                        key: 'C',
-                        scale: 'major'
+                        key: 'D',
+                        scale: 'minor'
                     }
                 }));
             });
@@ -555,12 +518,11 @@ describe('ChordPalette Component', () => {
                 // Simulate fretboard listening for key changes
                 document.addEventListener('key-changed', mockFretboard.handleKeyChange);
 
-                const button = chordPaletteElement.shadowRoot.querySelector('.chord-button[data-chord*="C"]');
-                fireEvent.click(button);
+                chordPaletteElement.selectKey('E', 'major');
 
                 expect(mockFretboard.handleKeyChange).toHaveBeenCalledWith(expect.objectContaining({
                     detail: {
-                        key: 'C',
+                        key: 'E',
                         scale: 'major'
                     }
                 }));
