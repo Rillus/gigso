@@ -213,6 +213,9 @@
                     // Use embedded presentation data instead of loading from file
                     this.presentationData = this.getPresentationData();
                     this.totalSlides = this.presentationData.slides.length;
+                    console.log('🎵 Speaker Notes: Loaded presentation data:', this.presentationData);
+                    console.log('🎵 Speaker Notes: Total slides:', this.totalSlides);
+                    console.log('🎵 Speaker Notes: Slide IDs:', this.presentationData.slides.map(s => s.id));
                 } catch (error) {
                     console.error('Error loading presentation data:', error);
                 }
