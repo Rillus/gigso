@@ -295,9 +295,13 @@
             }
             
             updateSlide(slideData) {
+                console.log('🎵 Speaker Notes: Received slide data:', slideData);
                 this.currentSlide = slideData.currentSlide || 0;
                 const slideType = slideData.slideType;
                 const title = slideData.title;
+                
+                console.log('🎵 Speaker Notes: Looking for slideType:', slideType);
+                console.log('🎵 Speaker Notes: Available slides:', this.presentationData?.slides?.map(s => s.id));
                 
                 // Update slide counter and title
                 document.getElementById('slide-counter').textContent = 
@@ -311,12 +315,18 @@
             updateNotesContent(slideType) {
                 const notesContent = document.getElementById('notes-content');
                 
+                console.log('🎵 Speaker Notes: updateNotesContent called with slideType:', slideType);
+                console.log('🎵 Speaker Notes: presentationData exists:', !!this.presentationData);
+                console.log('🎵 Speaker Notes: slides exist:', !!this.presentationData?.slides);
+                
                 if (!this.presentationData || !this.presentationData.slides) {
                     notesContent.innerHTML = '<div class="no-notes">Presentation data not loaded</div>';
                     return;
                 }
                 
                 const slideData = this.presentationData.slides.find(slide => slide.id === slideType);
+                console.log('🎵 Speaker Notes: Found slide data:', slideData);
+                console.log('🎵 Speaker Notes: Slide has speakerNotes:', !!slideData?.speakerNotes);
                 
                 if (!slideData || !slideData.speakerNotes) {
                     notesContent.innerHTML = '<div class="no-notes">No speaker notes available for this slide</div>';
