@@ -388,6 +388,10 @@ export default class GigsoPresentation extends BaseComponent {
                 slide.title = slideConfig.title;
                 slide.slideData = slideConfig;
                 
+                // Also set as attributes for better compatibility
+                slide.setAttribute('slide-type', slideConfig.id);
+                slide.setAttribute('title', slideConfig.title);
+                
                 console.log('🎵 Main Presentation: Created slide', i, 'with slideType:', slideConfig.id, 'title:', slideConfig.title);
                 
                 // Add to DOM
@@ -504,8 +508,8 @@ export default class GigsoPresentation extends BaseComponent {
             this.dispatchEvent(new CustomEvent('slide-changed', {
                 detail: { 
                     currentSlide: this.currentSlide,
-                    slideType: nextSlideElement.getAttribute('slide-type'),
-                    title: nextSlideElement.getAttribute('title')
+                    slideType: nextSlideElement.getAttribute('slide-type') || nextSlideElement.slideType,
+                    title: nextSlideElement.getAttribute('title') || nextSlideElement.title
                 }
             }));
             
@@ -516,12 +520,18 @@ export default class GigsoPresentation extends BaseComponent {
             console.log('🎵 Main Presentation: nextSlideElement.title:', nextSlideElement.title);
             console.log('🎵 Main Presentation: nextSlideElement.getAttribute("title"):', nextSlideElement.getAttribute('title'));
             
+            // Prioritize attribute over property for better compatibility
+            const slideType = nextSlideElement.getAttribute('slide-type') || nextSlideElement.slideType;
+            const title = nextSlideElement.getAttribute('title') || nextSlideElement.title;
+            
+            console.log('🎵 Main Presentation: Final slideType:', slideType, 'title:', title);
+            
             this.notifySpeakerNotesWindow({
                 type: 'slide-changed',
                 detail: {
                     currentSlide: this.currentSlide,
-                    slideType: nextSlideElement.slideType || nextSlideElement.getAttribute('slide-type'),
-                    title: nextSlideElement.title || nextSlideElement.getAttribute('title')
+                    slideType: slideType,
+                    title: title
                 }
             });
             
@@ -751,8 +761,8 @@ export default class GigsoPresentation extends BaseComponent {
                     type: 'presentation-ready',
                     detail: {
                         currentSlide: this.currentSlide,
-                        slideType: this.slides[this.currentSlide]?.slideType,
-                        title: this.slides[this.currentSlide]?.title
+                        slideType: this.slides[this.currentSlide]?.getAttribute('slide-type') || this.slides[this.currentSlide]?.slideType,
+                        title: this.slides[this.currentSlide]?.getAttribute('title') || this.slides[this.currentSlide]?.title
                     }
                 });
             }, 1000);
@@ -765,8 +775,8 @@ export default class GigsoPresentation extends BaseComponent {
             type: 'slide-changed',
             detail: {
                 currentSlide: this.currentSlide,
-                slideType: this.slides[this.currentSlide]?.slideType,
-                title: this.slides[this.currentSlide]?.title
+                slideType: this.slides[this.currentSlide]?.getAttribute('slide-type') || this.slides[this.currentSlide]?.slideType,
+                title: this.slides[this.currentSlide]?.getAttribute('title') || this.slides[this.currentSlide]?.title
             }
         });
     }
