@@ -257,6 +257,10 @@ export default class GigsoPresentation extends BaseComponent {
         this.setupEventListeners();
         this.setupKeyboardNavigation();
         this.startTimer();
+    }
+    
+    connectedCallback() {
+        // Load slides when component is connected to DOM
         this.loadSlides();
     }
     
@@ -365,12 +369,39 @@ export default class GigsoPresentation extends BaseComponent {
     
     async loadSlides() {
         try {
-            // Load presentation data from JSON file
-            const response = await fetch('/presentation-data.json');
-            if (!response.ok) {
-                throw new Error(`Failed to load presentation data: ${response.status}`);
+            // Try multiple paths for the JSON file
+            const possiblePaths = [
+                '/presentation-data.json',
+                './presentation-data.json',
+                'presentation-data.json'
+            ];
+            
+            let response = null;
+            let responseText = null;
+            
+            for (const path of possiblePaths) {
+                try {
+                    console.log(`🎵 Trying to load presentation data from ${path}`);
+                    response = await fetch(path);
+                    console.log(`🎵 Response status for ${path}:`, response.status);
+                    console.log(`🎵 Response headers for ${path}:`, Object.fromEntries(response.headers.entries()));
+                    
+                    if (response.ok) {
+                        responseText = await response.text();
+                        console.log(`🎵 Response text (first 100 chars) from ${path}:`, responseText.substring(0, 100));
+                        break;
+                    }
+                } catch (pathError) {
+                    console.log(`🎵 Failed to load from ${path}:`, pathError.message);
+                    continue;
+                }
             }
-            const presentationData = await response.json();
+            
+            if (!response || !response.ok) {
+                throw new Error(`Failed to load presentation data from any path. Last status: ${response?.status || 'no response'}`);
+            }
+            
+            const presentationData = JSON.parse(responseText);
             
             this.presentationData = presentationData;
             this.totalSlides = presentationData.slides.length;
@@ -411,6 +442,11 @@ export default class GigsoPresentation extends BaseComponent {
             
         } catch (error) {
             console.error('Error loading presentation slides:', error);
+            console.error('Error details:', {
+                name: error.name,
+                message: error.message,
+                stack: error.stack
+            });
             // Fallback to hardcoded data if JSON loading fails
             this.loadFallbackSlides();
         }
