@@ -1,0 +1,796 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ChordWheel Component - Gigso Demo</title>
+    <meta name="description" content="Interactive demo of ChordWheel component">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: linear-gradient(180deg, #F9E6C3 0%, #ffffff 100%);
+            min-height: 100vh;
+        }
+
+        /* Header */
+        .demo-header {
+            background: linear-gradient(135deg, #08113e 0%, #0DC9BB 100%);
+            color: white;
+            padding: 60px 20px 40px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .demo-header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 20"><defs><pattern id="music" x="0" y="0" width="20" height="20" patternUnits="userSpaceOnUse"><circle cx="10" cy="10" r="1" fill="rgba(255,255,255,0.1)"/></pattern></defs><rect width="100" height="20" fill="url(%23music)"/></svg>');
+            animation: float 20s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateX(0px) translateY(0px); }
+            50% { transform: translateX(-10px) translateY(-5px); }
+        }
+
+        .demo-header-content {
+            position: relative;
+            z-index: 2;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .demo-header h1 {
+            font-size: clamp(2.5rem, 5vw, 3.5rem);
+            font-weight: 700;
+            margin-bottom: 1rem;
+            background: linear-gradient(45deg, #FFE448, #F9E6C3);
+            background-clip: text;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-shadow: 0 4px 20px rgba(0,0,0,0.3);
+        }
+
+        .demo-breadcrumb {
+            margin-bottom: 20px;
+            opacity: 0.9;
+        }
+
+        .demo-breadcrumb a {
+            color: rgba(255,255,255,0.8);
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+
+        .demo-breadcrumb a:hover {
+            color: #FFE448;
+        }
+
+        .demo-header p {
+            font-size: 1.3rem;
+            opacity: 0.9;
+            margin-bottom: 30px;
+        }
+
+        .demo-actions {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border-radius: 25px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            border: none;
+            cursor: pointer;
+            font-size: 0.95rem;
+        }
+
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(10px);
+            color: white;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.25);
+            transform: translateY(-2px);
+        }
+
+        /* Container */
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        /* Component Showcase */
+        .component-showcase {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            margin: -30px 20px 40px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.1);
+            position: relative;
+            z-index: 3;
+        }
+
+        .showcase-header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .showcase-header h2 {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #08113e;
+            margin-bottom: 10px;
+        }
+
+        .showcase-header p {
+            color: #6c757d;
+            font-size: 1.1rem;
+        }
+
+        .component-container {
+            background: rgba(249, 230, 195, 0.2);
+            border: 2px solid rgba(13, 201, 187, 0.2);
+            border-radius: 15px;
+            padding: 30px;
+            margin-bottom: 30px;
+            min-height: 450px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow-x: auto;
+        }
+
+        /* Controls Section */
+        .controls-section {
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.08);
+        }
+
+        .controls-header h3 {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: #08113e;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .controls-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .control-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .control-group label {
+            font-weight: 600;
+            color: #08113e;
+            font-size: 0.9rem;
+        }
+
+        .control-group input,
+        .control-group select {
+            padding: 10px 15px;
+            border: 2px solid #e9ecef;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: border-color 0.3s ease;
+        }
+
+        .control-group input:focus,
+        .control-group select:focus {
+            outline: none;
+            border-color: #0DC9BB;
+        }
+
+        .control-group button {
+            padding: 10px 20px;
+            background: linear-gradient(45deg, #F67E07, #FFE448);
+            color: #08113e;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .control-group button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(246, 126, 7, 0.3);
+        }
+
+        .control-group button.secondary {
+            background: linear-gradient(45deg, #6c757d, #adb5bd);
+            color: white;
+        }
+
+        .control-group button.secondary:hover {
+            box-shadow: 0 4px 12px rgba(108, 117, 125, 0.3);
+        }
+
+        /* Status */
+        .status {
+            padding: 15px 20px;
+            border-radius: 10px;
+            font-weight: 500;
+            margin-top: 20px;
+        }
+
+        .status.info {
+            background: rgba(13, 201, 187, 0.1);
+            color: #0DC9BB;
+            border-left: 4px solid #0DC9BB;
+        }
+
+        .status.success {
+            background: rgba(96, 176, 91, 0.1);
+            color: #60B05B;
+            border-left: 4px solid #60B05B;
+        }
+
+        .status.warning {
+            background: rgba(250, 177, 92, 0.1);
+            color: #FAB15C;
+            border-left: 4px solid #FAB15C;
+        }
+
+        .status.error {
+            background: rgba(225, 69, 62, 0.1);
+            color: #E1453E;
+            border-left: 4px solid #E1453E;
+        }
+
+        /* Documentation Section */
+        .docs-section {
+            background: white;
+            border-radius: 20px;
+            padding: 0;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.08);
+            overflow: hidden;
+        }
+
+        .tabs {
+            display: flex;
+            border-bottom: 2px solid #f8f9fa;
+            background: #f8f9fa;
+        }
+
+        .tab {
+            padding: 15px 25px;
+            border: none;
+            background: transparent;
+            color: #6c757d;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border-bottom: 3px solid transparent;
+        }
+
+        .tab.active {
+            color: #0DC9BB;
+            border-bottom-color: #0DC9BB;
+            background: white;
+        }
+
+        .tab:hover:not(.active) {
+            color: #08113e;
+            background: rgba(13, 201, 187, 0.05);
+        }
+
+        .tab-content {
+            padding: 30px;
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .tab-content h3 {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: #08113e;
+            margin-bottom: 20px;
+        }
+
+        .tab-content p {
+            color: #6c757d;
+            line-height: 1.8;
+            margin-bottom: 15px;
+        }
+
+        .tab-content ul {
+            color: #6c757d;
+            line-height: 1.8;
+            margin-left: 20px;
+        }
+
+        .tab-content ul li {
+            margin-bottom: 8px;
+        }
+
+        /* Event Log */
+        .event-log {
+            background: #1a1a1a;
+            color: #f8f9fa;
+            border-radius: 10px;
+            padding: 20px;
+            max-height: 300px;
+            overflow-y: auto;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9rem;
+        }
+
+        .event {
+            margin-bottom: 5px;
+            padding: 5px 0;
+        }
+
+        .event.info { color: #0DC9BB; }
+        .event.success { color: #60B05B; }
+        .event.warning { color: #FAB15C; }
+        .event.error { color: #E1453E; }
+
+        /* Footer */
+        .demo-footer {
+            background: #08113e;
+            color: white;
+            padding: 40px 20px;
+            text-align: center;
+            margin-top: 50px;
+        }
+
+        .demo-footer p {
+            opacity: 0.8;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .demo-actions {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .btn {
+                width: 100%;
+                max-width: 300px;
+                justify-content: center;
+            }
+
+            .component-showcase {
+                margin: -30px 10px 30px;
+                padding: 30px 20px;
+            }
+
+            .controls-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .tabs {
+                flex-wrap: wrap;
+            }
+
+            .tab {
+                flex: 1;
+                min-width: 120px;
+                text-align: center;
+            }
+        }
+
+        /* Page Layout with Navigation */
+        .page-layout {
+            display: flex;
+            min-height: calc(100vh - 200px); /* Account for header */
+        }
+
+        .nav-sidebar {
+            flex-shrink: 0;
+            background: #f8f9fa;
+            border-right: 1px solid #e9ecef;
+        }
+
+        .main-content {
+            flex: 1;
+            min-width: 0; /* Allow flex item to shrink below content size */
+        }
+
+        .main-content .container {
+            max-width: none;
+            padding: 0 20px;
+        }
+
+        @media (max-width: 768px) {
+            .page-layout {
+                flex-direction: column;
+            }
+
+            .nav-sidebar {
+                border-right: none;
+                border-bottom: 1px solid #e9ecef;
+            }
+        }
+    </style>
+    <!-- Load Tone.js for audio functionality -->
+    <script src="https://unpkg.com/tone@14.7.77/build/Tone.js"></script>
+</head>
+<body>
+    <div class="demo-header">
+        <div class="demo-header-content">
+            <div class="demo-breadcrumb">
+                <a href="index.html">← Back to Gigso Home</a> •
+                <a href="demos.html">All Demos</a> •
+                <span>ChordWheel</span>
+            </div>
+            <h1>🎡 ChordWheel Demo</h1>
+            <p>Interactive circular chord interface for playing chord progressions with visual organization by harmonic relationships</p>
+            <div class="demo-actions">
+                <a href="all-together-demo.html" class="btn btn-secondary">🎵 Try Full Demo</a>
+                <a href="demos.html" class="btn btn-secondary">📚 More Components</a>
+            </div>
+        </div>
+    </div>
+
+    <div class="page-layout">
+        <div class="nav-sidebar">
+            <demo-navigation></demo-navigation>
+        </div>
+
+        <div class="main-content">
+            <div class="container">
+                <!-- Component Showcase -->
+                <div class="component-showcase">
+                    <div class="showcase-header">
+                        <h2>Component Preview</h2>
+                        <p>Interactive demonstration of the ChordWheel component</p>
+                    </div>
+                    <div class="component-container" id="component-container">
+                        <chord-wheel id="demo-component"></chord-wheel>
+                    </div>
+                </div>
+
+                <!-- Controls Section -->
+                <div class="controls-section">
+                    <div class="controls-header">
+                        <h3>🎛️ Interactive Controls</h3>
+                    </div>
+                    <div class="controls-grid" id="controls-grid">
+                        <div class="control-group">
+                            <label for="key-select">Key:</label>
+                            <select id="key-select">
+                                <option value="C" selected>C</option>
+                                <option value="C#">C#</option>
+                                <option value="D">D</option>
+                                <option value="D#">D#</option>
+                                <option value="E">E</option>
+                                <option value="F">F</option>
+                                <option value="F#">F#</option>
+                                <option value="G">G</option>
+                                <option value="G#">G#</option>
+                                <option value="A">A</option>
+                                <option value="A#">A#</option>
+                                <option value="B">B</option>
+                            </select>
+                        </div>
+                        <div class="control-group">
+                            <label for="scale-select">Scale:</label>
+                            <select id="scale-select">
+                                <option value="major" selected>Major</option>
+                                <option value="minor">Minor</option>
+                            </select>
+                        </div>
+                        <div class="control-group">
+                            <label for="mode-select">Mode:</label>
+                            <select id="mode-select">
+                                <option value="circle-of-fifths" selected>Circle of Fifths</option>
+                                <option value="diatonic">Diatonic</option>
+                                <option value="chromatic">Chromatic</option>
+                                <option value="jazz-ii-v-i">Jazz ii-V-I</option>
+                                <option value="blues">Blues</option>
+                            </select>
+                        </div>
+                        <div class="control-group">
+                            <label for="size-select">Size:</label>
+                            <select id="size-select">
+                                <option value="small">Small</option>
+                                <option value="medium" selected>Medium</option>
+                                <option value="large">Large</option>
+                            </select>
+                        </div>
+                        <div class="control-group">
+                            <label>Actions:</label>
+                            <button id="mute-btn">Mute</button>
+                            <button id="unmute-btn" class="secondary">Unmute</button>
+                        </div>
+                    </div>
+                    <div id="status" class="status info">
+                        ChordWheel component loaded! Use the controls above to interact with the component.
+                    </div>
+                </div>
+
+                <!-- Documentation Section -->
+                <div class="docs-section">
+                    <div class="tabs">
+                        <button class="tab active" onclick="showTab('overview')">Overview</button>
+                        <button class="tab" onclick="showTab('api')">API Reference</button>
+                        <button class="tab" onclick="showTab('events')">Events</button>
+                        <button class="tab" onclick="showTab('examples')">Examples</button>
+                        <button class="tab" onclick="showTab('events-log')">Event Log</button>
+                    </div>
+
+                    <!-- Overview Tab -->
+                    <div id="overview" class="tab-content active">
+                        <h3>Component Overview</h3>
+                        <p>The ChordWheel component provides an intuitive circular interface for playing chords, featuring major chords on the outer ring and minor chords on an inner ring. It supports multiple progression modes and harmonic relationships.</p>
+                        <p>This interactive demo allows you to explore all the features and capabilities of the ChordWheel component. Use the controls above to modify the component's behavior and see the results in real-time.</p>
+
+                        <h4>🎹 Keyboard Controls</h4>
+                        <p>You can play chords using your computer keyboard:</p>
+                        <ul>
+                            <li><strong>Number Keys 1-12:</strong> Play the corresponding chord buttons</li>
+                            <li><strong>Key 1:</strong> 12 o'clock position (top chord)</li>
+                            <li><strong>Keys 2-12:</strong> Proceed clockwise around the chord wheel</li>
+                            <li><strong>Multiple Keys:</strong> Press multiple number keys simultaneously for layered chords</li>
+                        </ul>
+
+                        <h4>🎡 Chord Modes</h4>
+                        <ul>
+                            <li><strong>Circle of Fifths:</strong> Chords arranged in perfect fifths for smooth harmonic transitions</li>
+                            <li><strong>Diatonic:</strong> Chords from the current key's scale (I, ii, iii, IV, V, vi, vii°)</li>
+                            <li><strong>Chromatic:</strong> All 12 chromatic chords for maximum harmonic freedom</li>
+                            <li><strong>Jazz ii-V-I:</strong> Common jazz progression patterns with extended harmonies</li>
+                            <li><strong>Blues:</strong> Classic blues progression chords (I, IV, V) with 7th extensions</li>
+                        </ul>
+                    </div>
+
+                    <!-- API Reference Tab -->
+                    <div id="api" class="tab-content">
+                        <h3>API Reference</h3>
+                        <p>The ChordWheel component provides a comprehensive API for integration into your applications.</p>
+
+                        <h4>Attributes</h4>
+                        <ul>
+                            <li><strong>key:</strong> Musical key (C, C#, D, D#, E, F, F#, G, G#, A, A#, B)</li>
+                            <li><strong>scale:</strong> Scale type (major, minor)</li>
+                            <li><strong>mode:</strong> Chord progression mode (circle-of-fifths, diatonic, chromatic, jazz-ii-v-i, blues)</li>
+                            <li><strong>size:</strong> Visual size (small, medium, large)</li>
+                        </ul>
+
+                        <h4>Events Received</h4>
+                        <ul>
+                            <li><strong>set-key:</strong> Changes the chord wheel's key and scale</li>
+                            <li><strong>set-mode:</strong> Changes the chord progression mode</li>
+                            <li><strong>mute:</strong> Mutes all audio output</li>
+                            <li><strong>unmute:</strong> Unmutes audio output</li>
+                        </ul>
+
+                        <h4>Events Dispatched</h4>
+                        <ul>
+                            <li><strong>chord-played:</strong> When a chord is played (contains chord, notes, duration, index)</li>
+                            <li><strong>key-changed:</strong> When key/scale changes (contains key, scale, chords)</li>
+                            <li><strong>mode-changed:</strong> When progression mode changes (contains mode, chords)</li>
+                        </ul>
+                    </div>
+
+                    <!-- Events Tab -->
+                    <div id="events" class="tab-content">
+                        <h3>Component Events</h3>
+                        <p>The ChordWheel component emits various events that you can listen to:</p>
+                        <ul>
+                            <li><strong>Chord Playback:</strong> Fired when chords are played, including chord data and notes</li>
+                            <li><strong>Key Changes:</strong> Fired when the musical key is modified</li>
+                            <li><strong>Mode Changes:</strong> Fired when the chord progression mode is modified</li>
+                            <li><strong>Scale Changes:</strong> Fired when the scale type is modified</li>
+                            <li><strong>Audio Events:</strong> Mute/unmute and audio context status changes</li>
+                        </ul>
+                        <p>View the Event Log tab to see real-time events as they occur.</p>
+                    </div>
+
+                    <!-- Examples Tab -->
+                    <div id="examples" class="tab-content">
+                        <h3>Usage Examples</h3>
+                        <p>Here are some common ways to use the ChordWheel component in your projects:</p>
+
+                        <h4>Basic Usage</h4>
+                        <p><code>&lt;chord-wheel&gt;&lt;/chord-wheel&gt;</code></p>
+
+                        <h4>With Properties</h4>
+                        <p><code>&lt;chord-wheel key="G" scale="major" mode="diatonic" size="large"&gt;&lt;/chord-wheel&gt;</code></p>
+
+                        <h4>Event Listeners</h4>
+                        <p><code>chordWheel.addEventListener('chord-played', handleChordPlayed);</code></p>
+                        <p><code>chordWheel.addEventListener('key-changed', handleKeyChanged);</code></p>
+                        <p><code>chordWheel.addEventListener('mode-changed', handleModeChanged);</code></p>
+
+                        <h4>Programmatic Control</h4>
+                        <p><code>chordWheel.setAttribute('key', 'F');</code></p>
+                        <p><code>chordWheel.setAttribute('mode', 'blues');</code></p>
+                        <p><code>chordWheel.dispatchEvent(new CustomEvent('mute'));</code></p>
+                    </div>
+
+                    <!-- Event Log Tab -->
+                    <div id="events-log" class="tab-content">
+                        <h3>Event Log</h3>
+                        <div class="event-log" id="event-log">
+                            <div class="event info">Component initialized</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="demo-footer">
+        <p>🎵 Gigso Component Demo - Built with modern web technologies</p>
+    </div>
+
+    <script>
+        // Tab functionality
+        function showTab(tabName) {
+            // Hide all tab contents
+            const tabContents = document.querySelectorAll('.tab-content');
+            tabContents.forEach(content => content.classList.remove('active'));
+
+            // Remove active class from all tabs
+            const tabs = document.querySelectorAll('.tab');
+            tabs.forEach(tab => tab.classList.remove('active'));
+
+            // Show selected tab content
+            document.getElementById(tabName).classList.add('active');
+
+            // Add active class to clicked tab
+            event.target.classList.add('active');
+        }
+
+        // Status update function
+        function updateStatus(message, type = 'info') {
+            const status = document.getElementById('status');
+            status.textContent = message;
+            status.className = `status ${type}`;
+            console.log('ChordWheel Demo Status:', message, type);
+        }
+
+        // Event logging function
+        function logEvent(message, type = 'info') {
+            const eventLog = document.getElementById('event-log');
+            const eventDiv = document.createElement('div');
+            eventDiv.className = `event ${type}`;
+            eventDiv.textContent = `[${new Date().toLocaleTimeString()}] ${message}`;
+            eventLog.appendChild(eventDiv);
+            eventLog.scrollTop = eventLog.scrollHeight;
+        }
+
+        // Initialize component
+        document.addEventListener('DOMContentLoaded', function() {
+            logEvent('ChordWheel demo page loaded', 'success');
+        });
+    </script>
+
+    <script type="module">
+        import './components/chord-wheel/chord-wheel.js';
+        import './components/demo-navigation/demo-navigation.js';
+
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('ChordWheel Demo: DOM loaded');
+            const component = document.getElementById('demo-component');
+
+            if (!component) {
+                console.error('ChordWheel Demo: Component element not found');
+                updateStatus('Error: Component element not found', 'error');
+                return;
+            }
+
+            console.log('ChordWheel Demo: Component element found', component);
+
+            // Wait for component to be fully initialized
+            setTimeout(() => {
+                if (component.shadowRoot) {
+                    console.log('ChordWheel Demo: Component shadow DOM ready');
+                    updateStatus('ChordWheel component ready for interaction');
+                } else {
+                    console.error('ChordWheel Demo: Component shadow DOM not ready');
+                    updateStatus('Error: Component not properly initialized', 'error');
+                }
+            }, 500);
+
+            // Component-specific event listeners
+            const keySelect = document.getElementById('key-select');
+            const scaleSelect = document.getElementById('scale-select');
+            const modeSelect = document.getElementById('mode-select');
+            const sizeSelect = document.getElementById('size-select');
+            const muteBtn = document.getElementById('mute-btn');
+            const unmuteBtn = document.getElementById('unmute-btn');
+
+            keySelect.addEventListener('change', (e) => {
+                component.setAttribute('key', e.target.value);
+                logEvent('Key changed to ' + e.target.value, 'info');
+                updateStatus('ChordWheel key updated to ' + e.target.value);
+            });
+
+            scaleSelect.addEventListener('change', (e) => {
+                component.setAttribute('scale', e.target.value);
+                logEvent('Scale changed to ' + e.target.value, 'info');
+                updateStatus('ChordWheel scale updated to ' + e.target.value);
+            });
+
+            modeSelect.addEventListener('change', (e) => {
+                component.setAttribute('mode', e.target.value);
+                logEvent('Mode changed to ' + e.target.value, 'info');
+                updateStatus('ChordWheel mode updated to ' + e.target.value);
+            });
+
+            sizeSelect.addEventListener('change', (e) => {
+                component.setAttribute('size', e.target.value);
+                logEvent('Size changed to ' + e.target.value, 'info');
+                updateStatus('ChordWheel size updated to ' + e.target.value);
+            });
+
+            muteBtn.addEventListener('click', () => {
+                component.dispatchEvent(new CustomEvent('mute'));
+                logEvent('ChordWheel muted', 'warning');
+                updateStatus('ChordWheel audio muted');
+            });
+
+            unmuteBtn.addEventListener('click', () => {
+                component.dispatchEvent(new CustomEvent('unmute'));
+                logEvent('ChordWheel unmuted', 'success');
+                updateStatus('ChordWheel audio unmuted');
+            });
+
+            // Listen for ChordWheel events
+            component.addEventListener('chord-played', (e) => {
+                logEvent(`Chord played: ${e.detail.chord} (${e.detail.notes.join(', ')})`, 'success');
+            });
+
+            component.addEventListener('key-changed', (e) => {
+                logEvent('Key changed: ' + e.detail.key + ' ' + e.detail.scale, 'info');
+            });
+
+            component.addEventListener('mode-changed', (e) => {
+                logEvent('Mode changed: ' + e.detail.mode, 'info');
+            });
+
+            // Log component initialization
+            logEvent('ChordWheel component initialized', 'success');
+            updateStatus('ChordWheel component ready for interaction');
+        });
+    </script>
+
+</body>
+</html>

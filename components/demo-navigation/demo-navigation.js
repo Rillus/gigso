@@ -183,6 +183,12 @@ export default class DemoNavigation extends HTMLElement {
                                 <span class="nav-link-text">HandPanWrapper</span>
                             </a>
                         </li>
+                        <li class="nav-item">
+                            <a href="chord-wheel-demo.html" class="nav-link" data-demo="chord-wheel">
+                                <span class="nav-link-icon">🎡</span>
+                                <span class="nav-link-text">ChordWheel</span>
+                            </a>
+                        </li>
                     </ul>
                 </div>
                 
