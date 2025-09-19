@@ -13,7 +13,7 @@ The Mobile Ukulele component provides a touch-optimised ukulele interface design
 |-----------|------|---------|-------------|
 | `tuning` | string | "standard" | Ukulele tuning (standard, low-g, baritone) |
 | `size` | string | "mobile" | Interface size (mobile, tablet, desktop) |
-| `frets` | number | 12 | Number of frets to display |
+| `frets` | number | 6 | Number of frets to display |
 | `show-notes` | boolean | false | Whether to show note names on frets |
 
 ### Events Received
