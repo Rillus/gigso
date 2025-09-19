@@ -93,7 +93,7 @@ describe('MobileUkulele', () => {
         });
 
         test('should initialize with standard tuning strings', () => {
-            expect(mobileUkulele.strings).toEqual(['G4', 'C4', 'E4', 'A4']);
+            expect(mobileUkulele.strings).toEqual(['A4', 'E4', 'C4', 'G4']);
         });
 
         test('should initialize empty pressed frets map', () => {
@@ -110,7 +110,7 @@ describe('MobileUkulele', () => {
         test('should update tuning when tuning attribute changes', () => {
             mobileUkulele.setAttribute('tuning', 'low-g');
             expect(mobileUkulele.tuning).toBe('low-g');
-            expect(mobileUkulele.strings).toEqual(['G3', 'C4', 'E4', 'A4']);
+            expect(mobileUkulele.strings).toEqual(['A4', 'E4', 'C4', 'G3']);
         });
 
         test('should update size when size attribute changes', () => {
@@ -138,17 +138,17 @@ describe('MobileUkulele', () => {
     describe('Tuning Configurations', () => {
         test('should have correct standard tuning', () => {
             mobileUkulele.changeTuning('standard');
-            expect(mobileUkulele.strings).toEqual(['G4', 'C4', 'E4', 'A4']);
+            expect(mobileUkulele.strings).toEqual(['A4', 'E4', 'C4', 'G4']);
         });
 
         test('should have correct low-g tuning', () => {
             mobileUkulele.changeTuning('low-g');
-            expect(mobileUkulele.strings).toEqual(['G3', 'C4', 'E4', 'A4']);
+            expect(mobileUkulele.strings).toEqual(['A4', 'E4', 'C4', 'G3']);
         });
 
         test('should have correct baritone tuning', () => {
             mobileUkulele.changeTuning('baritone');
-            expect(mobileUkulele.strings).toEqual(['D3', 'G3', 'B3', 'E4']);
+            expect(mobileUkulele.strings).toEqual(['E4', 'B3', 'G3', 'D3']);
         });
 
         test('should dispatch tuning-changed event when tuning changes', () => {
@@ -160,7 +160,7 @@ describe('MobileUkulele', () => {
             expect(tuningChangedSpy).toHaveBeenCalled();
             expect(tuningChangedSpy.mock.calls[0][0].detail).toEqual({
                 tuning: 'low-g',
-                strings: ['G3', 'C4', 'E4', 'A4']
+                strings: ['A4', 'E4', 'C4', 'G3']
             });
         });
     });
@@ -217,30 +217,30 @@ describe('MobileUkulele', () => {
 
     describe('Note Calculation', () => {
         test('should calculate open string notes correctly', () => {
-            expect(mobileUkulele.calculateNote(0, 0)).toBe('G4'); // String 1, open
-            expect(mobileUkulele.calculateNote(1, 0)).toBe('C4'); // String 2, open
-            expect(mobileUkulele.calculateNote(2, 0)).toBe('E4'); // String 3, open
-            expect(mobileUkulele.calculateNote(3, 0)).toBe('A4'); // String 4, open
+            expect(mobileUkulele.calculateNote(0, 0)).toBe('A4'); // String 1, open
+            expect(mobileUkulele.calculateNote(1, 0)).toBe('E4'); // String 2, open
+            expect(mobileUkulele.calculateNote(2, 0)).toBe('C4'); // String 3, open
+            expect(mobileUkulele.calculateNote(3, 0)).toBe('G4'); // String 4, open
         });
 
         test('should calculate fretted notes correctly', () => {
-            expect(mobileUkulele.calculateNote(0, 1)).toBe('G#4'); // String 1, fret 1
-            expect(mobileUkulele.calculateNote(1, 2)).toBe('D4');  // String 2, fret 2
-            expect(mobileUkulele.calculateNote(2, 3)).toBe('G4');  // String 3, fret 3
-            expect(mobileUkulele.calculateNote(3, 5)).toBe('D5');  // String 4, fret 5
+            expect(mobileUkulele.calculateNote(0, 1)).toBe('A#4'); // String 1, fret 1 (A4 + 1)
+            expect(mobileUkulele.calculateNote(1, 2)).toBe('F#4');  // String 2, fret 2 (E4 + 2)
+            expect(mobileUkulele.calculateNote(2, 3)).toBe('D#4');  // String 3, fret 3 (C4 + 3 semitones)
+            expect(mobileUkulele.calculateNote(3, 5)).toBe('C5');  // String 4, fret 5 (G4 + 5)
         });
 
         test('should handle octave changes correctly', () => {
-            expect(mobileUkulele.calculateNote(0, 12)).toBe('G5'); // String 1, fret 12 (octave up)
-            expect(mobileUkulele.calculateNote(1, 12)).toBe('C5'); // String 2, fret 12 (octave up)
+            expect(mobileUkulele.calculateNote(0, 12)).toBe('A5'); // String 1, fret 12 (octave up)
+            expect(mobileUkulele.calculateNote(1, 12)).toBe('E5'); // String 2, fret 12 (octave up)
         });
 
         test('should calculate notes correctly for different tunings', () => {
             mobileUkulele.changeTuning('low-g');
-            expect(mobileUkulele.calculateNote(0, 0)).toBe('G3'); // Low G tuning
+            expect(mobileUkulele.calculateNote(0, 0)).toBe('A4'); // Low G tuning - string 0 is still A4
 
             mobileUkulele.changeTuning('baritone');
-            expect(mobileUkulele.calculateNote(0, 0)).toBe('D3'); // Baritone tuning
+            expect(mobileUkulele.calculateNote(0, 0)).toBe('E4'); // Baritone tuning - string 0 is E4
         });
     });
 
@@ -288,7 +288,7 @@ describe('MobileUkulele', () => {
             expect(fretPressedSpy.mock.calls[0][0].detail).toEqual({
                 string: 0,
                 fret: 2,
-                note: 'A4'
+                note: 'B4'
             });
         });
 
@@ -348,7 +348,7 @@ describe('MobileUkulele', () => {
             // Should dispatch note-played event
             expect(notePlayedSpy).toHaveBeenCalled();
             expect(notePlayedSpy.mock.calls[0][0].detail).toEqual({
-                note: 'G4',
+                note: 'A4',
                 string: 0,
                 fret: 0,
                 frequency: expect.any(Number)
@@ -431,7 +431,7 @@ describe('MobileUkulele', () => {
             const frets = [0, 0, 1, 3]; // C major chord on ukulele
             await mobileUkulele.playChord(frets, '2n');
 
-            const expectedNotes = ['G4', 'C4', 'F4', 'C5'];
+            const expectedNotes = ['A4', 'E4', 'F4', 'C5'];
             expect(mobileUkulele.synth.triggerAttackRelease).toHaveBeenCalledWith(expectedNotes, '2n');
         });
 

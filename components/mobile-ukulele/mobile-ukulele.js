@@ -21,13 +21,18 @@ export default class MobileUkulele extends HTMLElement {
             'baritone': ['D3', 'G3', 'B3', 'E4']
         };
 
-        this.strings = this.tunings[this.tuning];
+        this.strings = this.tunings[this.tuning].slice().reverse(); // Reverse for proper ukulele orientation
 
         // Touch and interaction state
         this.pressedFrets = new Map(); // string -> fret mapping
         this.activeTouches = new Map(); // touch id -> {type, string, fret}
         this.lastPlayTime = 0;
         this.minPlayInterval = 50; // Minimum time between note triggers (ms)
+
+        // Swipe detection state
+        this.swipeStartPosition = null;
+        this.swipeActive = false;
+        this.swipedStrings = new Set(); // Track which strings have been swiped
 
         // Audio properties
         this.instrumentVolume = 0.8;
@@ -262,6 +267,7 @@ export default class MobileUkulele extends HTMLElement {
                     user-select: none;
                     -webkit-user-select: none;
                     touch-action: manipulation;
+                    box-sizing: border-box;
                 }
 
                 .mobile-ukulele.mobile {
@@ -280,7 +286,7 @@ export default class MobileUkulele extends HTMLElement {
                 }
 
                 .fretboard {
-                    flex: 1;
+                    flex: 0 0 80%;
                     position: relative;
                     background: linear-gradient(90deg,
                         #D2691E 0%,
@@ -437,7 +443,8 @@ export default class MobileUkulele extends HTMLElement {
                 }
 
                 .strum-area {
-                    width: 120px;
+                    flex: 1;
+                    min-width: 80px;
                     background: linear-gradient(145deg,
                         #654321 0%,
                         #8B4513 50%,
@@ -822,7 +829,17 @@ export default class MobileUkulele extends HTMLElement {
             // Touch events for mobile
             zone.addEventListener('touchstart', (event) => {
                 event.preventDefault();
-                this.handleStrum(event, string);
+                this.handleStrumTouchStart(event, string);
+            });
+
+            zone.addEventListener('touchmove', (event) => {
+                event.preventDefault();
+                this.handleStrumTouchMove(event, string);
+            });
+
+            zone.addEventListener('touchend', (event) => {
+                event.preventDefault();
+                this.handleStrumTouchEnd(event, string);
             });
 
             // Mouse events for desktop
@@ -953,6 +970,69 @@ export default class MobileUkulele extends HTMLElement {
         }
     }
 
+    handleStrumTouchStart(event, string) {
+        console.log('MobileUkulele: Touch start on strum zone - String:', string);
+
+        if (event.touches && event.touches.length > 0) {
+            const touch = event.touches[0];
+
+            // Initialize swipe detection
+            this.swipeStartPosition = {
+                x: touch.clientX,
+                y: touch.clientY,
+                string: string,
+                time: Date.now()
+            };
+            this.swipeActive = false;
+            this.swipedStrings.clear();
+
+            // For single tap, trigger the strum immediately
+            this.handleStrum(event, string);
+        }
+    }
+
+    handleStrumTouchMove(event, string) {
+        if (!this.swipeStartPosition || this.isMuted) return;
+
+        if (event.touches && event.touches.length > 0) {
+            const touch = event.touches[0];
+            const deltaX = Math.abs(touch.clientX - this.swipeStartPosition.x);
+            const deltaY = Math.abs(touch.clientY - this.swipeStartPosition.y);
+
+            // Detect if this is a swipe (movement threshold)
+            if (deltaX > 10 || deltaY > 10) {
+                this.swipeActive = true;
+            }
+
+            // If swiping and this string hasn't been triggered yet
+            if (this.swipeActive && !this.swipedStrings.has(string)) {
+                this.swipedStrings.add(string);
+
+                // Get the element under the current touch position
+                const elementAtPoint = this.shadowRoot.elementFromPoint(touch.clientX, touch.clientY);
+
+                // Check if we're over a strum zone
+                if (elementAtPoint && elementAtPoint.classList.contains('strum-zone')) {
+                    const swipeString = parseInt(elementAtPoint.getAttribute('data-string'));
+                    if (!isNaN(swipeString) && !this.swipedStrings.has(swipeString)) {
+                        console.log('MobileUkulele: Swipe detected over string:', swipeString);
+                        this.swipedStrings.add(swipeString);
+                        this.handleStrum(event, swipeString);
+                    }
+                }
+            }
+        }
+    }
+
+    handleStrumTouchEnd(event, string) {
+        console.log('MobileUkulele: Touch end on strum zone - String:', string);
+
+        // Reset swipe detection state
+        this.swipeStartPosition = null;
+        this.swipeActive = false;
+        this.swipedStrings.clear();
+    }
+
     async playNote(string, fret, duration = '4n') {
         if (!this.synth || this.isAudioMuted()) {
             return;
@@ -1021,6 +1101,8 @@ export default class MobileUkulele extends HTMLElement {
     }
 
     calculateNote(string, fret) {
+        // Since we display strings in reverse order (A-E-C-G instead of G-C-E-A),
+        // the string parameter is already correct for the reversed array
         const openNote = this.strings[string];
         const noteMap = {
             'C': 0, 'C#': 1, 'D': 2, 'D#': 3, 'E': 4, 'F': 5,
@@ -1089,7 +1171,7 @@ export default class MobileUkulele extends HTMLElement {
 
         if (this.tunings[tuning]) {
             this.tuning = tuning;
-            this.strings = this.tunings[tuning];
+            this.strings = this.tunings[tuning].slice().reverse(); // Reverse for proper ukulele orientation
 
             // Clear pressed frets
             this.pressedFrets.clear();
@@ -1372,7 +1454,9 @@ export default class MobileUkulele extends HTMLElement {
             if (this.strumZones) {
                 this.strumZones.forEach(zone => {
                     if (zone) {
-                        zone.removeEventListener('touchstart', this.handleStrum);
+                        zone.removeEventListener('touchstart', this.handleStrumTouchStart);
+                        zone.removeEventListener('touchmove', this.handleStrumTouchMove);
+                        zone.removeEventListener('touchend', this.handleStrumTouchEnd);
                         zone.removeEventListener('mousedown', this.handleStrum);
                         zone.removeEventListener('keydown', this.handleStrum);
                     }
