@@ -33,6 +33,13 @@
   - **Authentic Timbre**: Triangle oscillator with reverb for authentic hand pan sound
   - **Visual Feedback**: Pulse animations and ripple effects
   - **Complete Scale Support**: All 12 major and 12 minor scales with no repeated notes in any single key
+- **Mobile Ukulele**: Touch-optimised ukulele instrument for mobile phones
+  - **Landscape Mobile Design**: Optimised for mobile phones in landscape orientation
+  - **Fret Button Interface**: Pressable fret buttons for holding down strings
+  - **Strum Area**: Touch area for strumming individual strings or chords
+  - **Ukulele Tuning**: Standard G-C-E-A tuning with support for low-G and baritone
+  - **Multi-touch Chords**: Support for playing chords with multiple simultaneous touches
+  - **Authentic Ukulele Sound**: Bright, plucky timbre with string resonance
 - **Note Highlighting**: Visual feedback for currently playing notes
 - **MIDI-like Interaction**: Click to play individual notes
 
