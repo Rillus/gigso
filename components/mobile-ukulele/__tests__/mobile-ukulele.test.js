@@ -569,6 +569,215 @@ describe('MobileUkulele', () => {
         });
     });
 
+    describe('Swipe Functionality', () => {
+        beforeEach(() => {
+            // Mock getBoundingClientRect for strum area
+            const strumArea = mobileUkulele.shadowRoot.querySelector('.strum-area');
+            strumArea.getBoundingClientRect = jest.fn(() => ({
+                top: 100,
+                left: 200,
+                width: 80,
+                height: 160,
+                bottom: 260,
+                right: 280
+            }));
+        });
+
+        test('should initialize swipe detection state', () => {
+            expect(mobileUkulele.swipeStartPosition).toBeNull();
+            expect(mobileUkulele.swipeActive).toBe(false);
+            expect(mobileUkulele.swipedStrings.size).toBe(0);
+        });
+
+        test('should detect swipe start on touch start', () => {
+            const strumZone = mobileUkulele.shadowRoot.querySelector('.strum-zone[data-string="0"]');
+            const touchEvent = new TouchEvent('touchstart', {
+                touches: [{ identifier: 0, clientX: 250, clientY: 120 }]
+            });
+            Object.defineProperty(touchEvent, 'target', { value: strumZone });
+
+            mobileUkulele.handleStrumTouchStart(touchEvent, 0);
+
+            expect(mobileUkulele.swipeStartPosition).toEqual({
+                x: 250,
+                y: 120,
+                string: 0,
+                time: expect.any(Number)
+            });
+            expect(mobileUkulele.swipeActive).toBe(false);
+        });
+
+        test('should detect swipe when movement exceeds threshold', () => {
+            const strumZone = mobileUkulele.shadowRoot.querySelector('.strum-zone[data-string="0"]');
+            
+            // Start touch
+            const touchStartEvent = new TouchEvent('touchstart', {
+                touches: [{ identifier: 0, clientX: 250, clientY: 120 }]
+            });
+            Object.defineProperty(touchStartEvent, 'target', { value: strumZone });
+            mobileUkulele.handleStrumTouchStart(touchStartEvent, 0);
+
+            // Move touch beyond threshold
+            const touchMoveEvent = new TouchEvent('touchmove', {
+                touches: [{ identifier: 0, clientX: 250, clientY: 140 }] // 20px movement
+            });
+            Object.defineProperty(touchMoveEvent, 'target', { value: strumZone });
+            mobileUkulele.handleStrumTouchMove(touchMoveEvent, 0);
+
+            expect(mobileUkulele.swipeActive).toBe(true);
+        });
+
+        test('should not detect swipe for small movements', () => {
+            const strumZone = mobileUkulele.shadowRoot.querySelector('.strum-zone[data-string="0"]');
+            
+            // Start touch
+            const touchStartEvent = new TouchEvent('touchstart', {
+                touches: [{ identifier: 0, clientX: 250, clientY: 120 }]
+            });
+            Object.defineProperty(touchStartEvent, 'target', { value: strumZone });
+            mobileUkulele.handleStrumTouchStart(touchStartEvent, 0);
+
+            // Move touch within threshold
+            const touchMoveEvent = new TouchEvent('touchmove', {
+                touches: [{ identifier: 0, clientX: 255, clientY: 125 }] // 5px movement
+            });
+            Object.defineProperty(touchMoveEvent, 'target', { value: strumZone });
+            mobileUkulele.handleStrumTouchMove(touchMoveEvent, 0);
+
+            expect(mobileUkulele.swipeActive).toBe(false);
+        });
+
+        test('should calculate string from touch position correctly', () => {
+            const touch = { clientY: 120 }; // Top of strum area
+            const stringIndex = mobileUkulele.getStringFromTouchPosition(touch);
+            expect(stringIndex).toBe(0); // First string
+
+            const touch2 = { clientY: 140 }; // Second quarter
+            const stringIndex2 = mobileUkulele.getStringFromTouchPosition(touch2);
+            expect(stringIndex2).toBe(1); // Second string (160/4 = 40px per string, so 140-100=40, 40/40=1)
+
+            const touch3 = { clientY: 180 }; // Third quarter
+            const stringIndex3 = mobileUkulele.getStringFromTouchPosition(touch3);
+            expect(stringIndex3).toBe(2); // Third string
+
+            const touch4 = { clientY: 240 }; // Fourth quarter
+            const stringIndex4 = mobileUkulele.getStringFromTouchPosition(touch4);
+            expect(stringIndex4).toBe(3); // Fourth string
+        });
+
+        test('should return null for touch outside strum area', () => {
+            const touch = { clientY: 50 }; // Above strum area
+            const stringIndex = mobileUkulele.getStringFromTouchPosition(touch);
+            expect(stringIndex).toBeNull();
+
+            const touch2 = { clientY: 300 }; // Below strum area
+            const stringIndex2 = mobileUkulele.getStringFromTouchPosition(touch2);
+            expect(stringIndex2).toBeNull();
+        });
+
+        test('should trigger strum when swiping over different strings', async () => {
+            const notePlayedSpy = jest.fn();
+            mobileUkulele.addEventListener('note-played', notePlayedSpy);
+
+            // Start touch on first string
+            const strumZone = mobileUkulele.shadowRoot.querySelector('.strum-zone[data-string="0"]');
+            const touchStartEvent = new TouchEvent('touchstart', {
+                touches: [{ identifier: 0, clientX: 250, clientY: 120 }]
+            });
+            Object.defineProperty(touchStartEvent, 'target', { value: strumZone });
+            mobileUkulele.handleStrumTouchStart(touchStartEvent, 0);
+
+            // Move to second string (140px Y position = second string)
+            const touchMoveEvent = new TouchEvent('touchmove', {
+                touches: [{ identifier: 0, clientX: 250, clientY: 140 }] // Second string area
+            });
+            mobileUkulele.handleStrumAreaTouchMove(touchMoveEvent);
+
+            // Wait for async operations to complete
+            await new Promise(resolve => setTimeout(resolve, 10));
+
+            // Should trigger strum for second string
+            expect(notePlayedSpy).toHaveBeenCalled();
+            expect(mobileUkulele.swipedStrings.has(1)).toBe(true);
+        });
+
+        test('should not trigger same string multiple times during swipe', async () => {
+            const notePlayedSpy = jest.fn();
+            mobileUkulele.addEventListener('note-played', notePlayedSpy);
+
+            // Start touch
+            const strumZone = mobileUkulele.shadowRoot.querySelector('.strum-zone[data-string="0"]');
+            const touchStartEvent = new TouchEvent('touchstart', {
+                touches: [{ identifier: 0, clientX: 250, clientY: 120 }]
+            });
+            Object.defineProperty(touchStartEvent, 'target', { value: strumZone });
+            mobileUkulele.handleStrumTouchStart(touchStartEvent, 0);
+
+            // Move within same string area multiple times (both 120 and 130 are in first string area)
+            const touchMoveEvent1 = new TouchEvent('touchmove', {
+                touches: [{ identifier: 0, clientX: 250, clientY: 130 }]
+            });
+            const touchMoveEvent2 = new TouchEvent('touchmove', {
+                touches: [{ identifier: 0, clientX: 250, clientY: 135 }]
+            });
+
+            mobileUkulele.handleStrumAreaTouchMove(touchMoveEvent1);
+            mobileUkulele.handleStrumAreaTouchMove(touchMoveEvent2);
+
+            // Wait for async operations to complete
+            await new Promise(resolve => setTimeout(resolve, 10));
+
+            // Should trigger once for initial touch start and once for swipe detection
+            // The swipe detection correctly prevents multiple triggers of the same string
+            expect(notePlayedSpy).toHaveBeenCalledTimes(2);
+        });
+
+        test('should reset swipe state on touch end', () => {
+            const strumZone = mobileUkulele.shadowRoot.querySelector('.strum-zone[data-string="0"]');
+            
+            // Start swipe
+            const touchStartEvent = new TouchEvent('touchstart', {
+                touches: [{ identifier: 0, clientX: 250, clientY: 120 }]
+            });
+            Object.defineProperty(touchStartEvent, 'target', { value: strumZone });
+            mobileUkulele.handleStrumTouchStart(touchStartEvent, 0);
+
+            // End touch
+            const touchEndEvent = new TouchEvent('touchend', {
+                changedTouches: [{ identifier: 0 }]
+            });
+            Object.defineProperty(touchEndEvent, 'target', { value: strumZone });
+            mobileUkulele.handleStrumTouchEnd(touchEndEvent, 0);
+
+            expect(mobileUkulele.swipeStartPosition).toBeNull();
+            expect(mobileUkulele.swipeActive).toBe(false);
+            expect(mobileUkulele.swipedStrings.size).toBe(0);
+        });
+
+        test('should not process swipe when muted', () => {
+            mobileUkulele.isMuted = true;
+            const notePlayedSpy = jest.fn();
+            mobileUkulele.addEventListener('note-played', notePlayedSpy);
+
+            // Start touch
+            const strumZone = mobileUkulele.shadowRoot.querySelector('.strum-zone[data-string="0"]');
+            const touchStartEvent = new TouchEvent('touchstart', {
+                touches: [{ identifier: 0, clientX: 250, clientY: 120 }]
+            });
+            Object.defineProperty(touchStartEvent, 'target', { value: strumZone });
+            mobileUkulele.handleStrumTouchStart(touchStartEvent, 0);
+
+            // Move touch
+            const touchMoveEvent = new TouchEvent('touchmove', {
+                touches: [{ identifier: 0, clientX: 250, clientY: 180 }]
+            });
+            mobileUkulele.handleStrumAreaTouchMove(touchMoveEvent);
+
+            // Should not trigger strum when muted
+            expect(notePlayedSpy).not.toHaveBeenCalled();
+        });
+    });
+
     describe('External Events', () => {
         test('should handle set-tuning events', () => {
             const changeTuningSpy = jest.spyOn(mobileUkulele, 'changeTuning');

@@ -27,6 +27,7 @@ The Mobile Ukulele component provides a touch-optimised ukulele interface design
 ### Touch/Mouse Input
 - **Fret buttons**: Press to hold down frets (like pressing strings)
 - **String strum area**: Tap or swipe to strum individual strings
+- **Swipe detection**: Smooth swiping through strings with movement threshold
 - **Multi-touch**: Support for multiple simultaneous touches for chords
 - **Long press**: Sustains held frets while strumming
 
@@ -74,6 +75,8 @@ The Mobile Ukulele component provides a touch-optimised ukulele interface design
 ### Touch Interaction
 - **Fret pressing**: Tap fret buttons to press down frets (like holding strings)
 - **String strumming**: Tap or swipe in strum area to play held frets
+- **Swipe functionality**: Smooth swiping through strings with 10px movement threshold
+- **String detection**: Automatic detection of which string is being swiped over
 - **Multi-touch**: Support multiple simultaneous touches for chord playing
 - **Touch areas**: Clear, accessible touch targets for all interactive elements
 - **Visual feedback**: Immediate visual response to touch interactions
@@ -377,6 +380,8 @@ The ukulele synthesiser should replicate the characteristic sound:
 ### Touch Interaction
 - **Fret pressing**: Tap to press, tap again to release
 - **Strumming**: Tap or swipe in strum area
+- **Swipe detection**: 10px movement threshold for swipe activation
+- **String tracking**: Prevents duplicate triggers during swipe
 - **Multi-touch**: Support for chord playing with multiple fingers
 - **Visual feedback**: Immediate response to all touch interactions
 

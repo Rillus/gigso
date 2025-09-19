@@ -856,6 +856,14 @@ export default class MobileUkulele extends HTMLElement {
             });
         });
 
+        // Add global touch move listener to the strum area for better swipe detection
+        if (this.strumArea) {
+            this.strumArea.addEventListener('touchmove', (event) => {
+                event.preventDefault();
+                this.handleStrumAreaTouchMove(event);
+            }, { passive: false });
+        }
+
         // Add click handler for audio status indicator
         const audioIndicator = this.shadowRoot.getElementById('audioStatusIndicator');
         if (audioIndicator) {
@@ -929,12 +937,14 @@ export default class MobileUkulele extends HTMLElement {
         const fret = this.pressedFrets.get(string) || 0;
         const note = this.calculateNote(string, fret);
 
-        // Add visual feedback to strum zone
-        const zone = event.target;
-        zone.classList.add('active');
-        setTimeout(() => {
-            zone.classList.remove('active');
-        }, 300);
+        // Add visual feedback to strum zone if available
+        const zone = event.target || this.shadowRoot.querySelector(`.strum-zone[data-string="${string}"]`);
+        if (zone && zone.classList) {
+            zone.classList.add('active');
+            setTimeout(() => {
+                zone.classList.remove('active');
+            }, 300);
+        }
 
         // Play the note
         await this.playNote(string, fret, '4n');
@@ -1004,21 +1014,13 @@ export default class MobileUkulele extends HTMLElement {
                 this.swipeActive = true;
             }
 
-            // If swiping and this string hasn't been triggered yet
-            if (this.swipeActive && !this.swipedStrings.has(string)) {
-                this.swipedStrings.add(string);
-
-                // Get the element under the current touch position
-                const elementAtPoint = this.shadowRoot.elementFromPoint(touch.clientX, touch.clientY);
-
-                // Check if we're over a strum zone
-                if (elementAtPoint && elementAtPoint.classList.contains('strum-zone')) {
-                    const swipeString = parseInt(elementAtPoint.getAttribute('data-string'));
-                    if (!isNaN(swipeString) && !this.swipedStrings.has(swipeString)) {
-                        console.log('MobileUkulele: Swipe detected over string:', swipeString);
-                        this.swipedStrings.add(swipeString);
-                        this.handleStrum(event, swipeString);
-                    }
+            // If swiping, determine which string we're over
+            if (this.swipeActive) {
+                const currentString = this.getStringFromTouchPosition(touch);
+                if (currentString !== null && !this.swipedStrings.has(currentString)) {
+                    console.log('MobileUkulele: Swipe detected over string:', currentString);
+                    this.swipedStrings.add(currentString);
+                    this.handleStrum(event, currentString);
                 }
             }
         }
@@ -1031,6 +1033,54 @@ export default class MobileUkulele extends HTMLElement {
         this.swipeStartPosition = null;
         this.swipeActive = false;
         this.swipedStrings.clear();
+    }
+
+    handleStrumAreaTouchMove(event) {
+        if (!this.swipeStartPosition || this.isMuted) return;
+
+        if (event.touches && event.touches.length > 0) {
+            const touch = event.touches[0];
+            const deltaX = Math.abs(touch.clientX - this.swipeStartPosition.x);
+            const deltaY = Math.abs(touch.clientY - this.swipeStartPosition.y);
+
+            // Detect if this is a swipe (movement threshold)
+            if (deltaX > 10 || deltaY > 10) {
+                this.swipeActive = true;
+            }
+
+            // If swiping, determine which string we're over
+            if (this.swipeActive) {
+                const currentString = this.getStringFromTouchPosition(touch);
+                if (currentString !== null && !this.swipedStrings.has(currentString)) {
+                    console.log('MobileUkulele: Swipe detected over string:', currentString);
+                    this.swipedStrings.add(currentString);
+                    this.handleStrum(event, currentString);
+                }
+            }
+        }
+    }
+
+    getStringFromTouchPosition(touch) {
+        if (!this.strumArea) return null;
+
+        // Get the strum area's bounding rectangle
+        const strumAreaRect = this.strumArea.getBoundingClientRect();
+        
+        // Calculate relative Y position within the strum area
+        const relativeY = touch.clientY - strumAreaRect.top;
+        const strumAreaHeight = strumAreaRect.height;
+        
+        // Calculate which string zone the touch is in
+        // Each string takes up 1/4 of the strum area height
+        const stringHeight = strumAreaHeight / this.strings.length;
+        const stringIndex = Math.floor(relativeY / stringHeight);
+        
+        // Clamp to valid string indices
+        if (stringIndex >= 0 && stringIndex < this.strings.length) {
+            return stringIndex;
+        }
+        
+        return null;
     }
 
     async playNote(string, fret, duration = '4n') {
@@ -1461,6 +1511,10 @@ export default class MobileUkulele extends HTMLElement {
                         zone.removeEventListener('keydown', this.handleStrum);
                     }
                 });
+            }
+
+            if (this.strumArea) {
+                this.strumArea.removeEventListener('touchmove', this.handleStrumAreaTouchMove);
             }
 
             // Clean up audio effects if they exist
