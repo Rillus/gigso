@@ -37,6 +37,7 @@
   - **Landscape Mobile Design**: Optimised for mobile phones in landscape orientation
   - **Fret Button Interface**: Pressable fret buttons for holding down strings
   - **Strum Area**: Touch area for strumming individual strings or chords
+  - **Swipe Support**: Swipe through strings in strum area for fluid playing
   - **Ukulele Tuning**: Standard G-C-E-A tuning with support for low-G and baritone
   - **Multi-touch Chords**: Support for playing chords with multiple simultaneous touches
   - **Authentic Ukulele Sound**: Bright, plucky timbre with string resonance
