@@ -1,0 +1,1002 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mobile Ukulele Component - Gigso Demo</title>
+    <meta name="description" content="Interactive demo of Mobile Ukulele component">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: linear-gradient(180deg, #F9E6C3 0%, #ffffff 100%);
+            min-height: 100vh;
+        }
+
+        /* Header */
+        .demo-header {
+            background: linear-gradient(135deg, #08113e 0%, #0DC9BB 100%);
+            color: white;
+            padding: 60px 20px 40px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .demo-header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 20"><defs><pattern id="music" x="0" y="0" width="20" height="20" patternUnits="userSpaceOnUse"><circle cx="10" cy="10" r="1" fill="rgba(255,255,255,0.1)"/></pattern></defs><rect width="100" height="20" fill="url(%23music)"/></svg>');
+            animation: float 20s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateX(0px) translateY(0px); }
+            50% { transform: translateX(-10px) translateY(-5px); }
+        }
+
+        .demo-header-content {
+            position: relative;
+            z-index: 2;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .demo-header h1 {
+            font-size: clamp(2.5rem, 5vw, 3.5rem);
+            font-weight: 700;
+            margin-bottom: 1rem;
+            background: linear-gradient(45deg, #FFE448, #F9E6C3);
+            background-clip: text;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-shadow: 0 4px 20px rgba(0,0,0,0.3);
+        }
+
+        .demo-breadcrumb {
+            margin-bottom: 20px;
+            opacity: 0.9;
+        }
+
+        .demo-breadcrumb a {
+            color: rgba(255,255,255,0.8);
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+
+        .demo-breadcrumb a:hover {
+            color: #FFE448;
+        }
+
+        .demo-header p {
+            font-size: 1.3rem;
+            opacity: 0.9;
+            margin-bottom: 30px;
+        }
+
+        .demo-actions {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border-radius: 25px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            border: none;
+            cursor: pointer;
+            font-size: 0.95rem;
+        }
+
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(10px);
+            color: white;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.25);
+            transform: translateY(-2px);
+        }
+
+        /* Container */
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        /* Component Showcase */
+        .component-showcase {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            margin: -30px 20px 40px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.1);
+            position: relative;
+            z-index: 3;
+        }
+
+        .showcase-header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .showcase-header h2 {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #08113e;
+            margin-bottom: 10px;
+        }
+
+        .showcase-header p {
+            color: #6c757d;
+            font-size: 1.1rem;
+        }
+
+        .component-container {
+            background: rgba(249, 230, 195, 0.2);
+            border: 2px solid rgba(13, 201, 187, 0.2);
+            border-radius: 15px;
+            padding: 30px;
+            margin-bottom: 30px;
+            min-height: 280px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow-x: auto;
+        }
+
+        /* Orientation notice */
+        .orientation-notice {
+            background: linear-gradient(45deg, #FF6B6B, #FFE66D);
+            color: #333;
+            padding: 15px 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            text-align: center;
+            font-weight: 600;
+            display: none;
+        }
+
+        @media (orientation: portrait) and (max-width: 768px) {
+            .orientation-notice {
+                display: block;
+            }
+        }
+
+        /* Controls Section */
+        .controls-section {
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.08);
+        }
+
+        .controls-header h3 {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: #08113e;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .controls-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .control-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .control-group label {
+            font-weight: 600;
+            color: #08113e;
+            font-size: 0.9rem;
+        }
+
+        .control-group input,
+        .control-group select {
+            padding: 10px 15px;
+            border: 2px solid #e9ecef;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: border-color 0.3s ease;
+        }
+
+        .control-group input:focus,
+        .control-group select:focus {
+            outline: none;
+            border-color: #0DC9BB;
+        }
+
+        .control-group button {
+            padding: 10px 20px;
+            background: linear-gradient(45deg, #F67E07, #FFE448);
+            color: #08113e;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .control-group button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(246, 126, 7, 0.3);
+        }
+
+        .control-group button.secondary {
+            background: linear-gradient(45deg, #6c757d, #adb5bd);
+            color: white;
+        }
+
+        .control-group button.secondary:hover {
+            box-shadow: 0 4px 12px rgba(108, 117, 125, 0.3);
+        }
+
+        /* Status */
+        .status {
+            padding: 15px 20px;
+            border-radius: 10px;
+            font-weight: 500;
+            margin-top: 20px;
+        }
+
+        .status.info {
+            background: rgba(13, 201, 187, 0.1);
+            color: #0DC9BB;
+            border-left: 4px solid #0DC9BB;
+        }
+
+        .status.success {
+            background: rgba(96, 176, 91, 0.1);
+            color: #60B05B;
+            border-left: 4px solid #60B05B;
+        }
+
+        .status.warning {
+            background: rgba(250, 177, 92, 0.1);
+            color: #FAB15C;
+            border-left: 4px solid #FAB15C;
+        }
+
+        .status.error {
+            background: rgba(225, 69, 62, 0.1);
+            color: #E1453E;
+            border-left: 4px solid #E1453E;
+        }
+
+        /* Chord Library */
+        .chord-library {
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.08);
+        }
+
+        .chord-library h3 {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: #08113e;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .chord-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+        }
+
+        .chord-card {
+            background: linear-gradient(145deg, #f8f9fa, #e9ecef);
+            border: 2px solid #dee2e6;
+            border-radius: 12px;
+            padding: 15px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: center;
+        }
+
+        .chord-card:hover {
+            background: linear-gradient(145deg, #e9ecef, #dee2e6);
+            border-color: #0DC9BB;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(13, 201, 187, 0.2);
+        }
+
+        .chord-name {
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: #08113e;
+            margin-bottom: 8px;
+        }
+
+        .chord-frets {
+            font-family: monospace;
+            font-size: 0.9rem;
+            color: #6c757d;
+            margin-bottom: 10px;
+        }
+
+        .chord-difficulty {
+            font-size: 0.8rem;
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-weight: 600;
+        }
+
+        .chord-difficulty.easy {
+            background: rgba(96, 176, 91, 0.2);
+            color: #60B05B;
+        }
+
+        .chord-difficulty.medium {
+            background: rgba(250, 177, 92, 0.2);
+            color: #FAB15C;
+        }
+
+        .chord-difficulty.hard {
+            background: rgba(225, 69, 62, 0.2);
+            color: #E1453E;
+        }
+
+        /* Documentation Section */
+        .docs-section {
+            background: white;
+            border-radius: 20px;
+            padding: 0;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.08);
+            overflow: hidden;
+        }
+
+        .tabs {
+            display: flex;
+            border-bottom: 2px solid #f8f9fa;
+            background: #f8f9fa;
+        }
+
+        .tab {
+            padding: 15px 25px;
+            border: none;
+            background: transparent;
+            color: #6c757d;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border-bottom: 3px solid transparent;
+        }
+
+        .tab.active {
+            color: #0DC9BB;
+            border-bottom-color: #0DC9BB;
+            background: white;
+        }
+
+        .tab:hover:not(.active) {
+            color: #08113e;
+            background: rgba(13, 201, 187, 0.05);
+        }
+
+        .tab-content {
+            padding: 30px;
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .tab-content h3 {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: #08113e;
+            margin-bottom: 20px;
+        }
+
+        .tab-content p {
+            color: #6c757d;
+            line-height: 1.8;
+            margin-bottom: 15px;
+        }
+
+        .tab-content ul {
+            color: #6c757d;
+            line-height: 1.8;
+            margin-left: 20px;
+        }
+
+        .tab-content ul li {
+            margin-bottom: 8px;
+        }
+
+        /* Event Log */
+        .event-log {
+            background: #1a1a1a;
+            color: #f8f9fa;
+            border-radius: 10px;
+            padding: 20px;
+            max-height: 300px;
+            overflow-y: auto;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9rem;
+        }
+
+        .event {
+            margin-bottom: 5px;
+            padding: 5px 0;
+        }
+
+        .event.info { color: #0DC9BB; }
+        .event.success { color: #60B05B; }
+        .event.warning { color: #FAB15C; }
+        .event.error { color: #E1453E; }
+
+        /* Footer */
+        .demo-footer {
+            background: #08113e;
+            color: white;
+            padding: 40px 20px;
+            text-align: center;
+            margin-top: 50px;
+        }
+
+        .demo-footer p {
+            opacity: 0.8;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .demo-actions {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .btn {
+                width: 100%;
+                max-width: 300px;
+                justify-content: center;
+            }
+
+            .component-showcase {
+                margin: -30px 10px 30px;
+                padding: 30px 20px;
+            }
+
+            .controls-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .tabs {
+                flex-wrap: wrap;
+            }
+
+            .tab {
+                flex: 1;
+                min-width: 120px;
+                text-align: center;
+            }
+
+            .chord-grid {
+                grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            }
+        }
+
+        /* Page Layout with Navigation */
+        .page-layout {
+            display: flex;
+            min-height: calc(100vh - 200px);
+        }
+
+        .nav-sidebar {
+            flex-shrink: 0;
+            background: #f8f9fa;
+            border-right: 1px solid #e9ecef;
+        }
+
+        .main-content {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .main-content .container {
+            max-width: none;
+            padding: 0 20px;
+        }
+
+        @media (max-width: 768px) {
+            .page-layout {
+                flex-direction: column;
+            }
+
+            .nav-sidebar {
+                border-right: none;
+                border-bottom: 1px solid #e9ecef;
+            }
+        }
+    </style>
+    <!-- Load Tone.js for audio functionality -->
+    <script src="https://unpkg.com/tone@14.7.77/build/Tone.js"></script>
+</head>
+<body>
+    <div class="demo-header">
+        <div class="demo-header-content">
+            <div class="demo-breadcrumb">
+                <a href="index.html">← Back to Gigso Home</a> •
+                <a href="demos.html">All Demos</a> •
+                <span>Mobile Ukulele</span>
+            </div>
+            <h1>🎸 Mobile Ukulele Demo</h1>
+            <p>Touch-optimized ukulele interface designed for landscape mobile phone play with fret buttons and strum area</p>
+            <div class="demo-actions">
+                <a href="all-together-demo.html" class="btn btn-secondary">🎵 Try Full Demo</a>
+                <a href="demos.html" class="btn btn-secondary">📚 More Components</a>
+            </div>
+        </div>
+    </div>
+
+    <div class="page-layout">
+        <div class="nav-sidebar">
+            <demo-navigation></demo-navigation>
+        </div>
+
+        <div class="main-content">
+            <div class="container">
+                <!-- Orientation Notice -->
+                <div class="orientation-notice">
+                    📱 For the best mobile ukulele experience, please rotate your device to landscape mode!
+                </div>
+
+                <!-- Component Showcase -->
+                <div class="component-showcase">
+                    <div class="showcase-header">
+                        <h2>Component Preview</h2>
+                        <p>Interactive demonstration of the Mobile Ukulele component</p>
+                    </div>
+                    <div class="component-container" id="component-container">
+                        <mobile-ukulele id="demo-component"></mobile-ukulele>
+                    </div>
+                </div>
+
+                <!-- Controls Section -->
+                <div class="controls-section">
+                    <div class="controls-header">
+                        <h3>🎛️ Interactive Controls</h3>
+                    </div>
+                    <div class="controls-grid" id="controls-grid">
+                        <div class="control-group">
+                            <label for="tuning-select">Tuning:</label>
+                            <select id="tuning-select">
+                                <option value="standard" selected>Standard (G-C-E-A)</option>
+                                <option value="low-g">Low-G (G3-C-E-A)</option>
+                                <option value="baritone">Baritone (D-G-B-E)</option>
+                            </select>
+                        </div>
+                        <div class="control-group">
+                            <label for="size-select">Size:</label>
+                            <select id="size-select">
+                                <option value="mobile" selected>Mobile</option>
+                                <option value="tablet">Tablet</option>
+                                <option value="desktop">Desktop</option>
+                            </select>
+                        </div>
+                        <div class="control-group">
+                            <label for="frets-select">Frets:</label>
+                            <select id="frets-select">
+                                <option value="4">4 Frets</option>
+                                <option value="6" selected>6 Frets</option>
+                                <option value="8">8 Frets</option>
+                                <option value="12">12 Frets</option>
+                            </select>
+                        </div>
+                        <div class="control-group">
+                            <label for="show-notes-checkbox">Show Notes:</label>
+                            <input type="checkbox" id="show-notes-checkbox" />
+                        </div>
+                        <div class="control-group">
+                            <label>Actions:</label>
+                            <button id="mute-btn">Mute</button>
+                            <button id="unmute-btn" class="secondary">Unmute</button>
+                        </div>
+                        <div class="control-group">
+                            <label>Clear Frets:</label>
+                            <button id="clear-frets-btn" class="secondary">Clear All Frets</button>
+                        </div>
+                    </div>
+                    <div id="status" class="status info">
+                        Mobile Ukulele component loaded! Use the controls above to interact with the component.
+                    </div>
+                </div>
+
+                <!-- Chord Library -->
+                <div class="chord-library">
+                    <h3>🎼 Popular Ukulele Chords</h3>
+                    <div class="chord-grid" id="chord-grid">
+                        <div class="chord-card" data-chord="C" data-frets="0,0,0,3">
+                            <div class="chord-name">C Major</div>
+                            <div class="chord-frets">0-0-0-3</div>
+                            <div class="chord-difficulty easy">Easy</div>
+                        </div>
+                        <div class="chord-card" data-chord="G" data-frets="0,2,3,2">
+                            <div class="chord-name">G Major</div>
+                            <div class="chord-frets">0-2-3-2</div>
+                            <div class="chord-difficulty medium">Medium</div>
+                        </div>
+                        <div class="chord-card" data-chord="F" data-frets="2,0,1,0">
+                            <div class="chord-name">F Major</div>
+                            <div class="chord-frets">2-0-1-0</div>
+                            <div class="chord-difficulty medium">Medium</div>
+                        </div>
+                        <div class="chord-card" data-chord="Am" data-frets="2,0,0,0">
+                            <div class="chord-name">A Minor</div>
+                            <div class="chord-frets">2-0-0-0</div>
+                            <div class="chord-difficulty easy">Easy</div>
+                        </div>
+                        <div class="chord-card" data-chord="Dm" data-frets="2,2,1,0">
+                            <div class="chord-name">D Minor</div>
+                            <div class="chord-frets">2-2-1-0</div>
+                            <div class="chord-difficulty medium">Medium</div>
+                        </div>
+                        <div class="chord-card" data-chord="Em" data-frets="0,4,3,2">
+                            <div class="chord-name">E Minor</div>
+                            <div class="chord-frets">0-4-3-2</div>
+                            <div class="chord-difficulty hard">Hard</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Documentation Section -->
+                <div class="docs-section">
+                    <div class="tabs">
+                        <button class="tab active" onclick="showTab('overview')">Overview</button>
+                        <button class="tab" onclick="showTab('api')">API Reference</button>
+                        <button class="tab" onclick="showTab('events')">Events</button>
+                        <button class="tab" onclick="showTab('examples')">Examples</button>
+                        <button class="tab" onclick="showTab('events-log')">Event Log</button>
+                    </div>
+
+                    <!-- Overview Tab -->
+                    <div id="overview" class="tab-content active">
+                        <h3>Component Overview</h3>
+                        <p>The Mobile Ukulele component provides a touch-optimized ukulele interface designed specifically for mobile phones in landscape orientation. It features a fretboard with pressable fret buttons and a strum area where users can strum individual strings or play chords.</p>
+                        <p>This interactive demo allows you to explore all the features and capabilities of the Mobile Ukulele component. Use the controls above to modify the component's behavior and see the results in real-time.</p>
+
+                        <h4>🎸 How to Play</h4>
+                        <ul>
+                            <li><strong>Press Frets:</strong> Tap fret buttons to hold down frets (like pressing ukulele strings)</li>
+                            <li><strong>Strum Strings:</strong> Tap or swipe in the strum area on the right to play held frets</li>
+                            <li><strong>Play Chords:</strong> Press multiple frets simultaneously, then strum to play chords</li>
+                            <li><strong>Multi-touch:</strong> Support for multiple simultaneous touches for complex chords</li>
+                        </ul>
+
+                        <h4>🎵 Ukulele Tunings</h4>
+                        <ul>
+                            <li><strong>Standard:</strong> G4-C4-E4-A4 (most common ukulele tuning)</li>
+                            <li><strong>Low-G:</strong> G3-C4-E4-A4 (lower G string for more range)</li>
+                            <li><strong>Baritone:</strong> D3-G3-B3-E4 (larger baritone ukulele)</li>
+                        </ul>
+
+                        <h4>📱 Mobile Optimization</h4>
+                        <ul>
+                            <li><strong>Landscape Mode:</strong> Optimized for mobile phones in landscape orientation</li>
+                            <li><strong>Touch-Friendly:</strong> Large enough touch targets for reliable finger interaction</li>
+                            <li><strong>Responsive:</strong> Adapts to different screen sizes and device types</li>
+                            <li><strong>Multi-touch:</strong> Supports complex chord playing with multiple fingers</li>
+                        </ul>
+                    </div>
+
+                    <!-- API Reference Tab -->
+                    <div id="api" class="tab-content">
+                        <h3>API Reference</h3>
+                        <p>The Mobile Ukulele component provides a comprehensive API for integration into your applications.</p>
+
+                        <h4>Attributes</h4>
+                        <ul>
+                            <li><strong>tuning:</strong> Ukulele tuning (standard, low-g, baritone)</li>
+                            <li><strong>size:</strong> Interface size (mobile, tablet, desktop)</li>
+                            <li><strong>frets:</strong> Number of frets to display (4, 6, 8, 12)</li>
+                            <li><strong>show-notes:</strong> Whether to show note names on frets</li>
+                        </ul>
+
+                        <h4>Events Received</h4>
+                        <ul>
+                            <li><strong>set-tuning:</strong> Changes the ukulele tuning</li>
+                            <li><strong>mute:</strong> Mutes all audio output</li>
+                            <li><strong>unmute:</strong> Unmutes audio output</li>
+                            <li><strong>highlight-chord:</strong> Highlights a chord on the fretboard</li>
+                        </ul>
+
+                        <h4>Events Dispatched</h4>
+                        <ul>
+                            <li><strong>note-played:</strong> When a note is played (contains note, string, fret, frequency)</li>
+                            <li><strong>chord-played:</strong> When a chord is played (contains chord, notes, frets)</li>
+                            <li><strong>tuning-changed:</strong> When tuning changes (contains tuning, strings)</li>
+                            <li><strong>fret-pressed:</strong> When a fret is pressed (contains string, fret, note)</li>
+                            <li><strong>fret-released:</strong> When a fret is released (contains string, fret, note)</li>
+                        </ul>
+                    </div>
+
+                    <!-- Events Tab -->
+                    <div id="events" class="tab-content">
+                        <h3>Component Events</h3>
+                        <p>The Mobile Ukulele component emits various events that you can listen to:</p>
+                        <ul>
+                            <li><strong>Note Playback:</strong> Fired when individual notes are played</li>
+                            <li><strong>Chord Playback:</strong> Fired when chords are played (multiple frets)</li>
+                            <li><strong>Fret Interaction:</strong> Fired when frets are pressed or released</li>
+                            <li><strong>Tuning Changes:</strong> Fired when the ukulele tuning is modified</li>
+                            <li><strong>Audio Events:</strong> Mute/unmute and audio context status changes</li>
+                        </ul>
+                        <p>View the Event Log tab to see real-time events as they occur.</p>
+                    </div>
+
+                    <!-- Examples Tab -->
+                    <div id="examples" class="tab-content">
+                        <h3>Usage Examples</h3>
+                        <p>Here are some common ways to use the Mobile Ukulele component in your projects:</p>
+
+                        <h4>Basic Usage</h4>
+                        <p><code>&lt;mobile-ukulele&gt;&lt;/mobile-ukulele&gt;</code></p>
+
+                        <h4>With Properties</h4>
+                        <p><code>&lt;mobile-ukulele tuning="low-g" size="tablet" frets="8" show-notes&gt;&lt;/mobile-ukulele&gt;</code></p>
+
+                        <h4>Event Listeners</h4>
+                        <p><code>ukulele.addEventListener('note-played', handleNotePlayed);</code></p>
+                        <p><code>ukulele.addEventListener('chord-played', handleChordPlayed);</code></p>
+                        <p><code>ukulele.addEventListener('fret-pressed', handleFretPressed);</code></p>
+
+                        <h4>Programmatic Control</h4>
+                        <p><code>ukulele.setAttribute('tuning', 'baritone');</code></p>
+                        <p><code>ukulele.dispatchEvent(new CustomEvent('highlight-chord', {detail: {chord: 'C', frets: [0,0,0,3]}}));</code></p>
+                        <p><code>ukulele.dispatchEvent(new CustomEvent('mute'));</code></p>
+                    </div>
+
+                    <!-- Event Log Tab -->
+                    <div id="events-log" class="tab-content">
+                        <h3>Event Log</h3>
+                        <div class="event-log" id="event-log">
+                            <div class="event info">Component initialized</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="demo-footer">
+        <p>🎵 Gigso Component Demo - Built with modern web technologies</p>
+    </div>
+
+    <script>
+        // Tab functionality
+        function showTab(tabName) {
+            // Hide all tab contents
+            const tabContents = document.querySelectorAll('.tab-content');
+            tabContents.forEach(content => content.classList.remove('active'));
+
+            // Remove active class from all tabs
+            const tabs = document.querySelectorAll('.tab');
+            tabs.forEach(tab => tab.classList.remove('active'));
+
+            // Show selected tab content
+            document.getElementById(tabName).classList.add('active');
+
+            // Add active class to clicked tab
+            event.target.classList.add('active');
+        }
+
+        // Status update function
+        function updateStatus(message, type = 'info') {
+            const status = document.getElementById('status');
+            status.textContent = message;
+            status.className = `status ${type}`;
+            console.log('Mobile Ukulele Demo Status:', message, type);
+        }
+
+        // Event logging function
+        function logEvent(message, type = 'info') {
+            const eventLog = document.getElementById('event-log');
+            const eventDiv = document.createElement('div');
+            eventDiv.className = `event ${type}`;
+            eventDiv.textContent = `[${new Date().toLocaleTimeString()}] ${message}`;
+            eventLog.appendChild(eventDiv);
+            eventLog.scrollTop = eventLog.scrollHeight;
+        }
+
+        // Initialize component
+        document.addEventListener('DOMContentLoaded', function() {
+            logEvent('Mobile Ukulele demo page loaded', 'success');
+        });
+    </script>
+
+    <script type="module">
+        import './components/mobile-ukulele/mobile-ukulele.js';
+        import './components/demo-navigation/demo-navigation.js';
+
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('Mobile Ukulele Demo: DOM loaded');
+            const component = document.getElementById('demo-component');
+
+            if (!component) {
+                console.error('Mobile Ukulele Demo: Component element not found');
+                updateStatus('Error: Component element not found', 'error');
+                return;
+            }
+
+            console.log('Mobile Ukulele Demo: Component element found', component);
+
+            // Wait for component to be fully initialized
+            setTimeout(() => {
+                if (component.shadowRoot) {
+                    console.log('Mobile Ukulele Demo: Component shadow DOM ready');
+                    updateStatus('Mobile Ukulele component ready for interaction');
+                } else {
+                    console.error('Mobile Ukulele Demo: Component shadow DOM not ready');
+                    updateStatus('Error: Component not properly initialized', 'error');
+                }
+            }, 500);
+
+            // Component-specific event listeners
+            const tuningSelect = document.getElementById('tuning-select');
+            const sizeSelect = document.getElementById('size-select');
+            const fretsSelect = document.getElementById('frets-select');
+            const showNotesCheckbox = document.getElementById('show-notes-checkbox');
+            const muteBtn = document.getElementById('mute-btn');
+            const unmuteBtn = document.getElementById('unmute-btn');
+            const clearFretsBtn = document.getElementById('clear-frets-btn');
+
+            tuningSelect.addEventListener('change', (e) => {
+                component.setAttribute('tuning', e.target.value);
+                logEvent('Tuning changed to ' + e.target.value, 'info');
+                updateStatus('Ukulele tuning updated to ' + e.target.value);
+            });
+
+            sizeSelect.addEventListener('change', (e) => {
+                component.setAttribute('size', e.target.value);
+                logEvent('Size changed to ' + e.target.value, 'info');
+                updateStatus('Ukulele size updated to ' + e.target.value);
+            });
+
+            fretsSelect.addEventListener('change', (e) => {
+                component.setAttribute('frets', e.target.value);
+                logEvent('Frets changed to ' + e.target.value, 'info');
+                updateStatus('Fret count updated to ' + e.target.value);
+            });
+
+            showNotesCheckbox.addEventListener('change', (e) => {
+                component.setAttribute('show-notes', e.target.checked);
+                logEvent('Show notes: ' + e.target.checked, 'info');
+                updateStatus('Note display ' + (e.target.checked ? 'enabled' : 'disabled'));
+            });
+
+            muteBtn.addEventListener('click', () => {
+                component.dispatchEvent(new CustomEvent('mute'));
+                logEvent('Ukulele muted', 'warning');
+                updateStatus('Ukulele audio muted');
+            });
+
+            unmuteBtn.addEventListener('click', () => {
+                component.dispatchEvent(new CustomEvent('unmute'));
+                logEvent('Ukulele unmuted', 'success');
+                updateStatus('Ukulele audio unmuted');
+            });
+
+            clearFretsBtn.addEventListener('click', () => {
+                // Clear all pressed frets by accessing the component's internal state
+                if (component.pressedFrets) {
+                    component.pressedFrets.clear();
+                }
+                // Remove visual feedback from all fret buttons
+                const fretButtons = component.shadowRoot.querySelectorAll('.fret-button.pressed');
+                fretButtons.forEach(button => {
+                    button.classList.remove('pressed');
+                    button.setAttribute('aria-pressed', 'false');
+                });
+                logEvent('All frets cleared', 'info');
+                updateStatus('All pressed frets cleared');
+            });
+
+            // Listen for Mobile Ukulele events
+            component.addEventListener('note-played', (e) => {
+                logEvent(`Note played: ${e.detail.note} (String ${e.detail.string + 1}, Fret ${e.detail.fret})`, 'success');
+            });
+
+            component.addEventListener('chord-played', (e) => {
+                logEvent(`Chord played: ${e.detail.chord} (${e.detail.notes.join(', ')})`, 'success');
+            });
+
+            component.addEventListener('fret-pressed', (e) => {
+                logEvent(`Fret pressed: String ${e.detail.string + 1}, Fret ${e.detail.fret} (${e.detail.note})`, 'info');
+            });
+
+            component.addEventListener('fret-released', (e) => {
+                logEvent(`Fret released: String ${e.detail.string + 1}, Fret ${e.detail.fret} (${e.detail.note})`, 'info');
+            });
+
+            component.addEventListener('tuning-changed', (e) => {
+                logEvent('Tuning changed: ' + e.detail.tuning + ' (' + e.detail.strings.join('-') + ')', 'info');
+            });
+
+            // Chord library interaction
+            const chordCards = document.querySelectorAll('.chord-card');
+            chordCards.forEach(card => {
+                card.addEventListener('click', () => {
+                    const chord = card.getAttribute('data-chord');
+                    const fretsStr = card.getAttribute('data-frets');
+                    const frets = fretsStr.split(',').map(f => parseInt(f));
+
+                    // Highlight the chord on the ukulele
+                    component.dispatchEvent(new CustomEvent('highlight-chord', {
+                        detail: { chord, frets }
+                    }));
+
+                    // Clear existing pressed frets and set new ones
+                    if (component.pressedFrets) {
+                        component.pressedFrets.clear();
+
+                        // Clear all visual feedback first
+                        const allFretButtons = component.shadowRoot.querySelectorAll('.fret-button.pressed');
+                        allFretButtons.forEach(button => {
+                            button.classList.remove('pressed');
+                            button.setAttribute('aria-pressed', 'false');
+                        });
+
+                        // Set new pressed frets and add visual feedback
+                        frets.forEach((fret, string) => {
+                            if (fret >= 0) {
+                                component.pressedFrets.set(string, fret);
+                                const fretButton = component.shadowRoot.querySelector(
+                                    `.fret-button[data-string="${string}"][data-fret="${fret}"]`
+                                );
+                                if (fretButton) {
+                                    fretButton.classList.add('pressed');
+                                    fretButton.setAttribute('aria-pressed', 'true');
+                                }
+                            }
+                        });
+                    }
+
+                    logEvent(`Chord selected: ${chord} (${fretsStr})`, 'success');
+                    updateStatus(`${chord} chord selected - now strum to play!`);
+                });
+            });
+
+            // Log component initialization
+            logEvent('Mobile Ukulele component initialized', 'success');
+            updateStatus('Mobile Ukulele component ready for interaction');
+        });
+    </script>
+
+</body>
+</html>

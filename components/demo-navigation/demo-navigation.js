@@ -219,6 +219,12 @@ export default class DemoNavigation extends HTMLElement {
                                 <span class="nav-link-text">ScaleKey</span>
                             </a>
                         </li>
+                        <li class="nav-item">
+                            <a href="mobile-ukulele-demo.html" class="nav-link" data-demo="mobile-ukulele">
+                                <span class="nav-link-icon">🎸</span>
+                                <span class="nav-link-text">Mobile Ukulele</span>
+                            </a>
+                        </li>
                     </ul>
                 </div>
                 
