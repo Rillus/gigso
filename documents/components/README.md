@@ -31,6 +31,9 @@ Displays the currently selected or playing chord.
 ### [ChordDiagram](./chord-diagram.md)
 Visual representation of chord fingerings.
 
+### [MobileUkulele](./mobile-ukulele.md)
+Interactive mobile ukulele instrument designed for landscape mobile phone play with fret buttons and strum area.
+
 ## Transport Controls
 
 ### [TransportControls](./transport-controls.md)
@@ -67,6 +70,7 @@ Toggle interface for showing/hiding components.
 - **GigsoKeyboard**: Note playback and feedback
 - **HandPan**: Touch-screen hand pan instrument
 - **HandPanWrapper**: Complete HandPan solution with controls
+- **MobileUkulele**: Mobile ukulele instrument with fret buttons and strum area
 
 ### Playback Control
 - **TransportControls**: Container for controls
