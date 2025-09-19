@@ -78,6 +78,8 @@ The Mobile Ukulele component provides a touch-optimised ukulele interface design
 - **Swipe functionality**: Smooth swiping through strings with 10px movement threshold
 - **String detection**: Automatic detection of which string is being swiped over
 - **Multi-touch**: Support multiple simultaneous touches for chord playing
+- **Chord + Swipe**: Hold chord frets while swiping strum area for complex playing
+- **Touch separation**: Distinguishes between fret touches and strum touches
 - **Touch areas**: Clear, accessible touch targets for all interactive elements
 - **Visual feedback**: Immediate visual response to touch interactions
 - **Sustain**: Hold frets while strumming to sustain notes

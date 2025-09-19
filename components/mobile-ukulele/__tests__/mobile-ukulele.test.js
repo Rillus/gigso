@@ -589,19 +589,59 @@ describe('MobileUkulele', () => {
             expect(mobileUkulele.swipedStrings.size).toBe(0);
         });
 
-        test('should detect swipe start on touch start', () => {
+        test('should handle strum area touch start correctly', () => {
+            const strumArea = mobileUkulele.shadowRoot.querySelector('.strum-area');
+            const touchEvent = new TouchEvent('touchstart', {
+                touches: [{ identifier: 0, clientX: 250, clientY: 120 }]
+            });
+            
+            mobileUkulele.handleStrumAreaTouchStart(touchEvent);
+            
+            expect(mobileUkulele.swipeStartPosition).toEqual({
+                x: 250,
+                y: 120,
+                touchId: 0,
+                time: expect.any(Number)
+            });
+            expect(mobileUkulele.swipeActive).toBe(false);
+        });
+
+        test('should ignore fret touches when initializing swipe detection', () => {
+            // Simulate a fret touch first
+            const fretButton = mobileUkulele.shadowRoot.querySelector('.fret-button[data-string="0"][data-fret="1"]');
+            const fretTouchEvent = new TouchEvent('touchstart', {
+                touches: [{ identifier: 0, clientX: 100, clientY: 100 }]
+            });
+            Object.defineProperty(fretTouchEvent, 'target', { value: fretButton });
+            mobileUkulele.handleFretPress(fretTouchEvent, 0, 1);
+            
+            // Now try to start swipe with the same touch ID - should be ignored
+            const strumArea = mobileUkulele.shadowRoot.querySelector('.strum-area');
+            const strumTouchEvent = new TouchEvent('touchstart', {
+                touches: [{ identifier: 0, clientX: 250, clientY: 120 }]
+            });
+            
+            mobileUkulele.handleStrumAreaTouchStart(strumTouchEvent);
+            
+            // Should not initialize swipe detection for touch already used for frets
+            expect(mobileUkulele.swipeStartPosition).toBeNull();
+        });
+
+        test('should detect swipe start on touch start (legacy method)', () => {
+            // This test verifies the old method still works for backwards compatibility
             const strumZone = mobileUkulele.shadowRoot.querySelector('.strum-zone[data-string="0"]');
             const touchEvent = new TouchEvent('touchstart', {
                 touches: [{ identifier: 0, clientX: 250, clientY: 120 }]
             });
             Object.defineProperty(touchEvent, 'target', { value: strumZone });
 
-            mobileUkulele.handleStrumTouchStart(touchEvent, 0);
+            // Use the new global strum area handler instead
+            mobileUkulele.handleStrumAreaTouchStart(touchEvent);
 
             expect(mobileUkulele.swipeStartPosition).toEqual({
                 x: 250,
                 y: 120,
-                string: 0,
+                touchId: 0,
                 time: expect.any(Number)
             });
             expect(mobileUkulele.swipeActive).toBe(false);

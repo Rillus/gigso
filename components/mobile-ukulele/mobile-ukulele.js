@@ -826,20 +826,10 @@ export default class MobileUkulele extends HTMLElement {
         this.strumZones.forEach(zone => {
             const string = parseInt(zone.getAttribute('data-string'));
 
-            // Touch events for mobile
+            // Touch events for mobile - simplified since global strum area handlers manage swipe detection
             zone.addEventListener('touchstart', (event) => {
-                event.preventDefault();
-                this.handleStrumTouchStart(event, string);
-            });
-
-            zone.addEventListener('touchmove', (event) => {
-                event.preventDefault();
-                this.handleStrumTouchMove(event, string);
-            });
-
-            zone.addEventListener('touchend', (event) => {
-                event.preventDefault();
-                this.handleStrumTouchEnd(event, string);
+                // Let the global strum area handler manage this
+                // This prevents double-handling of touch events
             });
 
             // Mouse events for desktop
@@ -856,11 +846,24 @@ export default class MobileUkulele extends HTMLElement {
             });
         });
 
-        // Add global touch move listener to the strum area for better swipe detection
+        // Add global touch listeners to the strum area for better swipe detection
         if (this.strumArea) {
+            // Touch start - initialize swipe detection even when other touches are active
+            this.strumArea.addEventListener('touchstart', (event) => {
+                event.preventDefault();
+                this.handleStrumAreaTouchStart(event);
+            }, { passive: false });
+
+            // Touch move - handle swipe detection across the entire strum area
             this.strumArea.addEventListener('touchmove', (event) => {
                 event.preventDefault();
                 this.handleStrumAreaTouchMove(event);
+            }, { passive: false });
+
+            // Touch end - cleanup swipe state
+            this.strumArea.addEventListener('touchend', (event) => {
+                event.preventDefault();
+                this.handleStrumAreaTouchEnd(event);
             }, { passive: false });
         }
 
@@ -893,7 +896,8 @@ export default class MobileUkulele extends HTMLElement {
                 type: 'fret',
                 string: string,
                 fret: fret,
-                element: button
+                element: button,
+                touchId: touch.identifier
             });
         }
 
@@ -980,34 +984,63 @@ export default class MobileUkulele extends HTMLElement {
         }
     }
 
-    handleStrumTouchStart(event, string) {
-        console.log('MobileUkulele: Touch start on strum zone - String:', string);
+    // Legacy methods - now handled by global strum area handlers
+    // Keeping for backwards compatibility but not used in new implementation
 
+    handleStrumAreaTouchStart(event) {
+        if (this.isMuted) return;
+
+        console.log('MobileUkulele: Strum area touch start');
+        
+        // Find the first touch that's not already being tracked for frets
         if (event.touches && event.touches.length > 0) {
-            const touch = event.touches[0];
-
-            // Initialize swipe detection
-            this.swipeStartPosition = {
-                x: touch.clientX,
-                y: touch.clientY,
-                string: string,
-                time: Date.now()
-            };
-            this.swipeActive = false;
-            this.swipedStrings.clear();
-
-            // For single tap, trigger the strum immediately
-            this.handleStrum(event, string);
+            for (let i = 0; i < event.touches.length; i++) {
+                const touch = event.touches[i];
+                
+                // Check if this touch is already being tracked for fret interaction
+                const isFretTouch = Array.from(this.activeTouches.values()).some(activeTouch => 
+                    activeTouch.touchId === touch.identifier
+                );
+                
+                // If this is a new touch not used for frets, use it for swipe detection
+                if (!isFretTouch) {
+                    this.swipeStartPosition = {
+                        x: touch.clientX,
+                        y: touch.clientY,
+                        touchId: touch.identifier,
+                        time: Date.now()
+                    };
+                    this.swipeActive = false;
+                    this.swipedStrings.clear();
+                    
+                    // Trigger initial strum for the string we started on
+                    const initialString = this.getStringFromTouchPosition(touch);
+                    if (initialString !== null) {
+                        this.handleStrum(event, initialString);
+                    }
+                    break;
+                }
+            }
         }
     }
 
-    handleStrumTouchMove(event, string) {
+    handleStrumAreaTouchMove(event) {
         if (!this.swipeStartPosition || this.isMuted) return;
 
         if (event.touches && event.touches.length > 0) {
-            const touch = event.touches[0];
-            const deltaX = Math.abs(touch.clientX - this.swipeStartPosition.x);
-            const deltaY = Math.abs(touch.clientY - this.swipeStartPosition.y);
+            // Find the touch that matches our swipe start touch ID
+            let swipeTouch = null;
+            for (let i = 0; i < event.touches.length; i++) {
+                if (event.touches[i].identifier === this.swipeStartPosition.touchId) {
+                    swipeTouch = event.touches[i];
+                    break;
+                }
+            }
+            
+            if (!swipeTouch) return;
+            
+            const deltaX = Math.abs(swipeTouch.clientX - this.swipeStartPosition.x);
+            const deltaY = Math.abs(swipeTouch.clientY - this.swipeStartPosition.y);
 
             // Detect if this is a swipe (movement threshold)
             if (deltaX > 10 || deltaY > 10) {
@@ -1016,7 +1049,7 @@ export default class MobileUkulele extends HTMLElement {
 
             // If swiping, determine which string we're over
             if (this.swipeActive) {
-                const currentString = this.getStringFromTouchPosition(touch);
+                const currentString = this.getStringFromTouchPosition(swipeTouch);
                 if (currentString !== null && !this.swipedStrings.has(currentString)) {
                     console.log('MobileUkulele: Swipe detected over string:', currentString);
                     this.swipedStrings.add(currentString);
@@ -1026,35 +1059,20 @@ export default class MobileUkulele extends HTMLElement {
         }
     }
 
-    handleStrumTouchEnd(event, string) {
-        console.log('MobileUkulele: Touch end on strum zone - String:', string);
+    handleStrumAreaTouchEnd(event) {
+        if (!this.swipeStartPosition) return;
 
-        // Reset swipe detection state
-        this.swipeStartPosition = null;
-        this.swipeActive = false;
-        this.swipedStrings.clear();
-    }
-
-    handleStrumAreaTouchMove(event) {
-        if (!this.swipeStartPosition || this.isMuted) return;
-
-        if (event.touches && event.touches.length > 0) {
-            const touch = event.touches[0];
-            const deltaX = Math.abs(touch.clientX - this.swipeStartPosition.x);
-            const deltaY = Math.abs(touch.clientY - this.swipeStartPosition.y);
-
-            // Detect if this is a swipe (movement threshold)
-            if (deltaX > 10 || deltaY > 10) {
-                this.swipeActive = true;
-            }
-
-            // If swiping, determine which string we're over
-            if (this.swipeActive) {
-                const currentString = this.getStringFromTouchPosition(touch);
-                if (currentString !== null && !this.swipedStrings.has(currentString)) {
-                    console.log('MobileUkulele: Swipe detected over string:', currentString);
-                    this.swipedStrings.add(currentString);
-                    this.handleStrum(event, currentString);
+        console.log('MobileUkulele: Strum area touch end');
+        
+        // Check if our swipe touch ended
+        if (event.changedTouches && event.changedTouches.length > 0) {
+            for (let i = 0; i < event.changedTouches.length; i++) {
+                if (event.changedTouches[i].identifier === this.swipeStartPosition.touchId) {
+                    // Reset swipe detection state
+                    this.swipeStartPosition = null;
+                    this.swipeActive = false;
+                    this.swipedStrings.clear();
+                    break;
                 }
             }
         }
@@ -1514,7 +1532,9 @@ export default class MobileUkulele extends HTMLElement {
             }
 
             if (this.strumArea) {
+                this.strumArea.removeEventListener('touchstart', this.handleStrumAreaTouchStart);
                 this.strumArea.removeEventListener('touchmove', this.handleStrumAreaTouchMove);
+                this.strumArea.removeEventListener('touchend', this.handleStrumAreaTouchEnd);
             }
 
             // Clean up audio effects if they exist

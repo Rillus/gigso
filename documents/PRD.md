@@ -38,8 +38,9 @@
   - **Fret Button Interface**: Pressable fret buttons for holding down strings
   - **Strum Area**: Touch area for strumming individual strings or chords
   - **Swipe Support**: Swipe through strings in strum area for fluid playing
-  - **Ukulele Tuning**: Standard G-C-E-A tuning with support for low-G and baritone
   - **Multi-touch Chords**: Support for playing chords with multiple simultaneous touches
+  - **Chord + Swipe**: Hold chord frets while swiping strum area for complex playing
+  - **Ukulele Tuning**: Standard G-C-E-A tuning with support for low-G and baritone
   - **Authentic Ukulele Sound**: Bright, plucky timbre with string resonance
 - **Note Highlighting**: Visual feedback for currently playing notes
 - **MIDI-like Interaction**: Click to play individual notes
