@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mobile Ukulele - Physical Model Demo</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 20px;
+            font-family: Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            color: white;
+        }
+        
+        h1 {
+            text-align: center;
+            margin-bottom: 20px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+        
+        .demo-container {
+            width: 100%;
+            max-width: 800px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            padding: 20px;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        }
+        
+        .ukulele-container {
+            width: 100%;
+            height: 200px;
+            margin: 20px 0;
+        }
+        
+        .info-panel {
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 10px;
+            padding: 15px;
+            margin-top: 20px;
+        }
+        
+        .info-panel h3 {
+            margin-top: 0;
+            color: #FFD700;
+        }
+        
+        .info-panel p {
+            margin: 10px 0;
+            line-height: 1.5;
+        }
+        
+        .controls {
+            display: flex;
+            gap: 10px;
+            margin: 20px 0;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+        
+        .control-button {
+            background: linear-gradient(145deg, #FFD700, #FFA500);
+            border: none;
+            border-radius: 8px;
+            padding: 10px 20px;
+            color: #333;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(255, 215, 0, 0.3);
+        }
+        
+        .control-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(255, 215, 0, 0.4);
+        }
+        
+        .control-button:active {
+            transform: translateY(0);
+        }
+        
+        .status {
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 8px;
+            padding: 10px;
+            margin: 10px 0;
+            font-family: monospace;
+            font-size: 12px;
+        }
+    </style>
+</head>
+<body>
+    <h1>🎸 Mobile Ukulele - Physical Model Synthesis</h1>
+    
+    <div class="demo-container">
+        <div class="ukulele-container">
+            <mobile-ukulele 
+                tuning="standard" 
+                size="desktop" 
+                frets="6" 
+                show-notes="true">
+            </mobile-ukulele>
+        </div>
+        
+        <div class="controls">
+            <button class="control-button" onclick="testSingleNote()">Test Single Note</button>
+            <button class="control-button" onclick="testChord()">Test Chord</button>
+            <button class="control-button" onclick="testUpstroke()">Test Upstroke</button>
+            <button class="control-button" onclick="testDownstroke()">Test Downstroke</button>
+            <button class="control-button" onclick="changeTuning()">Change Tuning</button>
+        </div>
+        
+        <div class="info-panel">
+            <h3>🎵 Physical Model Synthesis Features</h3>
+            <p><strong>Karplus-Strong Algorithm:</strong> Uses noise source + feedback delay for realistic string resonance</p>
+            <p><strong>Natural Decay:</strong> Strings ring out naturally with realistic dampening</p>
+            <p><strong>Bright Timbre:</strong> Captures the characteristic ukulele sound</p>
+            <p><strong>Interactive:</strong> Press frets and use upstroke/downstroke buttons to play</p>
+        </div>
+        
+        <div class="status" id="status">
+            Ready - Click buttons or interact with the ukulele to test the new physical model synthesis
+        </div>
+    </div>
+
+    <!-- Load Tone.js -->
+    <script src="node_modules/tone/build/Tone.js"></script>
+    
+    <!-- Load the Mobile Ukulele component -->
+    <script type="module">
+        import MobileUkulele from './components/mobile-ukulele/mobile-ukulele.js';
+        
+        // Make functions globally available
+        window.testSingleNote = () => {
+            const ukulele = document.querySelector('mobile-ukulele');
+            ukulele.playNote(0, 2, '4n'); // A4 note
+            updateStatus('Playing single note: A4');
+        };
+        
+        window.testChord = () => {
+            const ukulele = document.querySelector('mobile-ukulele');
+            ukulele.playChord([0, 0, 0, 3], '2n'); // C major chord
+            updateStatus('Playing C major chord');
+        };
+        
+        window.testUpstroke = () => {
+            const ukulele = document.querySelector('mobile-ukulele');
+            ukulele.handleUpstroke({ target: { closest: () => ({ classList: { add: () => {}, remove: () => {} } }) } } });
+            updateStatus('Playing upstroke pattern');
+        };
+        
+        window.testDownstroke = () => {
+            const ukulele = document.querySelector('mobile-ukulele');
+            ukulele.handleDownstroke({ target: { closest: () => ({ classList: { add: () => {}, remove: () => {} } }) } });
+            updateStatus('Playing downstroke pattern');
+        };
+        
+        window.changeTuning = () => {
+            const ukulele = document.querySelector('mobile-ukulele');
+            const tunings = ['standard', 'low-g', 'baritone'];
+            const currentTuning = ukulele.tuning;
+            const nextTuning = tunings[(tunings.indexOf(currentTuning) + 1) % tunings.length];
+            ukulele.changeTuning(nextTuning);
+            updateStatus(`Changed tuning to: ${nextTuning}`);
+        };
+        
+        window.updateStatus = (message) => {
+            document.getElementById('status').textContent = new Date().toLocaleTimeString() + ' - ' + message;
+        };
+        
+        // Listen for ukulele events
+        document.addEventListener('DOMContentLoaded', () => {
+            const ukulele = document.querySelector('mobile-ukulele');
+            
+            ukulele.addEventListener('note-played', (event) => {
+                const { note, string, fret } = event.detail;
+                updateStatus(`Note played: ${note} (String ${string + 1}, Fret ${fret})`);
+            });
+            
+            ukulele.addEventListener('chord-played', (event) => {
+                const { chord, notes } = event.detail;
+                updateStatus(`Chord played: ${chord} (${notes.join(', ')})`);
+            });
+            
+            ukulele.addEventListener('upstroke-played', (event) => {
+                const { chord, notes } = event.detail;
+                updateStatus(`Upstroke played: ${chord} (${notes.join(', ')})`);
+            });
+            
+            ukulele.addEventListener('downstroke-played', (event) => {
+                const { chord, notes } = event.detail;
+                updateStatus(`Downstroke played: ${chord} (${notes.join(', ')})`);
+            });
+            
+            ukulele.addEventListener('tuning-changed', (event) => {
+                const { tuning } = event.detail;
+                updateStatus(`Tuning changed to: ${tuning}`);
+            });
+            
+            updateStatus('Mobile Ukulele with Physical Model Synthesis loaded successfully!');
+        });
+    </script>
+</body>
+</html>

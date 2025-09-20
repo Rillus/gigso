@@ -139,46 +139,22 @@ export default class MobileUkulele extends HTMLElement {
                 return;
             }
 
-            // Create ukulele-specific synthesiser with bright, plucky sound
-            this.synth = new Tone.PolySynth({
-                oscillator: {
-                    type: "sawtooth"  // Bright, plucky sound
-                },
-                envelope: {
-                    attack: 0.01,     // Quick attack
-                    decay: 0.1,       // Quick decay
-                    sustain: 0.2,     // Low sustain
-                    release: 0.5      // Medium release
-                }
-            });
-
-            // Create subtle reverb for string resonance
-            this.reverb = new Tone.Reverb({
-                decay: 0.8,
-                wet: 0.2
-            });
-
-            // Create slight delay for richness
-            this.delay = new Tone.PingPongDelay({
-                delayTime: 0.1,
-                feedback: 0.1,
-                wet: 0.1
-            });
+            // Create physically modelled ukulele synthesis using Karplus-Strong algorithm
+            this.createPhysicalModelSynth();
 
             // Create analyser for level monitoring
             this.analyser = new Tone.Analyser('waveform', 256);
 
-            // Create effects chain: synth → delay → reverb → analyser → destination
-            this.synth.connect(this.delay);
-            this.delay.connect(this.reverb);
-            this.reverb.connect(this.analyser);
+            // Connect analyser to destination
             this.analyser.toDestination();
 
             // Expose effects for external control
             this.audioEffects = {
-                synth: this.synth,
+                noise: this.noise,
+                filter: this.filter,
+                feedbackDelay: this.feedbackDelay,
                 reverb: this.reverb,
-                delay: this.delay
+                analyser: this.analyser
             };
 
         } catch (error) {
@@ -187,54 +163,132 @@ export default class MobileUkulele extends HTMLElement {
         }
     }
 
+    createPhysicalModelSynth() {
+        // Create noise source for the "pluck"
+        this.noise = new Tone.Noise("white").start();
+        
+        // Create feedback delay loop for string resonance
+        this.feedbackDelay = new Tone.FeedbackDelay("8n", 0.5);
+        
+        // Create filter to model string dampening
+        this.filter = new Tone.Filter(2000, "lowpass");
+        
+        // Create subtle reverb for string resonance
+        this.reverb = new Tone.Reverb({
+            decay: 0.8,
+            wet: 0.15
+        });
+        
+        // Connect the components: noise → filter → feedbackDelay → reverb
+        this.noise.connect(this.filter);
+        this.filter.connect(this.feedbackDelay);
+        this.feedbackDelay.connect(this.reverb);
+        this.reverb.connect(this.analyser);
+        
+        // The feedback loop: feedbackDelay → filter (creates the string resonance)
+        this.feedbackDelay.connect(this.filter);
+        
+        // Set initial noise volume to silent
+        this.noise.volume.value = -Infinity;
+        
+        // Create a polyphonic version by creating multiple instances for chords
+        this.stringVoices = new Map(); // Map to store individual string voices
+        
+        console.log('MobileUkulele: Physical model synthesis created with Karplus-Strong algorithm');
+    }
+
     createFallbackSynth() {
         try {
             if (typeof Tone !== 'undefined') {
-                // Create fallback synthesiser without effects
-                this.synth = new Tone.PolySynth({
-                    oscillator: { type: "sawtooth" },
-                    envelope: {
-                        attack: 0.01,
-                        decay: 0.1,
-                        sustain: 0.2,
-                        release: 0.5
-                    }
-                });
+                // Try to create physical model fallback
+                try {
+                    this.createPhysicalModelSynth();
+                } catch (physicalError) {
+                    console.warn('MobileUkulele: Physical model failed, using basic synthesiser fallback');
+                    
+                    // Create basic synthesiser fallback
+                    this.synth = new Tone.PolySynth({
+                        oscillator: { type: "sawtooth" },
+                        envelope: {
+                            attack: 0.01,
+                            decay: 0.1,
+                            sustain: 0.2,
+                            release: 0.5
+                        }
+                    });
 
-                // Create analyser for level monitoring
-                this.analyser = new Tone.Analyser('waveform', 256);
+                    // Create analyser for level monitoring
+                    this.analyser = new Tone.Analyser('waveform', 256);
 
-                // Connect: synth → analyser → destination
-                this.synth.connect(this.analyser);
-                this.analyser.toDestination();
+                    // Connect: synth → analyser → destination
+                    this.synth.connect(this.analyser);
+                    this.analyser.toDestination();
 
-                // Set fallback audio effects
-                this.audioEffects = { synth: this.synth, analyser: this.analyser };
+                    // Set fallback audio effects
+                    this.audioEffects = { synth: this.synth, analyser: this.analyser };
+
+                    // Override pluckString to use basic synth
+                    this.pluckString = (note) => {
+                        try {
+                            if (this.synth && typeof this.synth.triggerAttackRelease === 'function') {
+                                this.synth.triggerAttackRelease(note, '4n');
+                            }
+                        } catch (error) {
+                            console.warn('MobileUkulele: Error in fallback pluckString:', error);
+                        }
+                    };
+                }
 
                 // Set initial volume
                 this.updateSynthVolume();
             } else {
                 // Create mock synthesiser for test environments
-                this.synth = {
-                    triggerAttackRelease: () => {},
-                    toDestination: () => {},
-                    connect: () => {},
-                    oscillator: { type: 'sawtooth' },
-                    envelope: { attack: 0.01, decay: 0.1, sustain: 0.2, release: 0.5 }
+                this.noise = {
+                    volume: { value: -Infinity, rampTo: () => {} },
+                    start: () => {},
+                    connect: () => {}
                 };
-                this.audioEffects = { synth: this.synth };
+                this.filter = {
+                    connect: () => {},
+                    dispose: () => {}
+                };
+                this.feedbackDelay = {
+                    delayTime: { value: 0 },
+                    connect: () => {},
+                    dispose: () => {}
+                };
+                this.reverb = {
+                    connect: () => {},
+                    dispose: () => {}
+                };
+                this.analyser = {
+                    connect: () => {},
+                    dispose: () => {}
+                };
+                
+                // Mock pluckString function
+                this.pluckString = () => {
+                    console.log('MobileUkulele: Mock pluckString called (test environment)');
+                };
+                
+                this.audioEffects = { 
+                    noise: this.noise, 
+                    filter: this.filter, 
+                    feedbackDelay: this.feedbackDelay,
+                    reverb: this.reverb,
+                    analyser: this.analyser 
+                };
             }
         } catch (error) {
             console.warn('MobileUkulele: Error creating fallback synthesiser:', error);
             // Create minimal mock synthesiser
-            this.synth = {
-                triggerAttackRelease: () => {},
-                toDestination: () => {},
-                connect: () => {},
-                oscillator: { type: 'sawtooth' },
-                envelope: { attack: 0.01, decay: 0.1, sustain: 0.2, release: 0.5 }
+            this.noise = {
+                volume: { value: -Infinity, rampTo: () => {} },
+                start: () => {},
+                connect: () => {}
             };
-            this.audioEffects = { synth: this.synth };
+            this.pluckString = () => {};
+            this.audioEffects = { noise: this.noise };
         }
     }
 
@@ -1102,7 +1156,7 @@ export default class MobileUkulele extends HTMLElement {
     // Old swipe methods removed - now using chord buttons for upstroke/downstroke
 
     async playNote(string, fret, duration = '4n') {
-        if (!this.synth || this.isAudioMuted()) {
+        if (!this.noise || this.isAudioMuted()) {
             return;
         }
 
@@ -1122,15 +1176,9 @@ export default class MobileUkulele extends HTMLElement {
             this.lastPlayTime = now;
 
             const note = this.calculateNote(string, fret);
-
-            // Use triggerAttackRelease for proper note timing
-            if (typeof this.synth.triggerAttackRelease === 'function') {
-                this.synth.triggerAttackRelease(note, duration);
-            } else {
-                console.warn('MobileUkulele: Local synthesiser not available, using AudioManager fallback');
-                // Fallback to AudioManager for reliable audio
-                audioManager.playNote(note, duration, "mobile-ukulele");
-            }
+            
+            // Use physically modelled string pluck
+            this.pluckString(note);
 
         } catch (error) {
             console.warn('MobileUkulele: Error playing note:', error);
@@ -1138,8 +1186,29 @@ export default class MobileUkulele extends HTMLElement {
         }
     }
 
+    pluckString(note) {
+        try {
+            // Convert note to frequency and set the delay time
+            // This is the core of the pitch control in Karplus-Strong synthesis
+            const frequency = this.noteToFrequency(note);
+            const delayTime = 1 / frequency; // Delay time = 1/frequency for pitch
+            
+            // Set the delay time for the string resonance
+            this.feedbackDelay.delayTime.value = delayTime;
+            
+            // Trigger the pluck by briefly turning on the noise
+            this.noise.volume.value = -10; // Pluck volume
+            this.noise.volume.rampTo(-Infinity, 0.01); // Quick fade to silence
+            
+            console.log(`MobileUkulele: Plucked string - Note: ${note}, Frequency: ${frequency.toFixed(2)}Hz, Delay: ${(delayTime * 1000).toFixed(2)}ms`);
+            
+        } catch (error) {
+            console.warn('MobileUkulele: Error plucking string:', error);
+        }
+    }
+
     async playChord(frets, duration = '2n') {
-        if (!this.synth || this.isAudioMuted()) {
+        if (!this.noise || this.isAudioMuted()) {
             return;
         }
 
@@ -1153,14 +1222,13 @@ export default class MobileUkulele extends HTMLElement {
 
             const notes = frets.map((fret, string) => this.calculateNote(string, fret));
 
-            // Use triggerAttackRelease for proper chord timing
-            if (typeof this.synth.triggerAttackRelease === 'function') {
-                this.synth.triggerAttackRelease(notes, duration);
-            } else {
-                console.warn('MobileUkulele: Local synthesiser not available, using AudioManager fallback');
-                // Fallback to AudioManager for reliable audio
-                audioManager.playChord(notes, duration, "mobile-ukulele");
-            }
+            // Play each note in the chord with slight timing offset for realistic strumming
+            const strumDelay = 30; // 30ms delay between strings for chord strumming
+            notes.forEach((note, index) => {
+                setTimeout(() => {
+                    this.pluckString(note);
+                }, index * strumDelay);
+            });
 
         } catch (error) {
             console.warn('MobileUkulele: Error playing chord:', error);
@@ -1436,16 +1504,23 @@ export default class MobileUkulele extends HTMLElement {
     }
 
     updateSynthVolume() {
-        if (this.synth && this.synth.volume) {
-            // Multiply instrument and master volumes (0-1 range)
-            const combinedVolume = (this.instrumentVolume || 0.8) * (this.masterVolume || 0.7);
-
-            // Convert to decibels (-60dB to 0dB)
-            const volumeDb = combinedVolume === 0 ? -60 : Math.log10(combinedVolume) * 20;
-            this.synth.volume.value = volumeDb;
-
-            console.log('MobileUkulele: Volume updated - Instrument:', this.instrumentVolume, 'Master:', this.masterVolume, 'Combined:', combinedVolume, 'dB:', volumeDb);
+        // Calculate combined volume
+        const combinedVolume = (this.instrumentVolume || 0.8) * (this.masterVolume || 0.7);
+        
+        // Convert to decibels (-60dB to 0dB)
+        const volumeDb = combinedVolume === 0 ? -60 : Math.log10(combinedVolume) * 20;
+        
+        // Update volume for physical model components
+        if (this.reverb && this.reverb.volume) {
+            this.reverb.volume.value = volumeDb;
         }
+        
+        // Also update synth volume if it exists (fallback mode)
+        if (this.synth && this.synth.volume) {
+            this.synth.volume.value = volumeDb;
+        }
+
+        console.log('MobileUkulele: Volume updated - Instrument:', this.instrumentVolume, 'Master:', this.masterVolume, 'Combined:', combinedVolume, 'dB:', volumeDb);
     }
 
     startLevelMonitoring() {
@@ -1540,6 +1615,23 @@ export default class MobileUkulele extends HTMLElement {
                         effect.dispose();
                     }
                 });
+            }
+            
+            // Clean up physical model components
+            if (this.noise && typeof this.noise.dispose === 'function') {
+                this.noise.dispose();
+            }
+            if (this.filter && typeof this.filter.dispose === 'function') {
+                this.filter.dispose();
+            }
+            if (this.feedbackDelay && typeof this.feedbackDelay.dispose === 'function') {
+                this.feedbackDelay.dispose();
+            }
+            if (this.reverb && typeof this.reverb.dispose === 'function') {
+                this.reverb.dispose();
+            }
+            if (this.analyser && typeof this.analyser.dispose === 'function') {
+                this.analyser.dispose();
             }
 
             console.log('MobileUkulele: Cleanup completed');

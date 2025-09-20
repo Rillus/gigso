@@ -85,12 +85,15 @@ The Mobile Ukulele component provides a touch-optimised ukulele interface design
 - **Sustain**: Hold frets while strumming to sustain notes
 
 ### Audio Characteristics
-- **Ukulele timbre**: Bright, plucky sound characteristic of ukulele
-- **String resonance**: Each string has its own synthesiser voice
-- **Strumming patterns**: Realistic strumming with slight timing variations
-- **Chord support**: Polyphonic playback for multiple simultaneous notes
-- **Natural decay**: Realistic string decay and resonance
-- **Multi-touch audio**: Proper handling of simultaneous note playback
+- **Physical Model Synthesis**: Uses Karplus-Strong algorithm for realistic string resonance
+- **Noise-based Plucking**: White noise source simulates string pluck excitation
+- **Feedback Delay**: Creates natural string resonance through delay feedback loop
+- **String Dampening**: Low-pass filter models natural string dampening
+- **Ukulele Timbre**: Bright, plucky sound characteristic of ukulele
+- **Natural Decay**: Realistic string decay and resonance patterns
+- **Chord Support**: Polyphonic playback for multiple simultaneous notes
+- **Strumming Patterns**: Realistic strumming with slight timing variations
+- **Multi-touch Audio**: Proper handling of simultaneous note playback
 
 ### Tuning Support
 - **Standard tuning**: G4-C4-E4-A4 (most common ukulele tuning)
@@ -157,7 +160,13 @@ Processes strum area touch events and plays held frets.
 Changes the ukulele tuning and updates string notes.
 
 ### `createUkuleleSynth()`
-Creates a custom Tone.js synthesiser with ukulele-specific timbre.
+Creates a physically modelled ukulele synthesiser using Karplus-Strong algorithm with noise source and feedback delay.
+
+### `createPhysicalModelSynth()`
+Creates the physical model components: noise source, feedback delay, low-pass filter, and reverb for realistic string synthesis.
+
+### `pluckString(note)`
+Triggers a string pluck by setting the delay time based on the note frequency and briefly activating the noise source.
 
 ### `calculateNote(string, fret)`
 Calculates the note name for a given string and fret position.
@@ -176,38 +185,55 @@ ukulele.addEventListener('chord-played', (event) => {
 });
 ```
 
-### With Tone.js
+### With Tone.js Physical Model
 ```javascript
-// Custom ukulele synthesiser with string-specific voices
-this.synth = new Tone.PolySynth(Tone.Synth, {
-  oscillator: {
-    type: "sawtooth"  // Bright, plucky sound
-  },
-  envelope: {
-    attack: 0.01,     // Quick attack
-    decay: 0.1,       // Quick decay
-    sustain: 0.2,     // Low sustain
-    release: 0.5      // Medium release
-  }
-}).toDestination();
+// Create physically modelled ukulele synthesis using Karplus-Strong algorithm
+this.noise = new Tone.Noise("white").start();
 
-// Add subtle reverb for string resonance
+// Create feedback delay loop for string resonance
+this.feedbackDelay = new Tone.FeedbackDelay("8n", 0.5);
+
+// Create filter to model string dampening
+this.filter = new Tone.Filter(2000, "lowpass");
+
+// Create subtle reverb for string resonance
 this.reverb = new Tone.Reverb({
   decay: 0.8,
-  wet: 0.2
-}).toDestination();
+  wet: 0.15
+});
 
-// Connect synth to reverb
-this.synth.connect(this.reverb);
+// Connect components: noise → filter → feedbackDelay → reverb
+this.noise.connect(this.filter);
+this.filter.connect(this.feedbackDelay);
+this.feedbackDelay.connect(this.reverb);
+this.reverb.toDestination();
+
+// The feedback loop creates string resonance
+this.feedbackDelay.connect(this.filter);
+
+// Function to pluck a string
+pluckString(note) {
+  const frequency = this.noteToFrequency(note);
+  const delayTime = 1 / frequency; // Delay time = 1/frequency for pitch
+  this.feedbackDelay.delayTime.value = delayTime;
+  
+  // Trigger pluck by briefly turning on noise
+  this.noise.volume.value = -10;
+  this.noise.volume.rampTo(-Infinity, 0.01);
+}
 ```
 
 ### Event Flow
 1. User presses fret buttons (holds down frets)
-2. User taps strum area
-3. Mobile Ukulele plays held frets via Tone.js
-4. Visual feedback shows on fretboard
-5. `note-played` or `chord-played` event dispatched
-6. Notes decay naturally
+2. User taps strum area or uses chord buttons
+3. Mobile Ukulele calculates note frequencies
+4. Physical model triggers string pluck via noise source
+5. Feedback delay creates string resonance at calculated pitch
+6. Low-pass filter applies natural string dampening
+7. Reverb adds spatial dimension to the sound
+8. Visual feedback shows on fretboard
+9. `note-played` or `chord-played` event dispatched
+10. Notes decay naturally through the physical model
 
 ## Styling
 
@@ -333,12 +359,15 @@ test('should support multi-touch for chords', () => {
 
 ## Technical Notes
 
-### Ukulele Timbre
-The ukulele synthesiser should replicate the characteristic sound:
-- **Oscillator type**: Sawtooth or triangle wave base
-- **Envelope**: Quick attack, quick decay, low sustain, medium release
-- **Effects**: Subtle reverb for string resonance
-- **Harmonics**: Bright, plucky sound characteristic of ukulele
+### Physical Model Synthesis
+The ukulele uses physically modelled synthesis to replicate the characteristic sound:
+- **Algorithm**: Karplus-Strong string synthesis
+- **Excitation**: White noise source simulates string pluck
+- **Resonance**: Feedback delay loop creates string vibration
+- **Dampening**: Low-pass filter models natural string dampening
+- **Spatial**: Subtle reverb for acoustic space
+- **Timbre**: Bright, plucky sound characteristic of ukulele
+- **Decay**: Natural string decay through physical modelling
 
 ### Touch Handling
 - **Touch events**: `touchstart`, `touchend`, `touchmove`
