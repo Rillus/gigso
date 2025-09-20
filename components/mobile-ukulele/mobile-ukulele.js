@@ -682,10 +682,10 @@ export default class MobileUkulele extends HTMLElement {
         const stringElements = this.strings.map((stringNote, stringIndex) => {
             const fretButtonsForString = [];
 
-            // Create fret buttons for this string
-            for (let fretIndex = 0; fretIndex <= this.frets; fretIndex++) {
+            // Create fret buttons for this string (starting from fret 1, since fret 0 is open string)
+            for (let fretIndex = 1; fretIndex <= this.frets; fretIndex++) {
                 const note = this.calculateNote(stringIndex, fretIndex);
-                const position = (fretIndex / this.frets) * 100;
+                const position = ((fretIndex - 1) / (this.frets - 1)) * 100;
 
                 fretButtonsForString.push(`
                     <div
@@ -715,7 +715,7 @@ export default class MobileUkulele extends HTMLElement {
         // Add fret markers at common positions
         const fretMarkers = [3, 5].map(fretNum => {
             if (fretNum <= this.frets) {
-                const position = (fretNum / this.frets) * 100;
+                const position = ((fretNum - 1) / (this.frets - 1)) * 100;
                 return `<div class="fret-marker" style="left: ${position}%"></div>`;
             }
             return '';
@@ -724,7 +724,7 @@ export default class MobileUkulele extends HTMLElement {
         // Add fret lines
         const fretLines = [];
         for (let fretIndex = 1; fretIndex <= this.frets; fretIndex++) {
-            const position = (fretIndex / this.frets) * 100;
+            const position = ((fretIndex - 1) / (this.frets - 1)) * 100;
             fretLines.push(`<div class="fret-line" style="left: ${position}%"></div>`);
         }
 
@@ -1270,7 +1270,7 @@ export default class MobileUkulele extends HTMLElement {
         // Highlight the specified frets
         if (frets && Array.isArray(frets)) {
             frets.forEach((fret, string) => {
-                if (fret >= 0) {
+                if (fret > 0) { // Only highlight frets 1 and above (fret 0 is open string)
                     const button = this.shadowRoot.querySelector(
                         `.fret-button[data-string="${string}"][data-fret="${fret}"]`
                     );

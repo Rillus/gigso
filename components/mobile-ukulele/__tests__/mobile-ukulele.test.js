@@ -188,7 +188,7 @@ describe('MobileUkulele', () => {
 
         test('should render fret buttons for each string', () => {
             const fretButtons = mobileUkulele.shadowRoot.querySelectorAll('.fret-button');
-            expect(fretButtons.length).toBe(4 * (mobileUkulele.frets + 1)); // 4 strings * (frets + open)
+            expect(fretButtons.length).toBe(4 * mobileUkulele.frets); // 4 strings * frets (no fret 0)
         });
 
         test('should render strum zones for each string', () => {
@@ -478,21 +478,21 @@ describe('MobileUkulele', () => {
             const frets = [0, 0, 1, 3]; // Example chord
             mobileUkulele.highlightChord('C', frets);
 
-            // Check that correct fret buttons are highlighted
+            // Check that correct fret buttons are highlighted (only frets > 0)
             const highlightedButtons = mobileUkulele.shadowRoot.querySelectorAll('.fret-button.highlighted');
-            expect(highlightedButtons.length).toBe(4); // One for each string
+            expect(highlightedButtons.length).toBe(2); // Only frets 1 and 3 (fret 0 is open string)
         });
 
         test('should clear existing highlights before highlighting new chord', () => {
             // Highlight first chord
             mobileUkulele.highlightChord('C', [0, 0, 1, 3]);
             let highlighted = mobileUkulele.shadowRoot.querySelectorAll('.fret-button.highlighted');
-            expect(highlighted.length).toBe(4);
+            expect(highlighted.length).toBe(2); // Only frets 1 and 3
 
             // Highlight different chord
             mobileUkulele.highlightChord('G', [3, 2, 0, 3]);
             highlighted = mobileUkulele.shadowRoot.querySelectorAll('.fret-button.highlighted');
-            expect(highlighted.length).toBe(4); // Should still be 4, but different buttons
+            expect(highlighted.length).toBe(3); // frets 3, 2, and 3 (three highlighted buttons)
         });
 
         test('should handle negative frets in chord highlighting', () => {
@@ -500,7 +500,7 @@ describe('MobileUkulele', () => {
             mobileUkulele.highlightChord('Partial', frets);
 
             const highlightedButtons = mobileUkulele.shadowRoot.querySelectorAll('.fret-button.highlighted');
-            expect(highlightedButtons.length).toBe(3); // Only 3 strings played
+            expect(highlightedButtons.length).toBe(2); // Only frets 1 and 3 highlighted (not -1 or 0)
         });
     });
 
