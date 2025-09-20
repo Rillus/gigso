@@ -601,7 +601,8 @@ describe('MobileUkulele', () => {
                 x: 250,
                 y: 120,
                 touchId: 0,
-                time: expect.any(Number)
+                time: expect.any(Number),
+                initialString: expect.any(Number)
             });
             expect(mobileUkulele.swipeActive).toBe(false);
         });
@@ -642,7 +643,8 @@ describe('MobileUkulele', () => {
                 x: 250,
                 y: 120,
                 touchId: 0,
-                time: expect.any(Number)
+                time: expect.any(Number),
+                initialString: expect.any(Number)
             });
             expect(mobileUkulele.swipeActive).toBe(false);
         });

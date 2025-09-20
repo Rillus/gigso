@@ -33,6 +33,8 @@ export default class MobileUkulele extends HTMLElement {
         this.swipeStartPosition = null;
         this.swipeActive = false;
         this.swipedStrings = new Set(); // Track which strings have been swiped
+        this.lastStrumTime = 0;
+        this.strumThrottleMs = 80; // Minimum time between strum triggers during swipe
 
         // Audio properties
         this.instrumentVolume = 0.8;
@@ -991,31 +993,36 @@ export default class MobileUkulele extends HTMLElement {
         if (this.isMuted) return;
 
         console.log('MobileUkulele: Strum area touch start');
-        
+
         // Find the first touch that's not already being tracked for frets
         if (event.touches && event.touches.length > 0) {
             for (let i = 0; i < event.touches.length; i++) {
                 const touch = event.touches[i];
-                
+
                 // Check if this touch is already being tracked for fret interaction
-                const isFretTouch = Array.from(this.activeTouches.values()).some(activeTouch => 
+                const isFretTouch = Array.from(this.activeTouches.values()).some(activeTouch =>
                     activeTouch.touchId === touch.identifier
                 );
-                
+
                 // If this is a new touch not used for frets, use it for swipe detection
                 if (!isFretTouch) {
+                    const initialString = this.getStringFromTouchPosition(touch);
+
                     this.swipeStartPosition = {
                         x: touch.clientX,
                         y: touch.clientY,
                         touchId: touch.identifier,
-                        time: Date.now()
+                        time: Date.now(),
+                        initialString: initialString
                     };
                     this.swipeActive = false;
                     this.swipedStrings.clear();
-                    
-                    // Trigger initial strum for the string we started on
-                    const initialString = this.getStringFromTouchPosition(touch);
+                    this.lastStrumTime = 0; // Reset throttling for new touch
+
+                    // Only trigger initial strum and mark string as swiped
                     if (initialString !== null) {
+                        this.swipedStrings.add(initialString);
+                        this.lastStrumTime = Date.now();
                         this.handleStrum(event, initialString);
                     }
                     break;
@@ -1036,23 +1043,27 @@ export default class MobileUkulele extends HTMLElement {
                     break;
                 }
             }
-            
+
             if (!swipeTouch) return;
-            
+
             const deltaX = Math.abs(swipeTouch.clientX - this.swipeStartPosition.x);
             const deltaY = Math.abs(swipeTouch.clientY - this.swipeStartPosition.y);
 
-            // Detect if this is a swipe (movement threshold)
-            if (deltaX > 10 || deltaY > 10) {
+            // Detect if this is a swipe (lower threshold for better responsiveness)
+            if (deltaX > 5 || deltaY > 5) {
                 this.swipeActive = true;
             }
 
-            // If swiping, determine which string we're over
-            if (this.swipeActive) {
-                const currentString = this.getStringFromTouchPosition(swipeTouch);
-                if (currentString !== null && !this.swipedStrings.has(currentString)) {
-                    console.log('MobileUkulele: Swipe detected over string:', currentString);
+            // Always check the current string position, regardless of swipe state
+            // This enables press-and-drag functionality
+            const currentString = this.getStringFromTouchPosition(swipeTouch);
+            if (currentString !== null && !this.swipedStrings.has(currentString)) {
+                // Apply throttling during active swipes to prevent too many rapid notes
+                const now = Date.now();
+                if (!this.swipeActive || (now - this.lastStrumTime) >= this.strumThrottleMs) {
+                    console.log('MobileUkulele: Touch detected over string:', currentString);
                     this.swipedStrings.add(currentString);
+                    this.lastStrumTime = now;
                     this.handleStrum(event, currentString);
                 }
             }
