@@ -29,12 +29,8 @@ export default class MobileUkulele extends HTMLElement {
         this.lastPlayTime = 0;
         this.minPlayInterval = 50; // Minimum time between note triggers (ms)
 
-        // Swipe detection state
-        this.swipeStartPosition = null;
-        this.swipeActive = false;
-        this.swipedStrings = new Set(); // Track which strings have been swiped
-        this.lastStrumTime = 0;
-        this.strumThrottleMs = 80; // Minimum time between strum triggers during swipe
+        // Chord playing state
+        this.chordPlaybackDelay = 40; // Delay between strings in chord strumming (ms)
 
         // Audio properties
         this.instrumentVolume = 0.8;
@@ -246,7 +242,7 @@ export default class MobileUkulele extends HTMLElement {
         console.log('MobileUkulele: Rendering component');
 
         const fretboard = this.createFretboard();
-        const strumArea = this.createStrumArea();
+        const chordArea = this.createChordArea();
         const audioStatus = this.getAudioStatusIndicator();
 
         this.shadowRoot.innerHTML = `
@@ -444,7 +440,7 @@ export default class MobileUkulele extends HTMLElement {
                     box-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
                 }
 
-                .strum-area {
+                .chord-area {
                     flex: 1;
                     min-width: 80px;
                     background: linear-gradient(145deg,
@@ -454,8 +450,9 @@ export default class MobileUkulele extends HTMLElement {
                     border-radius: 8px;
                     display: flex;
                     flex-direction: column;
-                    justify-content: space-between;
-                    padding: 15px 10px;
+                    justify-content: center;
+                    gap: 15px;
+                    padding: 20px 10px;
                     box-shadow:
                         inset 0 0 10px rgba(101, 67, 33, 0.4),
                         0 2px 8px rgba(0, 0, 0, 0.2);
@@ -463,66 +460,63 @@ export default class MobileUkulele extends HTMLElement {
                     overflow: hidden;
                 }
 
-                .strum-area::before {
-                    content: '';
-                    position: absolute;
-                    top: 10px;
-                    bottom: 10px;
-                    left: 50%;
-                    width: 2px;
-                    background: linear-gradient(180deg,
-                        transparent 0%,
-                        #D2691E 20%,
-                        #CD853F 50%,
-                        #D2691E 80%,
-                        transparent 100%);
-                    transform: translateX(-50%);
-                    z-index: 1;
-                }
-
-                .strum-zone {
+                .chord-button {
                     flex: 1;
-                    margin: 2px 0;
-                    background: radial-gradient(ellipse at center,
+                    min-height: 50px;
+                    background: linear-gradient(145deg,
                         rgba(255, 255, 255, 0.1) 0%,
-                        rgba(255, 255, 255, 0.05) 30%,
-                        transparent 60%);
-                    border: 1px solid rgba(139, 69, 19, 0.3);
-                    border-radius: 4px;
-                    cursor: pointer;
-                    transition: all 0.2s ease;
+                        rgba(255, 255, 255, 0.05) 50%,
+                        transparent 100%);
+                    border: 2px solid rgba(255, 255, 255, 0.2);
+                    border-radius: 12px;
                     display: flex;
+                    flex-direction: column;
                     align-items: center;
                     justify-content: center;
-                    font-size: 10px;
-                    font-weight: bold;
-                    color: rgba(255, 255, 255, 0.7);
-                    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
-                    z-index: 2;
-                    position: relative;
+                    color: #FFE4B5;
+                    font-weight: 600;
+                    font-size: 12px;
+                    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+                    cursor: pointer;
+                    transition: all 0.15s ease;
+                    user-select: none;
+                    touch-action: manipulation;
+                    outline: none;
                 }
 
-                .strum-zone:hover {
-                    background: radial-gradient(ellipse at center,
-                        rgba(255, 215, 0, 0.2) 0%,
-                        rgba(255, 215, 0, 0.1) 30%,
-                        transparent 60%);
-                    border-color: rgba(255, 215, 0, 0.5);
-                    transform: scale(1.05);
-                    box-shadow: 0 2px 6px rgba(255, 215, 0, 0.3);
+                .chord-button:hover {
+                    background: linear-gradient(145deg,
+                        rgba(255, 255, 255, 0.2) 0%,
+                        rgba(255, 255, 255, 0.1) 50%,
+                        rgba(255, 255, 255, 0.05) 100%);
+                    border-color: rgba(255, 255, 255, 0.4);
+                    color: #FFF;
+                    transform: scale(1.02);
                 }
 
-                .strum-zone.active {
-                    background: radial-gradient(ellipse at center,
-                        rgba(255, 215, 0, 0.4) 0%,
-                        rgba(255, 165, 0, 0.2) 30%,
-                        transparent 60%);
-                    border-color: #FFD700;
-                    transform: scale(0.95);
+                .chord-button:active,
+                .chord-button.active {
+                    background: linear-gradient(145deg,
+                        rgba(255, 215, 0, 0.3) 0%,
+                        rgba(255, 215, 0, 0.2) 50%,
+                        rgba(255, 215, 0, 0.1) 100%);
+                    border-color: rgba(255, 215, 0, 0.6);
+                    color: #FFD700;
+                    transform: scale(0.98);
                     box-shadow:
-                        inset 0 2px 4px rgba(255, 140, 0, 0.3),
-                        0 0 8px rgba(255, 215, 0, 0.5);
-                    animation: strumPulse 0.3s ease-out;
+                        inset 0 0 10px rgba(255, 215, 0, 0.3),
+                        0 0 15px rgba(255, 215, 0, 0.4);
+                }
+
+                .chord-button-icon {
+                    font-size: 20px;
+                    font-weight: bold;
+                    margin-bottom: 4px;
+                }
+
+                .chord-button-label {
+                    font-size: 10px;
+                    opacity: 0.8;
                 }
 
                 @keyframes strumPulse {
@@ -606,12 +600,17 @@ export default class MobileUkulele extends HTMLElement {
                         font-size: 7px;
                     }
 
-                    .strum-area {
+                    .chord-area {
                         width: 100px;
                     }
 
-                    .strum-zone {
+                    .chord-button {
+                        min-height: 40px;
                         font-size: 9px;
+                    }
+
+                    .chord-button-icon {
+                        font-size: 16px;
                     }
                 }
 
@@ -627,13 +626,18 @@ export default class MobileUkulele extends HTMLElement {
                         font-size: 6px;
                     }
 
-                    .strum-area {
+                    .chord-area {
                         width: 80px;
                         padding: 10px 8px;
                     }
 
-                    .strum-zone {
+                    .chord-button {
+                        min-height: 35px;
                         font-size: 8px;
+                    }
+
+                    .chord-button-icon {
+                        font-size: 14px;
                     }
                 }
 
@@ -650,13 +654,18 @@ export default class MobileUkulele extends HTMLElement {
                         font-size: 6px;
                     }
 
-                    .strum-area {
+                    .chord-area {
                         width: 70px;
                         padding: 8px 6px;
                     }
 
-                    .strum-zone {
+                    .chord-button {
+                        min-height: 30px;
                         font-size: 7px;
+                    }
+
+                    .chord-button-icon {
+                        font-size: 12px;
                     }
 
                     .string {
@@ -667,7 +676,7 @@ export default class MobileUkulele extends HTMLElement {
 
             <div class="mobile-ukulele ${this.size}">
                 ${fretboard}
-                ${strumArea}
+                ${chordArea}
                 ${audioStatus}
             </div>
         `;
@@ -741,24 +750,29 @@ export default class MobileUkulele extends HTMLElement {
         `;
     }
 
-    createStrumArea() {
-        const strumZones = this.strings.map((stringNote, stringIndex) => {
-            return `
-                <div
-                    class="strum-zone"
-                    data-string="${stringIndex}"
+    createChordArea() {
+        return `
+            <div class="chord-area">
+                <button
+                    class="chord-button upstroke"
+                    id="upstroke-button"
                     role="button"
                     tabindex="0"
-                    aria-label="Strum string ${stringIndex + 1} (${stringNote.replace(/\d/, '')})"
+                    aria-label="Play upstroke chord (A-E-C-G)"
                 >
-                    ${stringNote.replace(/\d/, '')}
-                </div>
-            `;
-        }).join('');
-
-        return `
-            <div class="strum-area">
-                ${strumZones}
+                    <div class="chord-button-icon">↑</div>
+                    <div class="chord-button-label">Up</div>
+                </button>
+                <button
+                    class="chord-button downstroke"
+                    id="downstroke-button"
+                    role="button"
+                    tabindex="0"
+                    aria-label="Play downstroke chord (G-C-E-A)"
+                >
+                    <div class="chord-button-icon">↓</div>
+                    <div class="chord-button-label">Down</div>
+                </button>
             </div>
         `;
     }
@@ -778,8 +792,9 @@ export default class MobileUkulele extends HTMLElement {
 
     updateUIReferences() {
         this.fretButtons = this.shadowRoot.querySelectorAll('.fret-button');
-        this.strumArea = this.shadowRoot.querySelector('.strum-area');
-        this.strumZones = this.shadowRoot.querySelectorAll('.strum-zone');
+        this.chordArea = this.shadowRoot.querySelector('.chord-area');
+        this.upstrokeButton = this.shadowRoot.querySelector('#upstroke-button');
+        this.downstrokeButton = this.shadowRoot.querySelector('#downstroke-button');
     }
 
     addEventListeners() {
@@ -824,50 +839,50 @@ export default class MobileUkulele extends HTMLElement {
             });
         });
 
-        // Add event listeners to strum zones
-        this.strumZones.forEach(zone => {
-            const string = parseInt(zone.getAttribute('data-string'));
-
-            // Touch events for mobile - simplified since global strum area handlers manage swipe detection
-            zone.addEventListener('touchstart', (event) => {
-                // Let the global strum area handler manage this
-                // This prevents double-handling of touch events
+        // Add event listeners to chord buttons
+        if (this.upstrokeButton) {
+            // Touch events
+            this.upstrokeButton.addEventListener('touchstart', (event) => {
+                event.preventDefault();
+                this.handleUpstroke(event);
             });
 
-            // Mouse events for desktop
-            zone.addEventListener('mousedown', (event) => {
-                this.handleStrum(event, string);
+            // Mouse events
+            this.upstrokeButton.addEventListener('mousedown', (event) => {
+                this.handleUpstroke(event);
             });
 
-            // Keyboard events for accessibility
-            zone.addEventListener('keydown', (event) => {
+            // Keyboard events
+            this.upstrokeButton.addEventListener('keydown', (event) => {
                 if (event.key === 'Enter' || event.key === ' ') {
                     event.preventDefault();
-                    this.handleStrum(event, string);
+                    this.handleUpstroke(event);
                 }
             });
-        });
-
-        // Add global touch listeners to the strum area for better swipe detection
-        if (this.strumArea) {
-            // Touch start - initialize swipe detection even when other touches are active
-            this.strumArea.addEventListener('touchstart', (event) => {
-                event.preventDefault();
-                this.handleStrumAreaTouchStart(event);
-            }, { passive: false });
-
-            // Touch move - handle swipe detection across the entire strum area
-            this.strumArea.addEventListener('touchmove', (event) => {
-                event.preventDefault();
-                this.handleStrumAreaTouchMove(event);
-            }, { passive: false });
-
-            // Touch end - cleanup swipe state
-            this.strumArea.addEventListener('touchend', (event) => {
-                event.preventDefault();
-                this.handleStrumAreaTouchEnd(event);
-            }, { passive: false });
         }
+
+        if (this.downstrokeButton) {
+            // Touch events
+            this.downstrokeButton.addEventListener('touchstart', (event) => {
+                event.preventDefault();
+                this.handleDownstroke(event);
+            });
+
+            // Mouse events
+            this.downstrokeButton.addEventListener('mousedown', (event) => {
+                this.handleDownstroke(event);
+            });
+
+            // Keyboard events
+            this.downstrokeButton.addEventListener('keydown', (event) => {
+                if (event.key === 'Enter' || event.key === ' ') {
+                    event.preventDefault();
+                    this.handleDownstroke(event);
+                }
+            });
+        }
+
+        // Chord area is handled by individual button event listeners above
 
         // Add click handler for audio status indicator
         const audioIndicator = this.shadowRoot.getElementById('audioStatusIndicator');
@@ -986,131 +1001,105 @@ export default class MobileUkulele extends HTMLElement {
         }
     }
 
-    // Legacy methods - now handled by global strum area handlers
-    // Keeping for backwards compatibility but not used in new implementation
-
-    handleStrumAreaTouchStart(event) {
+    async handleUpstroke(event) {
         if (this.isMuted) return;
 
-        console.log('MobileUkulele: Strum area touch start');
+        console.log('MobileUkulele: Upstroke triggered');
 
-        // Find the first touch that's not already being tracked for frets
-        if (event.touches && event.touches.length > 0) {
-            for (let i = 0; i < event.touches.length; i++) {
-                const touch = event.touches[i];
-
-                // Check if this touch is already being tracked for fret interaction
-                const isFretTouch = Array.from(this.activeTouches.values()).some(activeTouch =>
-                    activeTouch.touchId === touch.identifier
-                );
-
-                // If this is a new touch not used for frets, use it for swipe detection
-                if (!isFretTouch) {
-                    const initialString = this.getStringFromTouchPosition(touch);
-
-                    this.swipeStartPosition = {
-                        x: touch.clientX,
-                        y: touch.clientY,
-                        touchId: touch.identifier,
-                        time: Date.now(),
-                        initialString: initialString
-                    };
-                    this.swipeActive = false;
-                    this.swipedStrings.clear();
-                    this.lastStrumTime = 0; // Reset throttling for new touch
-
-                    // Only trigger initial strum and mark string as swiped
-                    if (initialString !== null) {
-                        this.swipedStrings.add(initialString);
-                        this.lastStrumTime = Date.now();
-                        this.handleStrum(event, initialString);
-                    }
-                    break;
-                }
-            }
+        // Add visual feedback to button
+        const button = event.target.closest('.chord-button');
+        if (button) {
+            button.classList.add('active');
+            setTimeout(() => {
+                button.classList.remove('active');
+            }, 200);
         }
+
+        // Play chord in upstroke order: A-E-C-G (string indices 0,1,2,3)
+        const upstrokeOrder = [0, 1, 2, 3]; // A-E-C-G
+        const chordNotes = [];
+        const chordFrets = [];
+
+        // Calculate notes for each string
+        for (let i = 0; i < this.strings.length; i++) {
+            const fret = this.pressedFrets.get(i) || 0;
+            chordNotes.push(this.calculateNote(i, fret));
+            chordFrets.push(fret);
+        }
+
+        // Play notes with slight delay between each string
+        const strumDelay = 40; // 40ms delay between strings
+        for (let i = 0; i < upstrokeOrder.length; i++) {
+            const stringIndex = upstrokeOrder[i];
+            const fret = this.pressedFrets.get(stringIndex) || 0;
+
+            setTimeout(async () => {
+                await this.playNote(stringIndex, fret, '4n');
+            }, i * strumDelay);
+        }
+
+        // Dispatch upstroke event
+        this.dispatchEvent(new CustomEvent('upstroke-played', {
+            detail: {
+                direction: 'up',
+                chord: this.identifyChord(chordNotes),
+                notes: chordNotes,
+                frets: chordFrets,
+                order: upstrokeOrder
+            }
+        }));
     }
 
-    handleStrumAreaTouchMove(event) {
-        if (!this.swipeStartPosition || this.isMuted) return;
+    async handleDownstroke(event) {
+        if (this.isMuted) return;
 
-        if (event.touches && event.touches.length > 0) {
-            // Find the touch that matches our swipe start touch ID
-            let swipeTouch = null;
-            for (let i = 0; i < event.touches.length; i++) {
-                if (event.touches[i].identifier === this.swipeStartPosition.touchId) {
-                    swipeTouch = event.touches[i];
-                    break;
-                }
-            }
+        console.log('MobileUkulele: Downstroke triggered');
 
-            if (!swipeTouch) return;
-
-            const deltaX = Math.abs(swipeTouch.clientX - this.swipeStartPosition.x);
-            const deltaY = Math.abs(swipeTouch.clientY - this.swipeStartPosition.y);
-
-            // Detect if this is a swipe (lower threshold for better responsiveness)
-            if (deltaX > 5 || deltaY > 5) {
-                this.swipeActive = true;
-            }
-
-            // Always check the current string position, regardless of swipe state
-            // This enables press-and-drag functionality
-            const currentString = this.getStringFromTouchPosition(swipeTouch);
-            if (currentString !== null && !this.swipedStrings.has(currentString)) {
-                // Apply throttling during active swipes to prevent too many rapid notes
-                const now = Date.now();
-                if (!this.swipeActive || (now - this.lastStrumTime) >= this.strumThrottleMs) {
-                    console.log('MobileUkulele: Touch detected over string:', currentString);
-                    this.swipedStrings.add(currentString);
-                    this.lastStrumTime = now;
-                    this.handleStrum(event, currentString);
-                }
-            }
+        // Add visual feedback to button
+        const button = event.target.closest('.chord-button');
+        if (button) {
+            button.classList.add('active');
+            setTimeout(() => {
+                button.classList.remove('active');
+            }, 200);
         }
+
+        // Play chord in downstroke order: G-C-E-A (string indices 3,2,1,0)
+        const downstrokeOrder = [3, 2, 1, 0]; // G-C-E-A
+        const chordNotes = [];
+        const chordFrets = [];
+
+        // Calculate notes for each string
+        for (let i = 0; i < this.strings.length; i++) {
+            const fret = this.pressedFrets.get(i) || 0;
+            chordNotes.push(this.calculateNote(i, fret));
+            chordFrets.push(fret);
+        }
+
+        // Play notes with slight delay between each string
+        const strumDelay = 40; // 40ms delay between strings
+        for (let i = 0; i < downstrokeOrder.length; i++) {
+            const stringIndex = downstrokeOrder[i];
+            const fret = this.pressedFrets.get(stringIndex) || 0;
+
+            setTimeout(async () => {
+                await this.playNote(stringIndex, fret, '4n');
+            }, i * strumDelay);
+        }
+
+        // Dispatch downstroke event
+        this.dispatchEvent(new CustomEvent('downstroke-played', {
+            detail: {
+                direction: 'down',
+                chord: this.identifyChord(chordNotes),
+                notes: chordNotes,
+                frets: chordFrets,
+                order: downstrokeOrder
+            }
+        }));
     }
 
-    handleStrumAreaTouchEnd(event) {
-        if (!this.swipeStartPosition) return;
-
-        console.log('MobileUkulele: Strum area touch end');
-        
-        // Check if our swipe touch ended
-        if (event.changedTouches && event.changedTouches.length > 0) {
-            for (let i = 0; i < event.changedTouches.length; i++) {
-                if (event.changedTouches[i].identifier === this.swipeStartPosition.touchId) {
-                    // Reset swipe detection state
-                    this.swipeStartPosition = null;
-                    this.swipeActive = false;
-                    this.swipedStrings.clear();
-                    break;
-                }
-            }
-        }
-    }
-
-    getStringFromTouchPosition(touch) {
-        if (!this.strumArea) return null;
-
-        // Get the strum area's bounding rectangle
-        const strumAreaRect = this.strumArea.getBoundingClientRect();
-        
-        // Calculate relative Y position within the strum area
-        const relativeY = touch.clientY - strumAreaRect.top;
-        const strumAreaHeight = strumAreaRect.height;
-        
-        // Calculate which string zone the touch is in
-        // Each string takes up 1/4 of the strum area height
-        const stringHeight = strumAreaHeight / this.strings.length;
-        const stringIndex = Math.floor(relativeY / stringHeight);
-        
-        // Clamp to valid string indices
-        if (stringIndex >= 0 && stringIndex < this.strings.length) {
-            return stringIndex;
-        }
-        
-        return null;
-    }
+    // Old swipe methods removed - now using chord buttons for upstroke/downstroke
 
     async playNote(string, fret, duration = '4n') {
         if (!this.synth || this.isAudioMuted()) {
@@ -1542,11 +1531,7 @@ export default class MobileUkulele extends HTMLElement {
                 });
             }
 
-            if (this.strumArea) {
-                this.strumArea.removeEventListener('touchstart', this.handleStrumAreaTouchStart);
-                this.strumArea.removeEventListener('touchmove', this.handleStrumAreaTouchMove);
-                this.strumArea.removeEventListener('touchend', this.handleStrumAreaTouchEnd);
-            }
+            // Chord button cleanup is handled automatically when shadowRoot is cleared
 
             // Clean up audio effects if they exist
             if (this.audioEffects) {
